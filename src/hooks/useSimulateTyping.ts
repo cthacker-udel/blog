@@ -2,20 +2,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- disabled */
 import React from "react";
 
-import { findStylesheet } from "@/common";
-
 type useSimulateTypingProperties = {
     cssClassName: string;
     content: string;
     intervalStart?: number;
     intervalEnd?: number;
     ref: React.RefObject<HTMLElement>;
-};
-
-type TypingState = {
-    currentlyTyping: boolean;
-    started: boolean;
-    finished: boolean;
 };
 
 /**
@@ -53,19 +45,7 @@ export const useSimulateTyping = ({
 
     React.useEffect(() => {
         if (ref.current !== null && started) {
-            const hasNotStartedTyping =
-                ref.current.getAttribute("typing") === "F";
-            if (hasNotStartedTyping) {
-                console.log("in if");
-                const styleSheet = findStylesheet(
-                    ref.current.className,
-                    document.styleSheets,
-                );
-                if (styleSheet !== undefined) {
-                    ref.current.style.width = `${styleSheet.fontSize}`;
-                }
-                ref.current.style.transition = `${ref.current.style.transition} border-right .5s ease-in-out`;
-            }
+            ref.current.style.transition = `${ref.current.style.transition} border-right .5s ease-in-out`;
         }
     }, [content.length, ref, started]);
 
