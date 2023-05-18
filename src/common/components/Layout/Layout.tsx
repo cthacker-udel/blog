@@ -16,5 +16,7 @@ export const Layout = ({
     children,
     containerOverride,
 }: React.PropsWithChildren<LayoutProperties>): JSX.Element => (
-    <div className={`${styles.container} ${containerOverride}`}>{children}</div>
+    <div className={`${styles.container} ${containerOverride}`} id="layout">
+        {children}
+    </div>
 );

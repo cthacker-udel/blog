@@ -10,9 +10,12 @@ type SimulateTypingProperties = {
 };
 
 /**
+ * Renders a live typing simulation
  *
- * @param param0
- * @returns
+ * @param props - The properties of the SimulateTyping component
+ * @param props.className - The className that is injected into this component to apply to the text being injected
+ * @param props.content - The content the component is rendering
+ * @returns The animated text being displayed
  */
 export const SimulateTyping = ({
     className,
