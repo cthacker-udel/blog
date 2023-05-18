@@ -3,7 +3,7 @@
 import React from "react";
 
 type useSimulateTypingProperties = {
-    cssClassName: string;
+    cssClassName?: string;
     content: string;
     intervalStart?: number;
     intervalEnd?: number;

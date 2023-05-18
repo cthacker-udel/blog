@@ -10,6 +10,8 @@ import styles from "./Landing.module.css";
  */
 export const Landing = (): JSX.Element => {
     const blogTitleReference = React.createRef<HTMLDivElement>();
+    const descriptionReference = React.createRef<HTMLDivElement>();
+
     useBackground({
         imageConfig: {
             background:
@@ -20,10 +22,18 @@ export const Landing = (): JSX.Element => {
         content: "Cameron Thacker's Blog",
         ref: blogTitleReference,
     });
+    useSimulateTyping({
+        content: "This is a description to type alongside",
+        ref: descriptionReference,
+    });
 
     return (
         <div className={styles.landing_container}>
             <div className={styles.landing_title} ref={blogTitleReference} />
+            {/* <div
+                className={styles.landing_description}
+                ref={descriptionReference}
+            /> */}
         </div>
     );
 };
