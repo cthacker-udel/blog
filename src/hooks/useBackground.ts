@@ -3,7 +3,8 @@ import type { StaticImageData } from "next/image";
 import React from "react";
 
 type useBackgroundImageConfig = {
-    backgroundBlendMode:
+    background?: string;
+    backgroundBlendMode?:
         | "color-burn"
         | "color-dodge"
         | "color"
@@ -37,7 +38,7 @@ type useBackgroundImageConfig = {
 };
 
 type useBackgroundProperties = {
-    image: StaticImageData;
+    image?: StaticImageData;
     imageConfig?: useBackgroundImageConfig;
 };
 
@@ -55,7 +56,7 @@ export const useBackground = ({
      * Runs while DOM is being painted, allows for updates to the dom
      * prior to the user seeing the screen, will avoid flashes
      */
-    React.useLayoutEffect(() => {
+    React.useEffect(() => {
         // Accessing the root element of the document (covers page)
         const body = document.querySelector("body");
         if (body !== null) {
@@ -65,11 +66,15 @@ export const useBackground = ({
              * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
              */
 
-            // Reason: src attribute returns url of image
-            body.style.backgroundImage = image.src;
+            // Reason: Checking if image is undefined before accessing it's src attribute
+            if (image !== undefined) {
+                // Reason: src attribute returns url of image
+                body.style.backgroundImage = image.src;
+            }
 
             // Reason: Checking if image config is supplied
             if (imageConfig !== undefined) {
+                body.style.background = imageConfig.background ?? "";
                 body.style.backgroundSize =
                     imageConfig.backgroundSize ?? "cover";
                 body.style.backgroundRepeat =
@@ -80,7 +85,8 @@ export const useBackground = ({
                     imageConfig.backgroundClip ?? "none";
                 body.style.backgroundBlendMode =
                     imageConfig.backgroundBlendMode ?? "none";
+                console.log(body.style, imageConfig);
             }
         }
-    }, [image.src, imageConfig]);
+    }, [image, imageConfig]);
 };
