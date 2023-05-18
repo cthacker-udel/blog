@@ -1,0 +1,1 @@
+export { SimulateTyping } from "./SimulateTyping";

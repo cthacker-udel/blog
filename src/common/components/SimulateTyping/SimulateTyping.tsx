@@ -1,5 +1,33 @@
-export const SimulateTyping = ({ children, content }) => {
-    CREATE REF DYNAMICALLY HERE,
-    AND CALL THE HOOK HERE TO AVOID RE-RENDERS WHICH CAUSE THE REF TO LOSE TRACK BECOMING NULL, UNCOMMENT CODE IN
-    LANDING TO SEE ERROR
-}
+import React from "react";
+
+import { useSimulateTyping } from "@/hooks";
+
+import styles from "./SimulateTyping.module.css";
+
+type SimulateTypingProperties = {
+    className?: string;
+    content: string;
+};
+
+/**
+ *
+ * @param param0
+ * @returns
+ */
+export const SimulateTyping = ({
+    className,
+    content,
+}: SimulateTypingProperties): JSX.Element => {
+    const reference = React.createRef<HTMLDivElement>();
+    useSimulateTyping({
+        content,
+        ref: reference,
+    });
+
+    return (
+        <span
+            className={`${className} ${styles.typing_container}`}
+            ref={reference}
+        />
+    );
+};

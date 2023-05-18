@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/indent -- disabled */
-/* eslint-disable @typescript-eslint/no-non-null-assertion -- disabled */
 import React from "react";
 
 type useSimulateTypingProperties = {
@@ -26,37 +24,13 @@ export const useSimulateTyping = ({
     intervalEnd,
     ref,
 }: useSimulateTypingProperties): void => {
-    const [isPending, startTransition] = React.useTransition();
-
-    /**
-     * Whether the operation is finished, ends the useEffect loop
-     */
-    const [finished, setFinished] = React.useState<boolean>(false);
-
-    /**
-     * Whether the operation has started, controls whether the styles are updated
-     */
-    const [started, setStarted] = React.useState<boolean>(true);
-
     /**
      * The index of the letter currently being injected
      */
     const [currentTyping, setCurrentTyping] = React.useState<number>(0);
 
     React.useEffect(() => {
-        if (ref.current !== null && started) {
-            ref.current.style.transition = `${ref.current.style.transition} border-right .5s ease-in-out`;
-        }
-    }, [content.length, ref, started]);
-
-    React.useEffect(() => {
-        if (
-            ref.current !== null &&
-            !isPending &&
-            !finished &&
-            currentTyping < content.length
-        ) {
-            ref.current.setAttribute("typing", "T");
+        if (ref.current !== null && currentTyping < content.length) {
             const time =
                 Math.random() *
                 ((intervalEnd ?? 750) -
@@ -66,39 +40,13 @@ export const useSimulateTyping = ({
 
             setTimeout(() => {
                 element.innerHTML = `${element.innerHTML}${content[currentTyping]}`;
-                ref.current!.style.borderRight =
-                    currentTyping % 2 === 0
-                        ? "2px solid transparent"
-                        : "2px solid black";
-
                 setCurrentTyping((oldValue) => oldValue + 1);
             }, time);
         }
 
-        if (
-            !finished &&
-            currentTyping === content.length &&
-            ref.current !== null
-        ) {
-            startTransition(() => {
-                setFinished(true);
-                setStarted(false);
-            });
-            ref.current.setAttribute("typing", "F");
+        if (currentTyping === content.length && ref.current !== null) {
             ref.current.style.borderRight = "2px solid transparent";
-            ref.current.style.transition = ref.current.style.transition.replace(
-                " border-right .5s ease-in-out",
-                "",
-            );
+            ref.current.style.animation = "none";
         }
-    }, [
-        currentTyping,
-        content,
-        finished,
-        intervalStart,
-        intervalEnd,
-        isPending,
-        ref,
-        started,
-    ]);
+    }, [currentTyping, content, intervalStart, intervalEnd, ref]);
 };
