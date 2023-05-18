@@ -1,0 +1,1 @@
+export { useBackground } from "./useBackground";

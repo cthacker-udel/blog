@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- disabled */
 import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 
 import type { AppProps } from "next/app";
 import React from "react";
 import { ToastContainer } from "react-toastify";
-import { SWRConfig } from "swr/_internal";
 
-import { Layout } from "../common";
+import { Layout } from "@/common";
 
 /**
  * Used to initialize pages, control the page initialization and persist layouts between page
@@ -19,42 +17,22 @@ import { Layout } from "../common";
  * @returns The app component
  */
 const App = ({ Component, pageProps }: AppProps): JSX.Element => (
-  <>
-    <SWRConfig
-      value={{
-        fetcher: async (resource: string, _init: any): Promise<any> => {
-          const result = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}api/${resource}`
-          );
-
-          if (result.status === 401) {
-            throw new Error("Invalid user");
-          }
-
-          const convertedResult = (await result.json()) as ApiResponse;
-          const { data } = convertedResult;
-          return data;
-        },
-        provider: () => new Map(),
-        refreshInterval: 3000,
-      }}
-    >
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </SWRConfig>
-    <ToastContainer
-      autoClose={5000}
-      closeOnClick
-      draggable
-      hideProgressBar={false}
-      newestOnTop={false}
-      pauseOnHover
-      position="top-right"
-      rtl={false}
-      theme="light"
-    />
-  </>
+    <>
+        <Layout>
+            <Component {...pageProps} />
+        </Layout>
+        <ToastContainer
+            autoClose={5000}
+            closeOnClick
+            draggable
+            hideProgressBar={false}
+            newestOnTop={false}
+            pauseOnHover
+            position="top-right"
+            rtl={false}
+            theme="light"
+        />
+    </>
 );
 
-export { App as default };
+export default App;

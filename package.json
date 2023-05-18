@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "install-types": "npm i --save-dev @types/next @types/react-dom @types/react @types/uuid",
-    "install-linter": "npm i --save-dev eslint-config-intense eslint-config-prettier eslint-plugin-eslint-comments eslint-plugin-import eslint-plugin-no-secrets eslint-plugin-node eslint-plugin-prettier eslint-plugin-ramda eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-simple-import-sort eslint-plugin-sonarjs eslint-plugin-unicorn prettier prettier-eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-next",
+    "install-linter": "npm i --save-dev eslint-config-problems eslint-config-intense eslint-config-prettier eslint-plugin-eslint-comments eslint-plugin-import eslint-plugin-no-secrets eslint-plugin-node eslint-plugin-prettier eslint-plugin-ramda eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-simple-import-sort eslint-plugin-sonarjs eslint-plugin-unicorn prettier prettier-eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-next",
     "lint": "next lint"
   },
   "dependencies": {
@@ -38,6 +38,7 @@
     "eslint-config-intense": "^0.9.0",
     "eslint-config-next": "^13.4.2",
     "eslint-config-prettier": "^8.8.0",
+    "eslint-config-problems": "^7.0.1",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-no-secrets": "^0.8.9",
