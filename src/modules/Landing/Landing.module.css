@@ -1,9 +1,10 @@
 .landing_container {
     display: flex;
     flex-direction: column;
+    gap: 1em;
 }
 
 .landing_title {
     font-weight: 800;
-    font-size: 3.5em;
+    font-size: 3.75em;
 }

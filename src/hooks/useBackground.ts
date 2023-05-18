@@ -85,7 +85,6 @@ export const useBackground = ({
                     imageConfig.backgroundClip ?? "none";
                 body.style.backgroundBlendMode =
                     imageConfig.backgroundBlendMode ?? "none";
-                console.log(body.style, imageConfig);
             }
         }
     }, [image, imageConfig]);
