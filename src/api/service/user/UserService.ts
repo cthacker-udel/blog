@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-extraneous-class -- disabled */
-/* eslint-disable class-methods-use-this -- disabled */
 import type { User } from "@/@types";
 
 import { IUserService } from "./IUserService";
