@@ -1,4 +1,4 @@
 export type EncryptionResult = {
-    password: string;
-    passwordSalt: string;
+    hash: string;
+    salt: string;
 };

@@ -1,47 +1,43 @@
-/* eslint-disable @typescript-eslint/indent */
-import {
-    type Collection,
-    type Db,
-    MongoClient,
-    ServerApiVersion,
-} from "mongodb";
+/* eslint-disable class-methods-use-this -- disabled */
+/* eslint-disable @typescript-eslint/indent -- disabled */
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import type { User } from "@/@types";
+import { EncryptionService } from "@/api/service/encryption";
+
+import { MongoApi } from "../mongo/MongoApi";
 import type { IUserApi } from "./IUserApi";
-import { User } from "@/@types";
 
 /**
  *
  */
 export class UserApi implements IUserApi {
-    public client?: MongoClient;
+    public static mongoApi: MongoApi;
 
-    public database?: Db;
-
-    public collection?: Collection;
+    public static encryptionService: EncryptionService;
 
     /**
-     * Instantiates the client instance
+     * No-arg constructor
+     * Instantiates the mongo api of this class, which will be carried across instances
      */
-    public instantiateClient = async (): Promise<void> => {
-        this.client = new MongoClient(
-            process.env.MONGO_DB_URL as unknown as string,
-            {
-                serverApi: {
-                    deprecationErrors: true,
-                    strict: true,
-                    version: ServerApiVersion.v1,
-                },
-            },
-        );
-
-        await this.client.connect();
-        this.database = this.client.db(
-            process.env.MONGO_DATABASE_NAME as unknown as string,
-        );
-        this.collection = this.database.collection(
+    public constructor() {
+        UserApi.mongoApi = new MongoApi(
             process.env.MONGO_USER_COLLECTION as unknown as string,
         );
+        UserApi.encryptionService = new EncryptionService();
+    }
+
+    /** @inheritdoc */
+    public doesUsernameAlreadyExist = async (
+        username: string,
+    ): Promise<boolean> => {
+        try {
+            const request = UserApi.mongoApi.getRepo()?.findOne({ username });
+            return request !== null;
+        } catch (error: unknown) {
+            await UserApi.mongoApi.logError(error);
+            return true;
+        }
     };
 
     /** @inheritdoc */
@@ -50,8 +46,6 @@ export class UserApi implements IUserApi {
         response: NextApiResponse,
     ): Promise<void> => {
         try {
-            await this.instantiateClient();
-
             const requestBody = request.body as Pick<
                 User,
                 "password" | "username"
@@ -66,10 +60,26 @@ export class UserApi implements IUserApi {
 
             const { username, password } = requestBody;
 
-            const response = await this.collection.insertOne({});
+            const doesUsernameAlreadyExist =
+                await this.doesUsernameAlreadyExist(username);
+
+            if (doesUsernameAlreadyExist) {
+                throw new Error("Username already exists");
+            }
+
+            const hashResult = UserApi.encryptionService.hashPassword(password);
+
+            const insertionResult =
+                await UserApi.mongoApi.collection?.insertOne({
+                    password: hashResult.hash,
+                    passwordSalt: hashResult.salt,
+                    username,
+                } as Partial<User>);
+
+            response.status(insertionResult === null ? 400 : 200);
+            response.send({});
         } catch (error: unknown) {
-            response.status(500);
-            response.send({ error });
+            await UserApi.mongoApi.logError(error, response);
         }
     };
 }

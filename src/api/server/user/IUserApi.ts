@@ -12,4 +12,12 @@ export interface IUserApi {
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;
+
+    /**
+     * Checks if the username already exists or not
+     *
+     * @param _username - The username to verify if it already exists
+     * @returns Whether or not the username exists
+     */
+    doesUsernameAlreadyExist: (_username: string) => Promise<boolean>;
 }
