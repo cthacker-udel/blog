@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
+import { useRouter } from "next/router";
 import React from "react";
 import { Button } from "react-bootstrap";
 
@@ -18,6 +20,7 @@ export const Landing = (): JSX.Element => {
         },
     });
     useLayoutInjector(styles.landing_body);
+    const router = useRouter();
 
     return (
         <>
@@ -28,7 +31,14 @@ export const Landing = (): JSX.Element => {
                 />
             </div>
             <div className={styles.button_container}>
-                <Button variant="outline-primary">{"Login"}</Button>
+                <Button
+                    onClick={(): void => {
+                        router.push("/login");
+                    }}
+                    variant="outline-primary"
+                >
+                    {"Login"}
+                </Button>
                 <Button variant="outline-secondary">{"Sign Up"}</Button>
             </div>
         </>

@@ -1,0 +1,31 @@
+@keyframes appear_animation {
+    from {
+        opacity: 0%;
+    }
+    to {
+        opacity: 100%;
+    }
+}
+
+.login_layout {
+    gap: 3em;
+}
+
+.login_layout > * {
+    opacity: 0%;
+    animation: appear_animation 1.75s ease-in-out forwards;
+}
+
+.login_form_label {
+    display: none;
+}
+
+.login_title {
+    font-size: 5em;
+}
+
+.login_form {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5em;
+}
