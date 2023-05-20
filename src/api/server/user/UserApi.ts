@@ -2,8 +2,10 @@
 /* eslint-disable @typescript-eslint/indent -- disabled */
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import type { User } from "@/@types";
+import type { ApiResponse, User } from "@/@types";
 import { EncryptionService } from "@/api/service/encryption";
+import { convertErrorToApiResponse, generateEntityDateTimes } from "@/common";
+import { Collections } from "@/constants";
 
 import { MongoApi } from "../mongo/MongoApi";
 import type { IUserApi } from "./IUserApi";
@@ -21,9 +23,7 @@ export class UserApi implements IUserApi {
      * Instantiates the mongo api of this class, which will be carried across instances
      */
     public constructor() {
-        UserApi.mongoApi = new MongoApi(
-            process.env.MONGO_USER_COLLECTION as unknown as string,
-        );
+        UserApi.mongoApi = new MongoApi(Collections.USERS);
         UserApi.encryptionService = new EncryptionService();
     }
 
@@ -32,10 +32,11 @@ export class UserApi implements IUserApi {
         username: string,
     ): Promise<boolean> => {
         try {
-            const request = UserApi.mongoApi.getRepo()?.findOne({ username });
-            return request !== null;
+            const userRepo = MongoApi.getRepo<User>(Collections.USERS);
+            const doesUserExist = await userRepo.findOne({ username });
+            return doesUserExist !== null;
         } catch (error: unknown) {
-            await UserApi.mongoApi.logError(error);
+            await MongoApi.logError(error);
             return true;
         }
     };
@@ -46,19 +47,14 @@ export class UserApi implements IUserApi {
         response: NextApiResponse,
     ): Promise<void> => {
         try {
-            const requestBody = request.body as Pick<
+            const { password, username } = request.body as Pick<
                 User,
                 "password" | "username"
             >;
 
-            if (
-                requestBody.username === undefined ||
-                requestBody.password === undefined
-            ) {
+            if (username === undefined || password === undefined) {
                 throw new Error("Invalid credentials supplied");
             }
-
-            const { username, password } = requestBody;
 
             const doesUsernameAlreadyExist =
                 await this.doesUsernameAlreadyExist(username);
@@ -69,17 +65,64 @@ export class UserApi implements IUserApi {
 
             const hashResult = UserApi.encryptionService.hashPassword(password);
 
-            const insertionResult =
-                await UserApi.mongoApi.collection?.insertOne({
-                    password: hashResult.hash,
-                    passwordSalt: hashResult.salt,
-                    username,
-                } as Partial<User>);
+            const userRepo = MongoApi.getRepo<User>(Collections.USERS);
+
+            const insertionResult = userRepo.insertOne({
+                password: hashResult.hash,
+                passwordSalt: hashResult.salt,
+                username,
+                ...generateEntityDateTimes(),
+            });
 
             response.status(insertionResult === null ? 400 : 200);
-            response.send({});
+            response.send({
+                data: insertionResult !== null,
+            } as ApiResponse<boolean>);
         } catch (error: unknown) {
-            await UserApi.mongoApi.logError(error, response);
+            await MongoApi.logError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        }
+    };
+
+    /** @inheritdoc */
+    public login = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            const { password, username } = request.body as Pick<
+                User,
+                "password" | "username"
+            >;
+
+            if (password === undefined || username === undefined) {
+                throw new Error(
+                    "Must send username and password when making request",
+                );
+            }
+
+            const foundUser = await MongoApi.getRepo<User>(
+                Collections.USERS,
+            ).findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error("User does not exist");
+            }
+
+            const fixedHash = UserApi.encryptionService.fixedHash(
+                password,
+                foundUser.passwordSalt,
+            );
+
+            const isSuccessful = fixedHash === foundUser.password;
+
+            response.status(isSuccessful ? 200 : 400);
+            response.send({ data: isSuccessful } as ApiResponse<boolean>);
+        } catch (error: unknown) {
+            await MongoApi.logError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
         }
     };
 }

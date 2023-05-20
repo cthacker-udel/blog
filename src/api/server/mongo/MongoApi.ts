@@ -9,6 +9,7 @@ import {
 } from "mongodb";
 
 import type { ApiError } from "@/@types";
+import { Collections } from "@/constants";
 
 /**
  * Handles all mongo operations, such as collection fetching, and database connection instantiation
@@ -89,9 +90,7 @@ export class MongoApi {
      * @param error - The error to log
      */
     public static logError = async (error: unknown): Promise<void> => {
-        const errorCollection = MongoApi.getRepo<ApiError>(
-            process.env.MONGO_ERROR_COLLECTION as unknown as string,
-        );
+        const errorCollection = MongoApi.getRepo<ApiError>(Collections.ERRORS);
         if (errorCollection !== undefined) {
             const convertedError = error as Error;
 

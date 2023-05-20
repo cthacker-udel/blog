@@ -1,17 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+type ClientRequest = NextApiRequest;
+type ServerResponse = NextApiResponse;
+type PV = Promise<void>;
+
 export interface IUserApi {
     /**
      * Attempts to sign a user up in the database
      *
      * @param _request - The client request
-     * @param _response - The client response
+     * @param _response - The server response
      * @returns Whether or not the user signed up
      */
-    signUp: (
-        _request: NextApiRequest,
-        _response: NextApiResponse,
-    ) => Promise<void>;
+    signUp: (_request: ClientRequest, _response: ServerResponse) => PV;
 
     /**
      * Checks if the username already exists or not
@@ -20,4 +21,13 @@ export interface IUserApi {
      * @returns Whether or not the username exists
      */
     doesUsernameAlreadyExist: (_username: string) => Promise<boolean>;
+
+    /**
+     * Attempts to log the user into the database
+     *
+     * @param _request - The client request
+     * @param _response - The server response
+     * @returns Whether the login was successful or not
+     */
+    login: (_request: ClientRequest, _response: ServerResponse) => PV;
 }
