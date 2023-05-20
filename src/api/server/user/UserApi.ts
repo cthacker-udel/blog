@@ -6,13 +6,13 @@ import { EncryptionService } from "@/api/service/encryption";
 import { convertErrorToApiResponse, generateEntityDateTimes } from "@/common";
 import { Collections } from "@/constants";
 
-import { MongoApi } from "../mongo/MongoApi";
+import { DatabaseApi } from "../database";
 import type { IUserApi } from "./IUserApi";
 
 /**
  * Server-side user api implementation
  */
-export class UserApi extends MongoApi implements IUserApi {
+export class UserApi extends DatabaseApi implements IUserApi {
     /**
      * Used during signup and login
      */
@@ -32,11 +32,11 @@ export class UserApi extends MongoApi implements IUserApi {
         username: string,
     ): Promise<boolean> => {
         try {
-            const userRepo = await this.getRepo<User>(Collections.USERS);
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
             const doesUserExist = await userRepo.findOne({ username });
             return doesUserExist !== null;
         } catch (error: unknown) {
-            await this.logError(error);
+            await this.logMongoError(error);
             return true;
         }
     };
@@ -47,6 +47,7 @@ export class UserApi extends MongoApi implements IUserApi {
         response: NextApiResponse,
     ): Promise<void> => {
         try {
+            await this.startMongoTransaction();
             const { password, username } = request.body as Pick<
                 User,
                 "password" | "username"
@@ -65,7 +66,7 @@ export class UserApi extends MongoApi implements IUserApi {
 
             const hashResult = UserApi.encryptionService.hashPassword(password);
 
-            const userRepo = await this.getRepo<User>(Collections.USERS);
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
 
             const insertionResult = userRepo.insertOne({
                 password: hashResult.hash,
@@ -79,9 +80,11 @@ export class UserApi extends MongoApi implements IUserApi {
                 data: insertionResult !== null,
             } as ApiResponse<boolean>);
         } catch (error: unknown) {
-            await this.logError(error);
+            await this.logMongoError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
         }
     };
 
@@ -91,6 +94,7 @@ export class UserApi extends MongoApi implements IUserApi {
         response: NextApiResponse,
     ): Promise<void> => {
         try {
+            await this.startMongoTransaction();
             const { password, username } = request.body as Pick<
                 User,
                 "password" | "username"
@@ -102,7 +106,7 @@ export class UserApi extends MongoApi implements IUserApi {
                 );
             }
 
-            const userRepo = await this.getRepo<User>(Collections.USERS);
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
 
             const foundUser = await userRepo.findOne({ username });
 
@@ -120,9 +124,12 @@ export class UserApi extends MongoApi implements IUserApi {
             response.status(isSuccessful ? 200 : 400);
             response.send({ data: isSuccessful } as ApiResponse<boolean>);
         } catch (error: unknown) {
-            await this.logError(error);
+            console.log("catching", error);
+            await this.logMongoError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
         }
     };
 }
