@@ -38,7 +38,7 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { data, response } as ApiResponse<T>;
+        return { ...data, response } as ApiResponse<T>;
     };
 
     /**
@@ -77,7 +77,7 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { data, response } as ApiResponse<T>;
+        return { ...data, response } as ApiResponse<T>;
     };
 
     /**
@@ -116,7 +116,7 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { data, response } as ApiResponse<T>;
+        return { ...data, response } as ApiResponse<T>;
     };
 
     /**
@@ -155,7 +155,7 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { data, response } as ApiResponse<T>;
+        return { ...data, response } as ApiResponse<T>;
     };
 
     /**
@@ -194,6 +194,6 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { data, response } as ApiResponse<T>;
+        return { ...data, response } as ApiResponse<T>;
     };
 }
