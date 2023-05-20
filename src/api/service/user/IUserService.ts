@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-extraneous-class -- disabled */
-
 import type { ApiResponse } from "@/@types";
 
 /**
