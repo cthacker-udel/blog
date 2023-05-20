@@ -1,29 +1,36 @@
+/* eslint-disable @typescript-eslint/no-extraneous-class -- disabled */
 /* eslint-disable no-console -- disabled */
 import {
     type Collection,
     type Db,
+    type Document,
     MongoClient,
     ServerApiVersion,
 } from "mongodb";
-import type { NextApiResponse } from "next";
 
 import type { ApiError } from "@/@types";
 
 /**
- *
+ * Handles all mongo operations, such as collection fetching, and database connection instantiation
  */
 export class MongoApi {
-    public client: MongoClient;
-
-    public database?: Db;
-
-    public collection?: Collection;
+    /**
+     * The current mongo client instance
+     */
+    public static client: MongoClient;
 
     /**
-     *
+     * The current database
      */
-    public constructor(collectionName: string, databaseName?: string) {
-        this.client = new MongoClient(
+    public static database?: Db = undefined;
+
+    /**
+     * Instantiates the mongo client, and access the database specified in the constructor, else the environment variables
+     *
+     * @param databaseName - The database you want to connect to
+     */
+    public constructor(databaseName?: string) {
+        MongoApi.client = new MongoClient(
             process.env.MONGO_DB_URL as unknown as string,
             {
                 serverApi: {
@@ -34,14 +41,13 @@ export class MongoApi {
             },
         );
 
-        this.client
+        MongoApi.client
             .connect()
             .then((client: MongoClient) => {
-                this.database = client.db(
+                MongoApi.database = client.db(
                     databaseName ??
                         (process.env.MONGO_DATABASE_NAME as unknown as string),
                 );
-                this.collection = this.database.collection(collectionName);
             })
             .catch((error: unknown) => {
                 console.error(
@@ -53,33 +59,50 @@ export class MongoApi {
     }
 
     /**
-     * Returns the instantiated collection when this api was created
+     * Pings the database, checking if it is defined before executing any queries potentially
      *
+     * @returns Whether it is connected to a database
+     */
+    public static pingStatus = (): boolean => this.database !== undefined;
+
+    /**
+     * Returns the requested collection from the database using the mongodb connection
+     *
+     * @param collectionName - The name of the collection we are trying to access
      * @returns - The "repository" aka the collection
      */
-    public getRepo = (): Collection | undefined => this.collection;
+    public static getRepo = <T extends Document>(
+        collectionName: string,
+    ): Collection<T> => {
+        if (!this.pingStatus() || MongoApi.database === undefined) {
+            throw new Error(
+                "Database is not connected, cannot request collection",
+            );
+        }
 
-    public logError = async (
-        error: unknown,
-        response?: NextApiResponse,
-    ): Promise<void> => {
-        if (this.collection !== undefined) {
+        return MongoApi.database.collection(collectionName);
+    };
+
+    /**
+     * Logs an error to the error logs collection
+     *
+     * @param error - The error to log
+     */
+    public static logError = async (error: unknown): Promise<void> => {
+        const errorCollection = MongoApi.getRepo<ApiError>(
+            process.env.MONGO_ERROR_COLLECTION as unknown as string,
+        );
+        if (errorCollection !== undefined) {
             const convertedError = error as Error;
 
             if (convertedError === undefined) {
-                return;
+                throw new Error("Error sent is not an actual exception");
             }
 
-            await this.database
-                ?.collection(
-                    process.env.MONGO_ERROR_COLLECTION as unknown as string,
-                )
-                .insertOne({
-                    message: convertedError.message,
-                    stackTrace: convertedError.stack,
-                } as ApiError);
-            response?.status(500);
-            response?.send({ message: convertedError.message });
+            await errorCollection.insertOne({
+                message: convertedError.message,
+                stackTrace: convertedError.stack,
+            });
         }
     };
 }

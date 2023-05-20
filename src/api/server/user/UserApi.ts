@@ -9,7 +9,7 @@ import { MongoApi } from "../mongo/MongoApi";
 import type { IUserApi } from "./IUserApi";
 
 /**
- *
+ * Server-side user api implementation
  */
 export class UserApi implements IUserApi {
     public static mongoApi: MongoApi;
