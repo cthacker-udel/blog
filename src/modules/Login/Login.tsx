@@ -55,7 +55,6 @@ export const Login = (): JSX.Element => {
         ) {
             const { password, username } = getValues();
             const { data } = await new UserService().login(password, username);
-            console.log("data = ", data);
             if (data) {
                 router.push("/dashboard");
             } else {
