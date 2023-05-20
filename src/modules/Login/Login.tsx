@@ -1,7 +1,12 @@
+/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
+import { useRouter } from "next/router";
 import React from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { Key } from "ts-key-enum";
 
+import { UserService } from "@/api/service";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
 import styles from "./Login.module.css";
@@ -30,7 +35,9 @@ export const Login = (): JSX.Element => {
 
     useLayoutInjector(styles.login_layout);
 
-    const { formState, register } = useForm<LoginFormValues>({
+    const router = useRouter();
+
+    const { formState, getValues, register } = useForm<LoginFormValues>({
         criteriaMode: "all",
         defaultValues: LOGIN_FORM_DEFAULT_VALUES,
         delayError: 200,
@@ -38,48 +45,125 @@ export const Login = (): JSX.Element => {
         reValidateMode: "onChange",
     });
 
-    const { dirtyFields, isDirty, isValidating } = formState;
+    const { dirtyFields, errors, isDirty, isValidating } = formState;
+
+    const login = React.useCallback(async (): Promise<void> => {
+        if (
+            isDirty &&
+            Object.keys(dirtyFields).length === 2 &&
+            Object.keys(errors).length === 0
+        ) {
+            const { password, username } = getValues();
+            const { data } = await new UserService().login(password, username);
+            if (data) {
+                router.push("/dashboard");
+            } else {
+                toast.error("Failed to login");
+            }
+        }
+    }, [dirtyFields, errors, isDirty, getValues, router]);
 
     return (
         <>
             <div className={`${styles.login_title}`} id="login_title">
                 {"Login"}
             </div>
-            <div className={styles.login_form}>
-                <Form.Group controlId="username">
+            <div
+                className={styles.login_form}
+                id="login_form"
+                onKeyDown={async (
+                    event: React.KeyboardEvent<HTMLDivElement>,
+                ): Promise<void> => {
+                    const { key } = event;
+                    if (
+                        key === Key.Enter &&
+                        isDirty &&
+                        Object.keys(dirtyFields).length === 2
+                    ) {
+                        await login();
+                    }
+                }}
+                tabIndex={0}
+            >
+                <Form.Group>
                     <Form.Label className={styles.login_form_label}>
                         {"Username"}
                     </Form.Label>
                     <InputGroup>
-                        <Form.Control type="text" {...register("username")} />
-                        <InputGroup.Text>
-                            <i className="fa-solid fa-user text-dark" />
+                        <Form.Floating>
+                            <Form.Control
+                                autoComplete="off"
+                                autoCorrect="off"
+                                className={styles.login_form_control}
+                                id="login_form_username"
+                                placeholder="Enter your username"
+                                tabIndex={0}
+                                type="text"
+                                {...register("username")}
+                            />
+                            <label
+                                className={styles.login_form_floating_control}
+                                htmlFor="login_form_username"
+                            >
+                                {"Username"}
+                            </label>
+                        </Form.Floating>
+                        <InputGroup.Text
+                            className={styles.login_form_control_icon}
+                        >
+                            <i className="fa-solid fa-user" />
                         </InputGroup.Text>
                     </InputGroup>
                 </Form.Group>
-                <Form.Group controlId="password">
+                <Form.Group>
                     <Form.Label className={styles.login_form_label}>
                         {"Password"}
                     </Form.Label>
-                    <InputGroup>
-                        <Form.Control
-                            type="password"
-                            {...register("password")}
-                        />
-                        <InputGroup.Text>
-                            <i className="fa-solid fa-key text-dark" />
+                    <InputGroup tabIndex={1}>
+                        <Form.Floating>
+                            <Form.Control
+                                autoComplete="off"
+                                autoCorrect="off"
+                                className={styles.login_form_control}
+                                id="login_password_form"
+                                placeholder="Enter your password"
+                                tabIndex={0}
+                                type="password"
+                                {...register("password")}
+                            />
+                            <label
+                                className={styles.login_form_floating_control}
+                                htmlFor="login_password_form"
+                            >
+                                {"Password"}
+                            </label>
+                        </Form.Floating>
+                        <InputGroup.Text
+                            className={styles.login_form_control_icon}
+                        >
+                            <i className="fa-solid fa-key" />
                         </InputGroup.Text>
                     </InputGroup>
                 </Form.Group>
             </div>
             <Button
+                disabled={
+                    !isDirty ||
+                    isValidating ||
+                    !dirtyFields.username ||
+                    !dirtyFields.password
+                }
+                onClick={async (): Promise<void> => {
+                    await login();
+                }}
+                tabIndex={0}
                 variant={
                     isDirty &&
                     !isValidating &&
                     dirtyFields.username &&
                     dirtyFields.password
-                        ? "success"
-                        : "outline-secondary"
+                        ? "outline-success"
+                        : "outline-primary"
                 }
             >
                 {"Login"}

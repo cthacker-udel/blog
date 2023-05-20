@@ -29,3 +29,22 @@
     flex-direction: column;
     gap: 2.5em;
 }
+
+.login_form_control,
+.login_form_control:focus {
+    background-color: transparent;
+    border: 1px solid rgba(173, 216, 230, 0.75);
+    color: rgba(255, 255, 255, 0.65);
+    outline: none;
+    box-shadow: none;
+}
+
+.login_form_control_icon {
+    background-color: transparent;
+    border: 1px solid rgba(173, 216, 230, 0.75);
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.login_form_floating_control {
+    color: rgba(255, 255, 255, 0.25);
+}
