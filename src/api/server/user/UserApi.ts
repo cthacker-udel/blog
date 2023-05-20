@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -8,14 +7,20 @@ import { convertErrorToApiResponse, generateEntityDateTimes } from "@/common";
 import { Collections } from "@/constants";
 
 import { MongoApi } from "../mongo/MongoApi";
-import type { IUserApi } from "./IUserApi";
+import { IUserApi } from "./IUserApi";
 
 /**
  * Server-side user api implementation
  */
-export class UserApi implements IUserApi {
+export class UserApi extends IUserApi {
+    /**
+     * Execute mongo queries
+     */
     public static mongoApi: MongoApi;
 
+    /**
+     * Used during signup and login
+     */
     public static encryptionService: EncryptionService;
 
     /**
@@ -23,12 +28,13 @@ export class UserApi implements IUserApi {
      * Instantiates the mongo api of this class, which will be carried across instances
      */
     public constructor() {
+        super();
         UserApi.mongoApi = new MongoApi(Collections.USERS);
         UserApi.encryptionService = new EncryptionService();
     }
 
     /** @inheritdoc */
-    public doesUsernameAlreadyExist = async (
+    public static doesUsernameAlreadyExist = async (
         username: string,
     ): Promise<boolean> => {
         try {
@@ -42,7 +48,7 @@ export class UserApi implements IUserApi {
     };
 
     /** @inheritdoc */
-    public signUp = async (
+    public static signUp = async (
         request: NextApiRequest,
         response: NextApiResponse,
     ): Promise<void> => {
@@ -86,7 +92,7 @@ export class UserApi implements IUserApi {
     };
 
     /** @inheritdoc */
-    public login = async (
+    public static login = async (
         request: NextApiRequest,
         response: NextApiResponse,
     ): Promise<void> => {
