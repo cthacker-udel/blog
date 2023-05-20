@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-extraneous-class -- disabled */
 /* eslint-disable class-methods-use-this -- disabled */
 import type { ApiResponse } from "@/@types";
 
@@ -24,7 +23,7 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.BASE_URL}/${endpoint}${
+            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -62,7 +61,7 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.BASE_URL}/${endpoint}${
+            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -101,7 +100,7 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.BASE_URL}/${endpoint}${
+            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -140,7 +139,7 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.BASE_URL}/${endpoint}${
+            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -179,7 +178,7 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.BASE_URL}/${endpoint}${
+            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`

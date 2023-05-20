@@ -1,3 +1,3 @@
 import { UserApi } from "@/api/server";
 
-export default UserApi.login;
+export default new UserApi().login;

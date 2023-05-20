@@ -12,7 +12,7 @@ type PV = Promise<void>;
 /**
  *
  */
-export abstract class IUserApi {
+export interface IUserApi {
     /**
      * Attempts to sign a user up in the database
      *
@@ -20,10 +20,7 @@ export abstract class IUserApi {
      * @param _response - The server response
      * @returns Whether or not the user signed up
      */
-    public static signUp: (
-        _request: ClientRequest,
-        _response: ServerResponse,
-    ) => PV;
+    signUp: (_request: ClientRequest, _response: ServerResponse) => PV;
 
     /**
      * Checks if the username already exists or not
@@ -31,9 +28,7 @@ export abstract class IUserApi {
      * @param _username - The username to verify if it already exists
      * @returns Whether or not the username exists
      */
-    public static doesUsernameAlreadyExist: (
-        _username: string,
-    ) => Promise<boolean>;
+    doesUsernameAlreadyExist: (_username: string) => Promise<boolean>;
 
     /**
      * Attempts to log the user into the database
@@ -42,8 +37,5 @@ export abstract class IUserApi {
      * @param _response - The server response
      * @returns Whether the login was successful or not
      */
-    public static login: (
-        _request: ClientRequest,
-        _response: ServerResponse,
-    ) => PV;
+    login: (_request: ClientRequest, _response: ServerResponse) => PV;
 }

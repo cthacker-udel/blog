@@ -7,17 +7,12 @@ import { convertErrorToApiResponse, generateEntityDateTimes } from "@/common";
 import { Collections } from "@/constants";
 
 import { MongoApi } from "../mongo/MongoApi";
-import { IUserApi } from "./IUserApi";
+import type { IUserApi } from "./IUserApi";
 
 /**
  * Server-side user api implementation
  */
-export class UserApi extends IUserApi {
-    /**
-     * Execute mongo queries
-     */
-    public static mongoApi: MongoApi;
-
+export class UserApi extends MongoApi implements IUserApi {
     /**
      * Used during signup and login
      */
@@ -29,26 +24,25 @@ export class UserApi extends IUserApi {
      */
     public constructor() {
         super();
-        UserApi.mongoApi = new MongoApi(Collections.USERS);
         UserApi.encryptionService = new EncryptionService();
     }
 
     /** @inheritdoc */
-    public static doesUsernameAlreadyExist = async (
+    public doesUsernameAlreadyExist = async (
         username: string,
     ): Promise<boolean> => {
         try {
-            const userRepo = MongoApi.getRepo<User>(Collections.USERS);
+            const userRepo = await this.getRepo<User>(Collections.USERS);
             const doesUserExist = await userRepo.findOne({ username });
             return doesUserExist !== null;
         } catch (error: unknown) {
-            await MongoApi.logError(error);
+            await this.logError(error);
             return true;
         }
     };
 
     /** @inheritdoc */
-    public static signUp = async (
+    public signUp = async (
         request: NextApiRequest,
         response: NextApiResponse,
     ): Promise<void> => {
@@ -71,7 +65,7 @@ export class UserApi extends IUserApi {
 
             const hashResult = UserApi.encryptionService.hashPassword(password);
 
-            const userRepo = MongoApi.getRepo<User>(Collections.USERS);
+            const userRepo = await this.getRepo<User>(Collections.USERS);
 
             const insertionResult = userRepo.insertOne({
                 password: hashResult.hash,
@@ -85,14 +79,14 @@ export class UserApi extends IUserApi {
                 data: insertionResult !== null,
             } as ApiResponse<boolean>);
         } catch (error: unknown) {
-            await MongoApi.logError(error);
+            await this.logError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
         }
     };
 
     /** @inheritdoc */
-    public static login = async (
+    public login = async (
         request: NextApiRequest,
         response: NextApiResponse,
     ): Promise<void> => {
@@ -108,9 +102,9 @@ export class UserApi extends IUserApi {
                 );
             }
 
-            const foundUser = await MongoApi.getRepo<User>(
-                Collections.USERS,
-            ).findOne({ username });
+            const userRepo = await this.getRepo<User>(Collections.USERS);
+
+            const foundUser = await userRepo.findOne({ username });
 
             if (foundUser === null) {
                 throw new Error("User does not exist");
@@ -126,7 +120,7 @@ export class UserApi extends IUserApi {
             response.status(isSuccessful ? 200 : 400);
             response.send({ data: isSuccessful } as ApiResponse<boolean>);
         } catch (error: unknown) {
-            await MongoApi.logError(error);
+            await this.logError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
         }
