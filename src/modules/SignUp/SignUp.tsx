@@ -5,6 +5,7 @@ import { Button, Form, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
+import { Key } from "ts-key-enum";
 
 import { UserService } from "@/api/service";
 import {
@@ -16,7 +17,6 @@ import { useBackground, useLayoutInjector } from "@/hooks";
 
 import { PasswordLayout } from "./PasswordLayout";
 import styles from "./SignUp.module.css";
-import { Key } from "ts-key-enum";
 
 type FormValues = {
     password: string;
