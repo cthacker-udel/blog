@@ -14,19 +14,19 @@ const Home = (): JSX.Element => (
             <meta content="#FF0000" name="theme-color" />
             <meta content="website" property="og:type" />
             <meta
-                content="https://buckles-chat.vercel.app/"
+                content="https://cthackerblog.vercel.app/"
                 property="og:url"
             />
             <meta
-                content="Buckles Chat - Meow with your friends"
+                content="CThacker blog - The Thack is Back"
                 property="og:title"
             />
             <meta
-                content="Chatting application where you can have a blast talking about black cats! Talk about buckles, or send funny shrek gifs to each-other, whichever floats your boat! We are not sponsored by Burger King."
+                content="Blog about me, Cameron Thacker, follow my journey as I wade through the waters of computer science, creating applications, and learning interesting things along the way!"
                 property="og:description"
             />
             <meta
-                content="https://i.pinimg.com/736x/85/e0/5d/85e05d7acff2d8e11bb22f1fb869226e.jpg"
+                content="https://upload.wikimedia.org/wikipedia/en/8/81/Wario.png"
                 property="og:image"
             />
 
