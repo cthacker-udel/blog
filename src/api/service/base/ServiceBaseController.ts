@@ -23,7 +23,9 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
+            `${window.location.protocol}//${window.location.hostname}:${
+                window.location.port
+            }/api/${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -61,7 +63,9 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
+            `${window.location.protocol}//${window.location.hostname}:${
+                window.location.port
+            }/api/${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -100,7 +104,9 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
+            `${window.location.protocol}//${window.location.hostname}:${
+                window.location.port
+            }/api/${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -139,7 +145,9 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
+            `${window.location.protocol}//${window.location.hostname}:${
+                window.location.port
+            }/api/${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
@@ -178,7 +186,9 @@ export class ServiceBaseController {
         const queryString = new URLSearchParams(queryParameters);
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}${
+            `${window.location.protocol}//${window.location.hostname}:${
+                window.location.port
+            }/api/${endpoint}${
                 queryParameters === undefined
                     ? ""
                     : `?${encodeURIComponent(queryString.toString())}`
