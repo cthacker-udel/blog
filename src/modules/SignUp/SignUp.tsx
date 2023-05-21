@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
+import { useRouter } from "next/router";
 import React from "react";
 import { Button, Form, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "react-toastify";
 
+import { UserService } from "@/api/service";
 import {
     generatePopover,
-    generateTooltip,
     SignUpValidationText,
     SignUpValidationValues,
 } from "@/common";
@@ -39,7 +42,7 @@ export const SignUp = (): JSX.Element => {
 
     useLayoutInjector(styles.signup_layout);
 
-    const { control, register } = useForm<FormValues>({
+    const { control, formState, getValues, register } = useForm<FormValues>({
         criteriaMode: "all",
         defaultValues: FORM_DEFAULT_VALUES,
         delayError: 100,
@@ -47,46 +50,52 @@ export const SignUp = (): JSX.Element => {
         reValidateMode: "onChange",
     });
 
-    const password = useWatch({ control, name: "password" });
+    const passwordWatchValue = useWatch({ control, name: "password" });
+
+    const { dirtyFields, errors, isDirty, isValidating } = formState;
+
+    const router = useRouter();
+
+    const [isPasswordValid, setIsPasswordValid] =
+        React.useState<boolean>(false);
+
+    const updatePasswordValidity = React.useCallback((value: boolean) => {
+        setIsPasswordValid(value);
+    }, []);
+
+    const signUp = React.useCallback(async () => {
+        if (
+            isPasswordValid &&
+            Object.keys(errors).length === 0 &&
+            Object.keys(dirtyFields).length === 2 &&
+            isDirty
+        ) {
+            const { password, username } = getValues();
+            const signingUpToast = toast.loading("Signing up...");
+            const { data } = await new UserService().signUp(username, password);
+            if (data) {
+                toast.update(signingUpToast, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Successfully signed up!",
+                    type: "success",
+                });
+                router.push("/homepage");
+            } else {
+                toast.update(signingUpToast, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Failed to sign up",
+                    type: "error",
+                });
+            }
+        }
+    }, [dirtyFields, errors, isDirty, getValues, isPasswordValid, router]);
 
     return (
         <>
             <div className={styles.signup_title}>{"Sign Up"}</div>
             <div className={styles.signup_form}>
-                <Form.Floating>
-                    <Form.Control
-                        id="username_form"
-                        placeholder="Username"
-                        type="text"
-                        {...register("username", {
-                            maxLength: {
-                                message:
-                                    SignUpValidationText.USERNAME.MAX_LENGTH,
-                                value: SignUpValidationValues.USERNAME
-                                    .MAX_LENGTH,
-                            },
-                            required: {
-                                message: SignUpValidationText.USERNAME.REQUIRED,
-                                value: SignUpValidationValues.USERNAME.REQUIRED,
-                            },
-                            validate: {
-                                noSpaces: (value: string) => {
-                                    if (
-                                        SignUpValidationValues.USERNAME.NO_SPACES.test(
-                                            value,
-                                        )
-                                    ) {
-                                        return true;
-                                    }
-
-                                    return SignUpValidationText.USERNAME
-                                        .NO_SPACES;
-                                },
-                            },
-                        })}
-                    />
-                    <label htmlFor="username_form">{"Username"}</label>
-                </Form.Floating>
                 <Form.Floating>
                     <OverlayTrigger
                         overlay={(
@@ -94,7 +103,92 @@ export const SignUp = (): JSX.Element => {
                         ): JSX.Element =>
                             generatePopover(
                                 properties,
-                                <PasswordLayout password={password} />,
+                                errors.username?.message,
+                                <div className={styles.username_error_header}>
+                                    <i
+                                        className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
+                                    />
+                                    <span
+                                        className={
+                                            styles.username_error_header_text
+                                        }
+                                    >
+                                        {"Username Error"}
+                                    </span>
+                                    <i
+                                        className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
+                                    />
+                                </div>,
+                                {
+                                    popoverClassNameOverride:
+                                        styles.username_popover,
+                                    popoverHeaderClassNameOverride:
+                                        styles.username_error_popover_header,
+                                },
+                            )
+                        }
+                        placement="left"
+                        show={errors.username !== undefined}
+                    >
+                        <Form.Control
+                            autoComplete="off"
+                            id="username_form"
+                            placeholder="Username"
+                            type="text"
+                            {...register("username", {
+                                maxLength: {
+                                    message:
+                                        SignUpValidationText.USERNAME
+                                            .MAX_LENGTH,
+                                    value: SignUpValidationValues.USERNAME
+                                        .MAX_LENGTH,
+                                },
+                                required: {
+                                    message:
+                                        SignUpValidationText.USERNAME.REQUIRED,
+                                    value: SignUpValidationValues.USERNAME
+                                        .REQUIRED,
+                                },
+                                validate: {
+                                    noSpaces: (value: string) => {
+                                        if (
+                                            SignUpValidationValues.USERNAME.NO_SPACES.test(
+                                                value,
+                                            )
+                                        ) {
+                                            return true;
+                                        }
+
+                                        return SignUpValidationText.USERNAME
+                                            .NO_SPACES;
+                                    },
+                                },
+                            })}
+                        />
+                    </OverlayTrigger>
+                    <label htmlFor="username_form">{"Username"}</label>
+                </Form.Floating>
+                <Form.Floating
+                    onMouseLeave={(): void => {
+                        const passwordForm =
+                            document.querySelector("#password_form");
+                        if (passwordForm !== null) {
+                            (passwordForm as HTMLFormElement).blur();
+                        }
+                    }}
+                >
+                    <OverlayTrigger
+                        overlay={(
+                            properties: OverlayInjectedProps,
+                        ): JSX.Element =>
+                            generatePopover(
+                                properties,
+                                <PasswordLayout
+                                    password={passwordWatchValue}
+                                    updatePasswordValidity={
+                                        updatePasswordValidity
+                                    }
+                                />,
                                 "Password Requirements",
                                 {
                                     popoverClassNameOverride:
@@ -115,7 +209,16 @@ export const SignUp = (): JSX.Element => {
                     </OverlayTrigger>
                     <label htmlFor="password_form">{"Password"}</label>
                 </Form.Floating>
-                <Button variant="outline-primary">{"Sign Up"}</Button>
+                <Button
+                    disabled={
+                        errors.username !== undefined ||
+                        !isPasswordValid ||
+                        isValidating
+                    }
+                    variant="primary"
+                >
+                    {"Sign Up"}
+                </Button>
             </div>
         </>
     );

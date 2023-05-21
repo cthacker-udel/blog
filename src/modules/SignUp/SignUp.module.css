@@ -56,3 +56,37 @@
     text-decoration: underline;
     padding-bottom: 0.35em;
 }
+
+.username_popover {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+}
+
+.username_popover > div,
+.username_popover > div::after,
+.username_popover > div::before {
+    background: transparent;
+    border: none !important;
+}
+
+.username_error_popover_header {
+    font-size: 0.95em;
+    text-align: center;
+    padding-bottom: 0.35em;
+}
+
+.username_error_header {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    align-items: center;
+    justify-content: center;
+}
+
+.username_error_icon {
+    color: #7c0a02;
+}
+
+.username_error_header_text {
+    font-weight: bold;
+}

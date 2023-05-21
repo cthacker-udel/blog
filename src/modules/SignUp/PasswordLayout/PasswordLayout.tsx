@@ -6,6 +6,12 @@ import styles from "./PasswordLayout.module.css";
 
 type PasswordLayoutProperties = {
     password: string;
+    updatePasswordValidity: (_value: boolean) => void;
+};
+
+type PasswordRemainingCharacters = {
+    amount: number;
+    valid: boolean;
 };
 
 type PasswordValidationState = {
@@ -14,7 +20,7 @@ type PasswordValidationState = {
     hasNoSpaces: boolean;
     hasSymbol: boolean;
     hasUppercaseLetter: boolean;
-    remainingCharacters: { amount: number; valid: boolean };
+    remainingCharacters: PasswordRemainingCharacters;
 };
 
 const PASSWORD_VALIDATION_STATE_DEFAULT_VALUES: PasswordValidationState = {
@@ -37,10 +43,12 @@ const INVALID_ICON = "fa-regular fa-circle";
  *
  * @param props - The properties of the password layout component
  * @param props.password - The password being entered in form
+ * @param props.updatePasswordValidity - Updates the validity of the password being entered, used for submission
  * @returns The password layout component
  */
 export const PasswordLayout = ({
     password,
+    updatePasswordValidity,
 }: PasswordLayoutProperties): JSX.Element => {
     const [passwordValidationState, setPasswordValidationState] =
         React.useState<PasswordValidationState>(
@@ -67,13 +75,21 @@ export const PasswordLayout = ({
                 clone.hasUppercaseLetter = Regex.HAS_UPPERCASE.test(password);
                 clone.hasSymbol = Regex.HAS_SYMBOL.test(password);
                 clone.hasNoSpaces = Regex.NO_SPACES.test(password);
+                updatePasswordValidity(
+                    clone.hasDigit &&
+                        clone.hasLowercaseLetter &&
+                        clone.hasUppercaseLetter &&
+                        clone.hasSymbol &&
+                        clone.hasNoSpaces &&
+                        clone.remainingCharacters.valid,
+                );
                 return clone;
             },
         );
-    }, [password]);
+    }, [password, updatePasswordValidity]);
 
     return (
-        <div className={styles.password_layout}>
+        <div className={styles.password_layout} id="password_status_dashboard">
             <div className={styles.password_requirement}>
                 <i
                     className={`${
