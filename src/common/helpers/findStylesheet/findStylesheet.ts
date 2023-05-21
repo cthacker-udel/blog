@@ -9,8 +9,6 @@ export const findStylesheet = (
 ): CSSStyleDeclaration | undefined => {
     const styleSheets = [...stylesheetList];
 
-    console.log("sheets = ", styleSheets);
-
     for (const eachStyleSheet of styleSheets) {
         try {
             const rules = [...eachStyleSheet.cssRules];

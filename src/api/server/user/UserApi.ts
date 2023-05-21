@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
 import { setCookie } from "cookies-next";
 import { sign } from "jsonwebtoken";
@@ -154,7 +153,6 @@ export class UserApi extends DatabaseApi implements IUserApi {
             response.status(isSuccessful ? 200 : 400);
             response.send({ data: isSuccessful } as ApiResponse<boolean>);
         } catch (error: unknown) {
-            console.log("catching", error);
             await this.logMongoError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
