@@ -1,10 +1,11 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 import { Tooltip } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 
 type GenerateTooltipArgument = {
     props: OverlayInjectedProps;
-    text: string;
+    content: ReactNode | string;
+    classNameOverride?: string;
 };
 
 /**
@@ -17,9 +18,10 @@ type GenerateTooltipArgument = {
  */
 export const generateTooltip = ({
     props,
-    text,
+    classNameOverride,
+    content,
 }: GenerateTooltipArgument): JSX.Element => (
-    <Tooltip id={`tooltip_${text}`} {...props}>
-        {text}
+    <Tooltip className={classNameOverride ?? ""} {...props}>
+        {content}
     </Tooltip>
 );

@@ -1,10 +1,17 @@
 import React from "react";
-import { Button, Form } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { Button, Form, OverlayTrigger } from "react-bootstrap";
+import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import { useForm, useWatch } from "react-hook-form";
 
-import { SignUpValidationText, SignUpValidationValues } from "@/common";
+import {
+    generatePopover,
+    generateTooltip,
+    SignUpValidationText,
+    SignUpValidationValues,
+} from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
+import { PasswordLayout } from "./PasswordLayout";
 import styles from "./SignUp.module.css";
 
 type FormValues = {
@@ -32,13 +39,15 @@ export const SignUp = (): JSX.Element => {
 
     useLayoutInjector(styles.signup_layout);
 
-    const { register } = useForm<FormValues>({
+    const { control, register } = useForm<FormValues>({
         criteriaMode: "all",
         defaultValues: FORM_DEFAULT_VALUES,
         delayError: 100,
         mode: "all",
         reValidateMode: "onChange",
     });
+
+    const password = useWatch({ control, name: "password" });
 
     return (
         <>
@@ -79,12 +88,31 @@ export const SignUp = (): JSX.Element => {
                     <label htmlFor="username_form">{"Username"}</label>
                 </Form.Floating>
                 <Form.Floating>
-                    <Form.Control
-                        id="password_form"
-                        placeholder="Password"
-                        type="password"
-                        {...register("password")}
-                    />
+                    <OverlayTrigger
+                        overlay={(
+                            properties: OverlayInjectedProps,
+                        ): JSX.Element =>
+                            generatePopover(
+                                properties,
+                                <PasswordLayout password={password} />,
+                                "Password Requirements",
+                                {
+                                    popoverClassNameOverride:
+                                        styles.password_requirement_popover,
+                                    popoverHeaderClassNameOverride:
+                                        styles.password_requirement_popover_header,
+                                },
+                            )
+                        }
+                        placement="right"
+                    >
+                        <Form.Control
+                            id="password_form"
+                            placeholder="Password"
+                            type="password"
+                            {...register("password")}
+                        />
+                    </OverlayTrigger>
                     <label htmlFor="password_form">{"Password"}</label>
                 </Form.Floating>
                 <Button variant="outline-primary">{"Sign Up"}</Button>

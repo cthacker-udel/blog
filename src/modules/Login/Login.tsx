@@ -73,8 +73,8 @@ export const Login = (): JSX.Element => {
                     delay={{ hide: 100, show: 200 }}
                     overlay={(properties: OverlayInjectedProps): JSX.Element =>
                         generateTooltip({
+                            content: "Home Page",
                             props: properties,
-                            text: "Home Page",
                         })
                     }
                     placement="right"

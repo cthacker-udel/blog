@@ -1,9 +1,11 @@
 @keyframes appear_anim {
     from {
         opacity: 0%;
+        pointer-events: none;
     }
     to {
         opacity: 100%;
+        pointer-events: all;
     }
 }
 
@@ -18,6 +20,7 @@
 }
 
 .signup_form {
+    pointer-events: none;
     opacity: 0%;
     animation: appear_anim 1s 1s ease-in-out forwards;
     display: flex;
@@ -33,4 +36,23 @@
 
 .signup_form > div > label {
     color: rgba(255, 255, 255, 0.25);
+}
+
+.password_requirement_popover {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+}
+
+.password_requirement_popover > div,
+.password_requirement_popover > div::after,
+.password_requirement_popover > div::before {
+    background: transparent;
+    border: none !important;
+}
+
+.password_requirement_popover_header {
+    font-size: 0.95em;
+    text-align: center;
+    text-decoration: underline;
+    padding-bottom: 0.35em;
 }
