@@ -1,0 +1,36 @@
+@keyframes appear_anim {
+    from {
+        opacity: 0%;
+    }
+    to {
+        opacity: 100%;
+    }
+}
+
+.signup_layout {
+    gap: 1em;
+}
+
+.signup_title {
+    opacity: 0%;
+    animation: appear_anim 1s ease-in-out forwards;
+    font-size: 4.5em;
+}
+
+.signup_form {
+    opacity: 0%;
+    animation: appear_anim 1s 1s ease-in-out forwards;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+}
+
+.signup_form > div > input,
+.signup_form > div > input:focus {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.signup_form > div > label {
+    color: rgba(255, 255, 255, 0.25);
+}

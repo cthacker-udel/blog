@@ -39,7 +39,14 @@ export const Landing = (): JSX.Element => {
                 >
                     {"Login"}
                 </Button>
-                <Button variant="outline-secondary">{"Sign Up"}</Button>
+                <Button
+                    onClick={(): void => {
+                        router.push("/signup");
+                    }}
+                    variant="outline-secondary"
+                >
+                    {"Sign Up"}
+                </Button>
             </div>
         </>
     );

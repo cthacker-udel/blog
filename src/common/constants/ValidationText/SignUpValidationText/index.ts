@@ -1,0 +1,1 @@
+export { SignUpValidationText } from "./SignUpValidationText";
