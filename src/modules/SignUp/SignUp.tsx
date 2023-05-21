@@ -16,6 +16,7 @@ import { useBackground, useLayoutInjector } from "@/hooks";
 
 import { PasswordLayout } from "./PasswordLayout";
 import styles from "./SignUp.module.css";
+import { Key } from "ts-key-enum";
 
 type FormValues = {
     password: string;
@@ -95,7 +96,18 @@ export const SignUp = (): JSX.Element => {
     return (
         <>
             <div className={styles.signup_title}>{"Sign Up"}</div>
-            <div className={styles.signup_form}>
+            <div
+                className={styles.signup_form}
+                onKeyDown={async (
+                    event: React.KeyboardEvent<HTMLDivElement>,
+                ): Promise<void> => {
+                    const { key } = event;
+                    if (key === Key.Enter) {
+                        await signUp();
+                    }
+                }}
+                tabIndex={-1}
+            >
                 <Form.Floating>
                     <OverlayTrigger
                         overlay={(
