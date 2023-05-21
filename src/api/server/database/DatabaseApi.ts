@@ -1,3 +1,4 @@
+/* eslint-disable node/no-extraneous-import -- disabled */
 /* eslint-disable no-console -- disabled */
 import type { RedisClientType } from "@redis/client";
 import {
@@ -119,7 +120,6 @@ export class DatabaseApi {
     public getMongoRepo = <T extends Document>(
         collectionName: string,
     ): Collection<T> => {
-        console.log("before if");
         if (!this.pingMongoStatus() || this.database === undefined) {
             throw new Error(
                 "Database is not connected, cannot request collection",

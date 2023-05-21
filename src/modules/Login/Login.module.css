@@ -22,6 +22,21 @@
 
 .login_title {
     font-size: 5em;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+}
+
+.login_title_icon {
+    font-size: 0.35em;
+    align-self: center;
+    transition: color 1s ease-in-out;
+    color: rgba(45, 84, 200, 1);
+}
+
+.login_title_icon:hover {
+    color: rgba(34, 193, 195, 1);
+    cursor: pointer;
 }
 
 .login_form {

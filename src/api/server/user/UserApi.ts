@@ -1,4 +1,7 @@
+/* eslint-disable class-methods-use-this -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
+import { setCookie } from "cookies-next";
+import { sign } from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { ApiResponse, User } from "@/@types";
@@ -89,6 +92,24 @@ export class UserApi extends DatabaseApi implements IUserApi {
     };
 
     /** @inheritdoc */
+    public createSessionToken = async (username: string): Promise<string> => {
+        try {
+            await this.closeMongoTransaction();
+            const token = sign(
+                JSON.stringify({ username }),
+                process.env.JWT_SIGN_HASH as unknown as string,
+                { expiresIn: "30m" },
+            );
+            return token;
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            throw error;
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
     public login = async (
         request: NextApiRequest,
         response: NextApiResponse,
@@ -120,6 +141,15 @@ export class UserApi extends DatabaseApi implements IUserApi {
             );
 
             const isSuccessful = fixedHash === foundUser.password;
+
+            if (isSuccessful) {
+                const token = await this.createSessionToken(username);
+                setCookie(process.env.COOKIE_NAME as unknown as string, token, {
+                    maxAge: 1800,
+                    req: request,
+                    res: response,
+                });
+            }
 
             response.status(isSuccessful ? 200 : 400);
             response.send({ data: isSuccessful } as ApiResponse<boolean>);

@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 import { useRouter } from "next/router";
 import React from "react";
-import { Button, Form, InputGroup } from "react-bootstrap";
+import { Button, Form, InputGroup, OverlayTrigger } from "react-bootstrap";
+import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Key } from "ts-key-enum";
 
 import { UserService } from "@/api/service";
+import { generateTooltip } from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
 import styles from "./Login.module.css";
@@ -67,6 +69,23 @@ export const Login = (): JSX.Element => {
         <>
             <div className={`${styles.login_title}`} id="login_title">
                 {"Login"}
+                <OverlayTrigger
+                    delay={{ hide: 100, show: 200 }}
+                    overlay={(properties: OverlayInjectedProps): JSX.Element =>
+                        generateTooltip({
+                            props: properties,
+                            text: "Home Page",
+                        })
+                    }
+                    placement="right"
+                >
+                    <i
+                        className={`fa-solid fa-house fa-xs ${styles.login_title_icon}`}
+                        onClick={(): void => {
+                            router.push("/");
+                        }}
+                    />
+                </OverlayTrigger>
             </div>
             <div
                 className={styles.login_form}

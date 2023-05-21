@@ -37,4 +37,12 @@ export interface IUserApi {
      * @returns Whether the login was successful or not
      */
     login: (_request: ClientRequest, _response: ServerResponse) => PV;
+
+    /**
+     * Creates a session token for the user
+     *
+     * @param _username - The username of the user we are creating a session token for
+     * @returns The created token, empty string if failed
+     */
+    createSessionToken: (_username: string) => Promise<string>;
 }
