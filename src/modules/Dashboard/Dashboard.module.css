@@ -1,0 +1,26 @@
+@keyframes appear_anim {
+    from {
+        opacity: 0%;
+    }
+    to {
+        opacity: 100%;
+    }
+}
+
+.title_layout > * {
+    animation: appear_anim 1s ease-in-out forwards;
+}
+
+.title {
+    opacity: 0%;
+    font-size: 5em;
+}
+
+.logout_button {
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: 2em;
+    position: absolute;
+    left: calc(100% - 3em);
+    bottom: calc(100% - 3em);
+}
