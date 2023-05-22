@@ -27,4 +27,11 @@ export interface IUserService {
         _username: string,
         _password: string,
     ) => Promise<ApiResponse<boolean>>;
+
+    /**
+     * Attempts to log the user out of the service
+     *
+     * @returns Whether the logout was successful or not
+     */
+    logout: () => Promise<ApiResponse<boolean>>;
 }

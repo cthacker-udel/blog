@@ -45,4 +45,16 @@ export interface IUserApi {
      * @returns The created token, empty string if failed
      */
     createSessionToken: (_username: string) => Promise<string>;
+
+    /**
+     * Attempts to log the user out of the website, essentially erasing their session, which automatically kicks them out
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Whether the logout was successful
+     */
+    logout: (
+        _request: ClientRequest,
+        _response: ServerResponse,
+    ) => Promise<boolean>;
 }

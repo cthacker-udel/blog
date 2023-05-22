@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/indent -- disabled */
-import { setCookie } from "cookies-next";
+import { removeCookies, setCookie } from "cookies-next";
 import { sign } from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -152,6 +152,28 @@ export class UserApi extends DatabaseApi implements IUserApi {
             await this.logMongoError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public logout = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<boolean> => {
+        try {
+            await this.startMongoTransaction();
+            removeCookies(process.env.COOKIE_NAME as unknown as string, {
+                req: request,
+                res: response,
+            });
+            return true;
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+            return false;
         } finally {
             await this.closeMongoTransaction();
         }

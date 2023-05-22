@@ -40,4 +40,13 @@ export class UserService extends ServiceBaseController implements IUserService {
 
         return response;
     };
+
+    /** @inheritdoc */
+    public logout = async (): Promise<ApiResponse<boolean>> => {
+        const response = await this.get<boolean>(
+            `${Endpoints.USER.BASE}${Endpoints.USER.LOGOUT}`,
+        );
+
+        return response;
+    };
 }
