@@ -1,4 +1,5 @@
 import React from "react";
+import { Key } from "ts-key-enum";
 
 type useSimulateTypingProperties = {
     cssClassName?: string;
@@ -29,7 +30,23 @@ export const useSimulateTyping = ({
      */
     const [currentTyping, setCurrentTyping] = React.useState<number>(0);
 
+    const cutOffAnimation = React.useCallback(
+        (event: KeyboardEvent) => {
+            const { key } = event;
+            if (key === Key.Enter) {
+                const element = ref.current;
+                if (element !== null) {
+                    element.innerHTML = `${content}`;
+                    setCurrentTyping(content.length);
+                }
+            }
+        },
+        [content, ref],
+    );
+
     React.useEffect(() => {
+        document.addEventListener("keydown", cutOffAnimation);
+
         if (ref.current !== null && currentTyping < content.length) {
             const time =
                 Math.random() *
@@ -39,8 +56,10 @@ export const useSimulateTyping = ({
             const element = ref.current;
 
             setTimeout(() => {
-                element.innerHTML = `${element.innerHTML}${content[currentTyping]}`;
-                setCurrentTyping((oldValue) => oldValue + 1);
+                if (element.innerHTML !== content) {
+                    element.innerHTML = `${element.innerHTML}${content[currentTyping]}`;
+                    setCurrentTyping((oldValue) => oldValue + 1);
+                }
             }, time);
         }
 
@@ -48,5 +67,16 @@ export const useSimulateTyping = ({
             ref.current.style.borderRight = "2px solid transparent";
             ref.current.style.animation = "none";
         }
-    }, [currentTyping, content, intervalStart, intervalEnd, ref]);
+
+        return () => {
+            document.removeEventListener("keydown", cutOffAnimation);
+        };
+    }, [
+        currentTyping,
+        cutOffAnimation,
+        content,
+        intervalStart,
+        intervalEnd,
+        ref,
+    ]);
 };
