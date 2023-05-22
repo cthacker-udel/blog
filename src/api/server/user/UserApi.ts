@@ -50,7 +50,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
     ): Promise<void> => {
         try {
             await this.startMongoTransaction();
-            const { password, username } = request.body as Pick<
+            const { password, username } = JSON.parse(request.body) as Pick<
                 User,
                 "password" | "username"
             >;
@@ -70,7 +70,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
 
             const userRepo = this.getMongoRepo<User>(Collections.USERS);
 
-            const insertionResult = userRepo.insertOne({
+            const insertionResult = await userRepo.insertOne({
                 password: hashResult.hash,
                 passwordSalt: hashResult.salt,
                 username,
@@ -93,18 +93,14 @@ export class UserApi extends DatabaseApi implements IUserApi {
     /** @inheritdoc */
     public createSessionToken = async (username: string): Promise<string> => {
         try {
-            await this.closeMongoTransaction();
             const token = sign(
                 JSON.stringify({ username }),
                 process.env.JWT_SIGN_HASH as unknown as string,
-                { expiresIn: "30m" },
             );
             return token;
         } catch (error: unknown) {
             await this.logMongoError(error);
             throw error;
-        } finally {
-            await this.closeMongoTransaction();
         }
     };
 
@@ -115,7 +111,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
     ): Promise<void> => {
         try {
             await this.startMongoTransaction();
-            const { password, username } = request.body as Pick<
+            const { password, username } = JSON.parse(request.body) as Pick<
                 User,
                 "password" | "username"
             >;

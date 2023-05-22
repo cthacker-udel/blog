@@ -71,7 +71,7 @@ export class ServiceBaseController {
                     : `?${encodeURIComponent(queryString.toString())}`
             }`,
             {
-                body: body as BodyInit,
+                body: JSON.stringify(body) as BodyInit,
                 credentials: "include",
                 headers: { ...customHeaders },
                 method: "POST",

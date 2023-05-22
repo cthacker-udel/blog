@@ -40,6 +40,7 @@ export class EncryptionService {
         const hash = createHash("sha512")
             .update(
                 pbkdf2Sync(password, salt, 100, 128, "sha512").toString("hex"),
+                "hex",
             )
             .digest("hex");
         return hash;

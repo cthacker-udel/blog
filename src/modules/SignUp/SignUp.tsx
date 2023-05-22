@@ -227,6 +227,9 @@ export const SignUp = (): JSX.Element => {
                         !isPasswordValid ||
                         isValidating
                     }
+                    onClick={async (): Promise<void> => {
+                        await signUp();
+                    }}
                     variant="primary"
                 >
                     {"Sign Up"}

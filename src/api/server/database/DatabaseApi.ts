@@ -147,6 +147,5 @@ export class DatabaseApi {
                 stackTrace: convertedError.stack,
             });
         }
-        await this.closeMongoTransaction();
     };
 }
