@@ -103,7 +103,7 @@ export const Dashboard = (): JSX.Element => {
             >
                 <Button
                     className={styles.change_username_button}
-                    onClick={async (): Promise<void> => {
+                    onClick={(): void => {
                         console.log("hello");
                     }}
                     onMouseEnter={(
@@ -166,7 +166,7 @@ export const Dashboard = (): JSX.Element => {
             >
                 <Button
                     className={styles.request_admin_access_button}
-                    onClick={async (): Promise<void> => {
+                    onClick={(): void => {
                         console.log("requesting admin access");
                     }}
                     onMouseEnter={(
