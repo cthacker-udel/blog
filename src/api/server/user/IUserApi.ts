@@ -57,4 +57,16 @@ export interface IUserApi {
         _request: ClientRequest,
         _response: ServerResponse,
     ) => Promise<boolean>;
+
+    /**
+     * Attempts to send a request for admin access to the admin email
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Whether the request was sent
+     */
+    requestAdminAccess: (
+        _request: ClientRequest,
+        _response: ServerResponse,
+    ) => Promise<boolean>;
 }

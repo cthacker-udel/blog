@@ -1,14 +1,22 @@
+/* eslint-disable camelcase -- disabled */
 /* eslint-disable import/no-nodejs-modules -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-import { removeCookies, setCookie } from "cookies-next";
+import { type MailDataRequired, MailService } from "@sendgrid/mail";
+import { deleteCookie, setCookie } from "cookies-next";
 import { sign } from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { ApiResponse, User } from "@/@types";
+import type { AdminRequest } from "@/@types/api/AdminRequest";
 import { EncryptionService } from "@/api/service/encryption";
-import { convertErrorToApiResponse, generateEntityDateTimes } from "@/common";
+import {
+    convertErrorToApiResponse,
+    generateEntityDateTimes,
+    generateRequestAdminAccessConfirmationLink,
+    parseCookie,
+} from "@/common";
 import { Collections } from "@/constants";
 
 import { DatabaseApi } from "../database";
@@ -167,7 +175,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
     ): Promise<boolean> => {
         try {
             await this.startMongoTransaction();
-            removeCookies(process.env.COOKIE_NAME as unknown as string, {
+            deleteCookie(process.env.COOKIE_NAME as unknown as string, {
                 req: request,
                 res: response,
             });
@@ -185,6 +193,75 @@ export class UserApi extends DatabaseApi implements IUserApi {
                     convertErrorToApiResponse(error, false),
                 );
             }
+            return false;
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public requestAdminAccess = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<boolean> => {
+        try {
+            await this.startMongoTransaction();
+            const sendgridClient = new MailService();
+            sendgridClient.setApiKey(
+                process.env.SENDGRID_API_KEY as unknown as string,
+            );
+            const adminRequestRepo = this.getMongoRepo<AdminRequest>(
+                Collections.ADMIN_REQUESTS,
+            );
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const { username } = parseCookie(request);
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error(
+                    "Could not find user requesting admin access in database",
+                );
+            }
+
+            const foundRequest = await adminRequestRepo.findOne({
+                user_id: foundUser._id,
+            });
+
+            if (foundRequest !== null) {
+                throw new Error("Request for admin access already exists");
+            }
+
+            const makeRequest = await adminRequestRepo.insertOne({
+                requestedAt: new Date(Date.now()),
+                user_id: foundUser._id,
+            });
+
+            if (!makeRequest.acknowledged) {
+                return false;
+            }
+
+            const link = generateRequestAdminAccessConfirmationLink(
+                makeRequest.insertedId,
+                username,
+            );
+
+            const [sendEmailResponse] = await sendgridClient.send({
+                dynamicTemplateData: { link, username },
+                templateId: process.env
+                    .REQUEST_ADMIN_ACCESS_EMAIL_TEMPLATE_ID as unknown as string,
+                to: {
+                    email: process.env
+                        .SENDGRID_ADMIN_TO_EMAIL as unknown as string,
+                },
+            } as unknown as MailDataRequired);
+
+            return sendEmailResponse.statusCode === 202;
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
             return false;
         } finally {
             await this.closeMongoTransaction();

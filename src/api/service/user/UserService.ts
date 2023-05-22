@@ -49,4 +49,13 @@ export class UserService extends ServiceBaseController implements IUserService {
 
         return response;
     };
+
+    /** @inheritdoc */
+    public requestAdminAccess = async (): Promise<ApiResponse<boolean>> => {
+        const response = await this.get<boolean>(
+            `${Endpoints.USER.BASE}${Endpoints.USER.REQUEST_ADMIN_ACCESS}`,
+        );
+
+        return response;
+    };
 }
