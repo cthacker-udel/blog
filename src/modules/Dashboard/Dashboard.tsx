@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string -- disabled */
 /* eslint-disable no-extra-boolean-cast -- disabled */
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 import { useRouter } from "next/router";
@@ -151,6 +152,69 @@ export const Dashboard = (): JSX.Element => {
                     <i
                         className="fa-solid fa-user-pen"
                         id="edit_username_icon"
+                    />
+                </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+                overlay={(properties: OverlayInjectedProps): JSX.Element =>
+                    generateTooltip({
+                        content: "Request Admin Access",
+                        props: properties,
+                    })
+                }
+                placement="left"
+            >
+                <Button
+                    className={styles.request_admin_access_button}
+                    onClick={async (): Promise<void> => {
+                        console.log("requesting admin access");
+                    }}
+                    onMouseEnter={(
+                        event: React.MouseEvent<HTMLButtonElement>,
+                    ): void => {
+                        const { target } = event;
+                        if (Boolean(target)) {
+                            const convertedTarget = target as HTMLButtonElement;
+                            convertedTarget.className =
+                                convertedTarget.className.replace(
+                                    "btn-primary",
+                                    "btn-info",
+                                );
+                            const icon = document.querySelector(
+                                "#request_admin_access_icon",
+                            );
+                            if (Boolean(icon) && icon !== null) {
+                                icon.className = `${icon.className} fa-flip`;
+                            }
+                        }
+                    }}
+                    onMouseLeave={(
+                        event: React.MouseEvent<HTMLButtonElement>,
+                    ): void => {
+                        const { target } = event;
+                        if (Boolean(target)) {
+                            const convertedTarget = target as HTMLButtonElement;
+                            convertedTarget.className =
+                                convertedTarget.className.replace(
+                                    "btn-primary",
+                                    "btn-info",
+                                );
+                            const icon = document.querySelector(
+                                "#request_admin_access_icon",
+                            );
+                            if (Boolean(icon) && icon !== null) {
+                                icon.className = icon.className.replaceAll(
+                                    " fa-flip",
+                                    "",
+                                );
+                            }
+                        }
+                    }}
+                    variant="warning"
+                >
+                    <i
+                        className="fa-solid fa-unlock"
+                        id="request_admin_access_icon"
                     />
                 </Button>
             </OverlayTrigger>
