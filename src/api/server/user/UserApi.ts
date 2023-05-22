@@ -16,6 +16,7 @@ import {
     generateEntityDateTimes,
     generateRequestAdminAccessConfirmationLink,
     parseCookie,
+    UserRoles,
 } from "@/common";
 import { Collections } from "@/constants";
 
@@ -86,6 +87,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
                 passwordSalt: hashResult.salt,
                 username,
                 ...generateEntityDateTimes(),
+                role: UserRoles.USER,
             });
 
             response.status(insertionResult === null ? 400 : 200);

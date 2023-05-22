@@ -1,5 +1,7 @@
 import type { ObjectId } from "mongodb";
 
+import type { UserRoles } from "@/common";
+
 export type User = {
     _id?: ObjectId;
     createdAt: Date;
@@ -8,4 +10,5 @@ export type User = {
     password: string;
     passwordSalt: string;
     profilePictureUrl?: string;
+    role: UserRoles;
 };
