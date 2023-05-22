@@ -53,10 +53,7 @@ export interface IUserApi {
      * @param _response - The client response
      * @returns Whether the logout was successful
      */
-    logout: (
-        _request: ClientRequest,
-        _response: ServerResponse,
-    ) => Promise<boolean>;
+    logout: (_request: ClientRequest, _response: ServerResponse) => PV;
 
     /**
      * Attempts to send a request for admin access to the admin email
@@ -68,5 +65,5 @@ export interface IUserApi {
     requestAdminAccess: (
         _request: ClientRequest,
         _response: ServerResponse,
-    ) => Promise<boolean>;
+    ) => PV;
 }

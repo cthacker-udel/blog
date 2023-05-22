@@ -174,14 +174,20 @@ export class UserApi extends DatabaseApi implements IUserApi {
     public logout = async (
         request: IncomingMessage | NextApiRequest,
         response: NextApiResponse | ServerResponse,
-    ): Promise<boolean> => {
+    ): Promise<void> => {
         try {
             await this.startMongoTransaction();
             deleteCookie(process.env.COOKIE_NAME as unknown as string, {
                 req: request,
                 res: response,
             });
-            return true;
+            if ((response as NextApiResponse) === undefined) {
+                (response as ServerResponse).write(
+                    JSON.stringify({ data: true }),
+                );
+            } else {
+                (response as NextApiResponse).send({ data: true });
+            }
         } catch (error: unknown) {
             await this.logMongoError(error);
             if ((response as NextApiResponse) === undefined) {
@@ -195,7 +201,6 @@ export class UserApi extends DatabaseApi implements IUserApi {
                     convertErrorToApiResponse(error, false),
                 );
             }
-            return false;
         } finally {
             await this.closeMongoTransaction();
         }
@@ -205,7 +210,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
     public requestAdminAccess = async (
         request: NextApiRequest,
         response: NextApiResponse,
-    ): Promise<boolean> => {
+    ): Promise<void> => {
         try {
             await this.startMongoTransaction();
             const sendgridClient = new MailService();
@@ -241,7 +246,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
             });
 
             if (!makeRequest.acknowledged) {
-                return false;
+                response.send({ data: false });
             }
 
             const link = generateRequestAdminAccessConfirmationLink(
@@ -259,12 +264,11 @@ export class UserApi extends DatabaseApi implements IUserApi {
                 },
             } as unknown as MailDataRequired);
 
-            return sendEmailResponse.statusCode === 202;
+            response.send({ data: sendEmailResponse.statusCode === 202 });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
-            return false;
         } finally {
             await this.closeMongoTransaction();
         }
