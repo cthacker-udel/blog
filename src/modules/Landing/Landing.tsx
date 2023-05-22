@@ -1,10 +1,11 @@
+/* eslint-disable camelcase -- disabled */
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 import { useRouter } from "next/router";
 import React from "react";
 import { Button } from "react-bootstrap";
 
 import { SimulateTyping } from "@/common";
-import { useBackground, useLayoutInjector } from "@/hooks";
+import { useBackground, useCancelAnimations, useLayoutInjector } from "@/hooks";
 
 import styles from "./Landing.module.css";
 
@@ -20,6 +21,12 @@ export const Landing = (): JSX.Element => {
         },
     });
     useLayoutInjector(styles.landing_body);
+    useCancelAnimations({
+        endingAnimationIdMapping: {
+            landing_button_container: { opacity: "100%", top: "75vh" },
+        },
+        ids: ["landing_button_container"],
+    });
     const router = useRouter();
 
     return (
@@ -30,7 +37,10 @@ export const Landing = (): JSX.Element => {
                     content="Cameron Thacker's Blog"
                 />
             </div>
-            <div className={styles.button_container}>
+            <div
+                className={styles.button_container}
+                id="landing_button_container"
+            >
                 <Button
                     onClick={(): void => {
                         router.push("/login");
