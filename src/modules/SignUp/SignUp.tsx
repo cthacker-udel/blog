@@ -81,7 +81,7 @@ export const SignUp = (): JSX.Element => {
                     render: "Successfully signed up!",
                     type: "success",
                 });
-                router.push("/homepage");
+                router.push("/dashboard");
             } else {
                 toast.update(signingUpToast, {
                     autoClose: 1500,
