@@ -1,0 +1,1 @@
+export { generateRequestAdminAccessLink } from "./generateRequestAdminAccessLink";

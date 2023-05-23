@@ -6,6 +6,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { type MailDataRequired, MailService } from "@sendgrid/mail";
 import { deleteCookie, setCookie } from "cookies-next";
 import { sign } from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { ApiResponse, User } from "@/@types";
@@ -14,7 +15,7 @@ import { EncryptionService } from "@/api/service/encryption";
 import {
     convertErrorToApiResponse,
     generateEntityDateTimes,
-    generateRequestAdminAccessConfirmationLink,
+    generateRequestAdminAccessLink,
     parseCookie,
     UserRoles,
 } from "@/common";
@@ -249,22 +250,129 @@ export class UserApi extends DatabaseApi implements IUserApi {
                 response.send({ data: false });
             }
 
-            const link = generateRequestAdminAccessConfirmationLink(
+            const confirmUrl = generateRequestAdminAccessLink(
                 makeRequest.insertedId,
                 username,
             );
 
+            const rejectUrl = generateRequestAdminAccessLink(
+                makeRequest.insertedId,
+                username,
+                false,
+            );
+
             const [sendEmailResponse] = await sendgridClient.send({
-                dynamicTemplateData: { link, username },
+                dynamicTemplateData: { confirmUrl, rejectUrl, username },
+                from: {
+                    email: process.env
+                        .SENDGRID_ADMIN_TO_EMAIL as unknown as string,
+                },
                 templateId: process.env
                     .REQUEST_ADMIN_ACCESS_EMAIL_TEMPLATE_ID as unknown as string,
                 to: {
                     email: process.env
                         .SENDGRID_ADMIN_TO_EMAIL as unknown as string,
                 },
-            } as unknown as MailDataRequired);
+            } as MailDataRequired);
 
             response.send({ data: sendEmailResponse.statusCode === 202 });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public confirmAdminAccess = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const id = request.query.id as string;
+
+            if (id === undefined) {
+                throw new Error(
+                    "Failed to parse id from query string in confirming",
+                );
+            }
+
+            const requestRepo = this.getMongoRepo<AdminRequest>(
+                Collections.ADMIN_REQUESTS,
+            );
+
+            const foundRequest = await requestRepo.findOne({
+                _id: new ObjectId(id),
+            });
+
+            if (foundRequest === null) {
+                throw new Error("Unable to find request to confirm");
+            }
+
+            const { user_id } = foundRequest;
+
+            const deleteResult = await requestRepo.deleteOne(foundRequest);
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const updateResult = await userRepo.updateOne(
+                { _id: user_id },
+                { role: UserRoles.ADMIN },
+            );
+
+            response.status(
+                deleteResult.acknowledged && updateResult.acknowledged
+                    ? 200
+                    : 400,
+            );
+            response.send({
+                data: deleteResult.acknowledged && updateResult.acknowledged,
+            });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public rejectAdminAccess = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const id = request.query.id as string;
+
+            if (id === undefined || id.length === 0) {
+                throw new Error(
+                    "Failed to parse id from query string in rejecting",
+                );
+            }
+
+            const requestRepo = this.getMongoRepo<AdminRequest>(
+                Collections.ADMIN_REQUESTS,
+            );
+
+            const foundRequest = await requestRepo.findOne({
+                _id: new ObjectId(id),
+            });
+
+            if (foundRequest === null) {
+                throw new Error("Request unable to be found");
+            }
+
+            const deleteResult = await requestRepo.deleteOne(foundRequest);
+
+            response.status(deleteResult.acknowledged ? 200 : 400);
+            response.send({ data: deleteResult.acknowledged });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);
