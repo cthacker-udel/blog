@@ -1,42 +1,42 @@
-.username_popover {
+.post_title_popover {
     background: rgba(0, 0, 0, 0.05);
     border: none;
 }
 
-.username_popover > div,
-.username_popover > div::after,
-.username_popover > div::before {
+.post_title_popover > div,
+.post_title_popover > div::after,
+.post_title_popover > div::before {
     background: transparent;
     border: none !important;
     min-width: 15vw;
 }
 
-.username_popover_error > div,
-.username_popover_error > div::after,
-.username_popover_error > div::before {
+.post_title_popover_error > div,
+.post_title_popover_error > div::after,
+.post_title_popover_error > div::before {
     color: #fd1d1d;
 }
 
-.username_popover_success > div,
-.username_popover_success > div::after,
-.username_popover_success > div::before {
+.post_title_popover_success > div,
+.post_title_popover_success > div::after,
+.post_title_popover_success > div::before {
     color: #78a842;
 }
 
-.username_popover_body {
+.post_title_popover_body {
     font-family: "DynaPuff", sans-serif !important;
     letter-spacing: 0.05em;
     min-height: 10vh;
     min-width: 100%;
 }
 
-.username_error_popover_header {
+.post_title_error_popover_header {
     font-size: 0.95em;
     text-align: center;
     padding-bottom: 0.35em;
 }
 
-.username_popover_header {
+.post_title_popover_header {
     display: flex;
     flex-direction: row;
     gap: 0.5em;
@@ -44,30 +44,30 @@
     justify-content: center;
 }
 
-.username_error_icon {
+.post_title_error_icon {
     color: #7c0a02;
 }
 
-.username_success_icon {
+.post_title_success_icon {
     color: #78a842;
 }
 
-.username_error_header_text {
+.post_title_error_header_text {
     font-weight: bold;
 }
 
-.edit_username_modal_content {
+.edit_post_title_modal_content {
     background: transparent;
     border: none;
 }
 
-.edit_username_form,
-.edit_username_form:focus {
+.edit_post_title_form,
+.edit_post_title_form:focus {
     background: transparent;
     border-color: #22a2c3;
     color: #22a2c3;
 }
 
-.edit_username_form_label {
+.edit_post_title_form_label {
     color: #22a2c3;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises -- id*/
 import { useRouter } from "next/router";
 import React from "react";
 import { Form, Modal, OverlayTrigger } from "react-bootstrap";
@@ -7,7 +8,11 @@ import { toast } from "react-toastify";
 import { Key } from "ts-key-enum";
 
 import { UserService } from "@/api/service";
-import { generatePopover } from "@/common";
+import {
+    AddPostValidationText,
+    AddPostValidationValues,
+    generatePopover,
+} from "@/common";
 
 import styles from "./AddPostModal.module.css";
 
@@ -45,7 +50,7 @@ export const AddPostModal = ({
 
     const router = useRouter();
 
-    const editUsername = React.useCallback(async () => {
+    const addPost = React.useCallback(async () => {
         if (
             dirtyFields.title !== undefined &&
             errors.title !== undefined &&
@@ -55,23 +60,31 @@ export const AddPostModal = ({
             const addingPostToast = toast.loading("Adding post...");
             const { title } = getValues();
             const { data } = await new UserService().addPost(title);
-            if (data ?? false) {
-                toast.update(addingPostToast, {
-                    autoClose: 1500,
-                    isLoading: false,
-                    render: "Successfully added post!",
-                    type: "success",
-                });
-            } else {
+            if (data === null) {
                 toast.update(addingPostToast, {
                     autoClose: 1500,
                     isLoading: false,
                     render: "Failed to add post",
                     type: "error",
                 });
+            } else {
+                toast.update(addingPostToast, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Successfully added post!",
+                    type: "success",
+                });
+                router.push(`post/${data.toString()}`);
             }
         }
-    }, [dirtyFields.title, errors.title, getValues, isDirty, isValidating]);
+    }, [
+        dirtyFields.title,
+        errors.title,
+        getValues,
+        isDirty,
+        isValidating,
+        router,
+    ]);
 
     const onClose = React.useCallback(() => {
         clearErrors();
@@ -81,7 +94,7 @@ export const AddPostModal = ({
 
     return (
         <Modal
-            contentClassName={styles.edit_username_modal_content}
+            contentClassName={styles.edit_post_title_modal_content}
             onHide={(): void => {
                 onClose();
             }}
@@ -93,7 +106,7 @@ export const AddPostModal = ({
                 ): Promise<void> => {
                     const { key } = keyEvent;
                     if (key === Key.Enter) {
-                        await editUsername();
+                        await addPost();
                     }
                 }}
             >
@@ -110,56 +123,56 @@ export const AddPostModal = ({
                                 errors.title === undefined ? (
                                     <div
                                         className={
-                                            styles.username_popover_header
+                                            styles.post_title_popover_header
                                         }
                                     >
                                         <i
-                                            className={`fa-solid fa-circle-check fa-beat ${styles.username_success_icon}`}
+                                            className={`fa-solid fa-circle-check fa-beat ${styles.post_title_success_icon}`}
                                         />
                                         <span
                                             className={
-                                                styles.username_error_header_text
+                                                styles.post_title_error_header_text
                                             }
                                         >
-                                            {"Username is valid!"}
+                                            {"Title is valid!"}
                                         </span>
                                         <i
-                                            className={`fa-solid fa-circle-check fa-beat ${styles.username_success_icon}`}
+                                            className={`fa-solid fa-circle-check fa-beat ${styles.post_title_success_icon}`}
                                         />
                                     </div>
                                 ) : (
                                     <div
                                         className={
-                                            styles.username_popover_header
+                                            styles.post_title_popover_header
                                         }
                                     >
                                         <i
-                                            className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
+                                            className={`fa-solid fa-circle-exclamation fa-spin ${styles.post_title_error_icon}`}
                                         />
                                         <span
                                             className={
-                                                styles.username_error_header_text
+                                                styles.post_title_error_header_text
                                             }
                                         >
-                                            {"Username Error"}
+                                            {"Title Error"}
                                         </span>
                                         <i
-                                            className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
+                                            className={`fa-solid fa-circle-exclamation fa-spin ${styles.post_title_error_icon}`}
                                         />
                                     </div>
                                 ),
                                 {
                                     popoverBodyClassNameOverride:
-                                        styles.username_popover_body,
+                                        styles.post_title_popover_body,
                                     popoverClassNameOverride: `${
-                                        styles.username_popover
+                                        styles.post_title_popover
                                     } ${
                                         errors.title === undefined
-                                            ? styles.username_popover_success
-                                            : styles.username_popover_error
+                                            ? styles.post_title_popover_success
+                                            : styles.post_title_popover_error
                                     }`,
                                     popoverHeaderClassNameOverride:
-                                        styles.username_error_popover_header,
+                                        styles.post_title_error_popover_header,
                                 },
                             )
                         }
@@ -170,47 +183,31 @@ export const AddPostModal = ({
                     >
                         <Form.Control
                             autoComplete="off"
-                            className={styles.edit_username_form}
-                            id="edit_username_form"
-                            placeholder="Username"
+                            className={styles.edit_post_title_form}
+                            id="edit_post_title_form"
+                            placeholder="Post Title"
                             type="text"
                             {...register("title", {
                                 maxLength: {
                                     message:
-                                        EditUsernameValidationText.USERNAME
-                                            .MAX_LENGTH,
-                                    value: EditUsernameValidationValues.USERNAME
+                                        AddPostValidationText.TITLE.MAX_LENGTH,
+                                    value: AddPostValidationValues.TITLE
                                         .MAX_LENGTH,
                                 },
                                 required: {
                                     message:
-                                        EditUsernameValidationText.USERNAME
-                                            .REQUIRED,
-                                    value: EditUsernameValidationValues.USERNAME
+                                        AddPostValidationText.TITLE.REQUIRED,
+                                    value: AddPostValidationValues.TITLE
                                         .REQUIRED,
-                                },
-                                validate: {
-                                    noSpaces: (value: string) => {
-                                        if (
-                                            EditUsernameValidationValues.USERNAME.NO_SPACES.test(
-                                                value,
-                                            )
-                                        ) {
-                                            return true;
-                                        }
-
-                                        return EditUsernameValidationText
-                                            .USERNAME.NO_SPACES;
-                                    },
                                 },
                             })}
                         />
                     </OverlayTrigger>
                     <label
-                        className={styles.edit_username_form_label}
-                        htmlFor="edit_username_form"
+                        className={styles.edit_post_title_form_label}
+                        htmlFor="edit_post_title_form"
                     >
-                        {"Username"}
+                        {"Post Title"}
                     </label>
                 </Form.Floating>
             </Modal.Body>

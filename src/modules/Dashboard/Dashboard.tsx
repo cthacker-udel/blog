@@ -11,6 +11,7 @@ import { AdminService, UserService } from "@/api/service";
 import { generateTooltip, UserRoles } from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
+import { AddPostModal } from "./AddPostModal";
 import styles from "./Dashboard.module.css";
 import { EditUsernameModal } from "./EditUsernameModal";
 import { UserInfo } from "./UserInfo";
@@ -76,6 +77,13 @@ export const Dashboard = ({
 
     const closeEditUsernameModal = React.useCallback(() => {
         setShowEditUsernameModal(false);
+    }, []);
+
+    const [showAddPostModal, setShowAddPostModal] =
+        React.useState<boolean>(false);
+
+    const closeAddPostModal = React.useCallback(() => {
+        setShowAddPostModal(false);
     }, []);
 
     return (
@@ -336,6 +344,9 @@ export const Dashboard = ({
                 >
                     <Button
                         className={styles.add_post_button}
+                        onClick={(): void => {
+                            setShowAddPostModal(true);
+                        }}
                         onMouseEnter={(
                             event: React.MouseEvent<HTMLButtonElement>,
                         ): void => {
@@ -386,6 +397,10 @@ export const Dashboard = ({
             <EditUsernameModal
                 onHide={closeEditUsernameModal}
                 showEditUsernameModal={showEditUsernameModal}
+            />
+            <AddPostModal
+                onHide={closeAddPostModal}
+                showAddPostModal={showAddPostModal}
             />
         </>
     );

@@ -1,3 +1,5 @@
+import type { ObjectId } from "mongodb";
+
 import type { ApiResponse } from "@/@types";
 
 /**
@@ -55,7 +57,7 @@ export interface IUserService {
      * Attempts to add a post to the posts collection
      *
      * @param _title - The title of the post to add
-     * @returns Whether the post was added successfully
+     * @returns The id of the post that was created
      */
-    addPost: (_title: string) => Promise<ApiResponse<boolean>>;
+    addPost: (_title: string) => Promise<ApiResponse<ObjectId | null>>;
 }

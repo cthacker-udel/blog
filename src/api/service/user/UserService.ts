@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/indent -- disabled */
 
+import type { ObjectId } from "mongodb";
+
 import type { ApiResponse, Post, User } from "@/@types";
 import { Endpoints } from "@/constants";
 
@@ -74,8 +76,10 @@ export class UserService extends ServiceBaseController implements IUserService {
     };
 
     /** @inheritdoc */
-    public addPost = async (title: string): Promise<ApiResponse<boolean>> => {
-        const response = await this.post<boolean, Pick<Post, "title">>(
+    public addPost = async (
+        title: string,
+    ): Promise<ApiResponse<ObjectId | null>> => {
+        const response = await this.post<ObjectId, Pick<Post, "title">>(
             `${Endpoints.POST.BASE}${Endpoints.POST.ADD}`,
             { title },
         );

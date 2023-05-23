@@ -1,0 +1,1 @@
+export { AddPostValidationText } from "./AddPostValidationText";
