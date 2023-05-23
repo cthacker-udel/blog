@@ -1,0 +1,1 @@
+export { ServiceBaseController } from "./ServiceBaseController";
