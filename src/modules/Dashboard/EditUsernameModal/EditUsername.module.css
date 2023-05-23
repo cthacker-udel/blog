@@ -8,6 +8,26 @@
 .username_popover > div::before {
     background: transparent;
     border: none !important;
+    min-width: 15vw;
+}
+
+.username_popover_error > div,
+.username_popover_error > div::after,
+.username_popover_error > div::before {
+    color: #fd1d1d;
+}
+
+.username_popover_success > div,
+.username_popover_success > div::after,
+.username_popover_success > div::before {
+    color: #78a842;
+}
+
+.username_popover_body {
+    font-family: "DynaPuff", sans-serif !important;
+    letter-spacing: 0.05em;
+    min-height: 10vh;
+    min-width: 100%;
 }
 
 .username_error_popover_header {
@@ -16,7 +36,7 @@
     padding-bottom: 0.35em;
 }
 
-.username_error_header {
+.username_popover_header {
     display: flex;
     flex-direction: row;
     gap: 0.5em;
@@ -28,6 +48,26 @@
     color: #7c0a02;
 }
 
+.username_success_icon {
+    color: #78a842;
+}
+
 .username_error_header_text {
     font-weight: bold;
+}
+
+.edit_username_modal_content {
+    background: transparent;
+    border: none;
+}
+
+.edit_username_form,
+.edit_username_form:focus {
+    background: transparent;
+    border-color: #22a2c3;
+    color: #22a2c3;
+}
+
+.edit_username_form_label {
+    color: #22a2c3;
 }

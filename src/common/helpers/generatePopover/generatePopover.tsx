@@ -37,7 +37,7 @@ export const generatePopover = (
         <Popover.Body
             className={classNameOverrides?.popoverBodyClassNameOverride ?? ""}
         >
-            {bodyContent}
+            {bodyContent ?? <div />}
         </Popover.Body>
     </Popover>
 );

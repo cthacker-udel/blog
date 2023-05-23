@@ -37,13 +37,14 @@ export const EditUsernameModal = ({
     showEditUsernameModal,
     onHide,
 }: EditUsernameModalProperties): JSX.Element => {
-    const { formState, getValues, register } = useForm<FormValues>({
-        criteriaMode: "all",
-        defaultValues: EDIT_USERNAME_FORM_DEFAULT_VALUES,
-        delayError: 100,
-        mode: "all",
-        reValidateMode: "onChange",
-    });
+    const { clearErrors, formState, getValues, register, reset } =
+        useForm<FormValues>({
+            criteriaMode: "all",
+            defaultValues: EDIT_USERNAME_FORM_DEFAULT_VALUES,
+            delayError: 100,
+            mode: "all",
+            reValidateMode: "onChange",
+        });
 
     const { dirtyFields, errors, isDirty, isValidating } = formState;
 
@@ -86,11 +87,20 @@ export const EditUsernameModal = ({
         router,
     ]);
 
+    const onClose = React.useCallback(() => {
+        clearErrors();
+        reset();
+        onHide();
+    }, [clearErrors, onHide, reset]);
+
     return (
-        <Modal onHide={onHide} show={showEditUsernameModal}>
-            <Modal.Header closeButton closeVariant="white">
-                {"Edit Username"}
-            </Modal.Header>
+        <Modal
+            contentClassName={styles.edit_username_modal_content}
+            onHide={(): void => {
+                onClose();
+            }}
+            show={showEditUsernameModal}
+        >
             <Modal.Body
                 onKeyDown={async (
                     keyEvent: React.KeyboardEvent<HTMLDivElement>,
@@ -108,35 +118,73 @@ export const EditUsernameModal = ({
                         ): JSX.Element =>
                             generatePopover(
                                 properties,
-                                errors.username?.message,
-                                <div className={styles.username_error_header}>
-                                    <i
-                                        className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
-                                    />
-                                    <span
+                                errors.username === undefined
+                                    ? "Press Enter to confirm"
+                                    : errors.username?.message,
+                                errors.username === undefined ? (
+                                    <div
                                         className={
-                                            styles.username_error_header_text
+                                            styles.username_popover_header
                                         }
                                     >
-                                        {"Username Error"}
-                                    </span>
-                                    <i
-                                        className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
-                                    />
-                                </div>,
+                                        <i
+                                            className={`fa-solid fa-circle-check fa-beat ${styles.username_success_icon}`}
+                                        />
+                                        <span
+                                            className={
+                                                styles.username_error_header_text
+                                            }
+                                        >
+                                            {"Username is valid!"}
+                                        </span>
+                                        <i
+                                            className={`fa-solid fa-circle-check fa-beat ${styles.username_success_icon}`}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={
+                                            styles.username_popover_header
+                                        }
+                                    >
+                                        <i
+                                            className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
+                                        />
+                                        <span
+                                            className={
+                                                styles.username_error_header_text
+                                            }
+                                        >
+                                            {"Username Error"}
+                                        </span>
+                                        <i
+                                            className={`fa-solid fa-circle-exclamation fa-spin ${styles.username_error_icon}`}
+                                        />
+                                    </div>
+                                ),
                                 {
-                                    popoverClassNameOverride:
-                                        styles.username_popover,
+                                    popoverBodyClassNameOverride:
+                                        styles.username_popover_body,
+                                    popoverClassNameOverride: `${
+                                        styles.username_popover
+                                    } ${
+                                        errors.username === undefined
+                                            ? styles.username_popover_success
+                                            : styles.username_popover_error
+                                    }`,
                                     popoverHeaderClassNameOverride:
                                         styles.username_error_popover_header,
                                 },
                             )
                         }
-                        placement="left"
-                        show={errors.username !== undefined}
+                        placement={
+                            errors.username === undefined ? "right" : "left"
+                        }
+                        show={dirtyFields.username !== undefined}
                     >
                         <Form.Control
                             autoComplete="off"
+                            className={styles.edit_username_form}
                             id="edit_username_form"
                             placeholder="Username"
                             type="text"
@@ -172,6 +220,12 @@ export const EditUsernameModal = ({
                             })}
                         />
                     </OverlayTrigger>
+                    <label
+                        className={styles.edit_username_form_label}
+                        htmlFor="edit_username_form"
+                    >
+                        {"Username"}
+                    </label>
                 </Form.Floating>
             </Modal.Body>
         </Modal>

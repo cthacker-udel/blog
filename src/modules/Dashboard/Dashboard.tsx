@@ -12,6 +12,7 @@ import { generateTooltip } from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
 import styles from "./Dashboard.module.css";
+import { EditUsernameModal } from "./EditUsernameModal";
 
 /**
  *
@@ -53,6 +54,13 @@ export const Dashboard = (): JSX.Element => {
                 type: "error",
             });
         }
+    }, []);
+
+    const [showEditUsernameModal, setShowEditUsernameModal] =
+        React.useState<boolean>(false);
+
+    const closeEditUsernameModal = React.useCallback(() => {
+        setShowEditUsernameModal(false);
     }, []);
 
     return (
@@ -126,7 +134,7 @@ export const Dashboard = (): JSX.Element => {
                 <Button
                     className={styles.change_username_button}
                     onClick={(): void => {
-                        console.log("hello");
+                        setShowEditUsernameModal(true);
                     }}
                     onMouseEnter={(
                         event: React.MouseEvent<HTMLButtonElement>,
@@ -240,6 +248,10 @@ export const Dashboard = (): JSX.Element => {
                     />
                 </Button>
             </OverlayTrigger>
+            <EditUsernameModal
+                onHide={closeEditUsernameModal}
+                showEditUsernameModal={showEditUsernameModal}
+            />
         </>
     );
 };
