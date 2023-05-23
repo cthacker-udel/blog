@@ -19,21 +19,19 @@ export const parseCookie = (
         throw new Error("Cookie does not exist in request");
     }
 
-    const parsedCookie = JSON.parse(
-        verify(
-            cookie,
-            process.env.JWT_SIGN_HASH as unknown as string,
-        ) as string,
+    const cookiePayload = verify(
+        cookie,
+        process.env.JWT_SIGN_HASH as unknown as string,
     ) as Pick<User, "username">;
 
     if (
-        parsedCookie.username === undefined ||
-        parsedCookie.username.length === 0
+        cookiePayload.username === undefined ||
+        cookiePayload.username.length === 0
     ) {
         throw new Error(
             "Cookie is invalid, username does not exist or is empty string",
         );
     }
 
-    return parsedCookie;
+    return cookiePayload;
 };

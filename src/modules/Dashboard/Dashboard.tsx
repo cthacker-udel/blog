@@ -5,8 +5,9 @@ import { useRouter } from "next/router";
 import React from "react";
 import { Button, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import { toast } from "react-toastify";
 
-import { UserService } from "@/api/service";
+import { AdminService, UserService } from "@/api/service";
 import { generateTooltip } from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
@@ -32,6 +33,27 @@ export const Dashboard = (): JSX.Element => {
         await new UserService().logout();
         router.push("/");
     }, [router]);
+
+    const requestAdminAccess = React.useCallback(async () => {
+        const requestingToast = toast.loading("Requesting admin access...");
+        const { data } = await new AdminService().requestAdminAccess();
+
+        if (data) {
+            toast.update(requestingToast, {
+                autoClose: 1500,
+                isLoading: false,
+                render: "Successfully sent request!",
+                type: "success",
+            });
+        } else {
+            toast.update(requestingToast, {
+                autoClose: 1500,
+                isLoading: false,
+                render: "Failed to send request",
+                type: "error",
+            });
+        }
+    }, []);
 
     return (
         <>
@@ -166,8 +188,8 @@ export const Dashboard = (): JSX.Element => {
             >
                 <Button
                     className={styles.request_admin_access_button}
-                    onClick={(): void => {
-                        console.log("requesting admin access");
+                    onClick={async (): Promise<void> => {
+                        await requestAdminAccess();
                     }}
                     onMouseEnter={(
                         event: React.MouseEvent<HTMLButtonElement>,

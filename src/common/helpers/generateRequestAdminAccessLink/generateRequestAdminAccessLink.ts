@@ -7,15 +7,15 @@ import { Endpoints } from "@/constants";
  *
  * @param id - The object id of the created request
  * @param username - The username associated with the request
+ * @param url - The base url to link to the button in the email
  * @param confirm - Whether the email is for confirmation or rejection
  */
 export const generateRequestAdminAccessLink = (
     id: ObjectId,
     username: string,
+    url: string,
     confirm = true,
 ): string =>
-    `${window.location.protocol}//${window.location.hostname}:${
-        window.location.port
-    }/api/${Endpoints.ADMIN.BASE}${
+    `${url}/api/${Endpoints.ADMIN.BASE}${
         confirm ? Endpoints.ADMIN.CONFIRM_ACCESS : Endpoints.ADMIN.REJECT_ACCESS
     }?username=${username}&id=${id.toString()}`;

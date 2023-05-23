@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- disabled */
 /* eslint-disable camelcase -- disabled */
 
 import { type MailDataRequired, MailService } from "@sendgrid/mail";
@@ -26,6 +27,17 @@ export class AdminApi extends DatabaseApi implements IAdminApi {
         response: NextApiResponse,
     ): Promise<void> => {
         try {
+            const host = request.headers.host;
+            const referrer = request.headers.referer;
+
+            if (referrer === undefined || host === undefined) {
+                throw new Error(
+                    "Need host and referrer to send admin request emails",
+                );
+            }
+
+            const isHttp = referrer?.startsWith("http");
+
             await this.startMongoTransaction();
             const sendgridClient = new MailService();
             sendgridClient.setApiKey(
@@ -44,6 +56,10 @@ export class AdminApi extends DatabaseApi implements IAdminApi {
                 throw new Error(
                     "Could not find user requesting admin access in database",
                 );
+            }
+
+            if (foundUser.role === UserRoles.ADMIN) {
+                throw new Error("You already have admin access!");
             }
 
             const foundRequest = await adminRequestRepo.findOne({
@@ -66,11 +82,13 @@ export class AdminApi extends DatabaseApi implements IAdminApi {
             const confirmUrl = generateRequestAdminAccessLink(
                 makeRequest.insertedId,
                 username,
+                `${isHttp ? "http://" : "https://"}${host}`,
             );
 
             const rejectUrl = generateRequestAdminAccessLink(
                 makeRequest.insertedId,
                 username,
+                `${isHttp ? "http://" : "https://"}${host}`,
                 false,
             );
 
@@ -134,7 +152,7 @@ export class AdminApi extends DatabaseApi implements IAdminApi {
 
             const updateResult = await userRepo.updateOne(
                 { _id: user_id },
-                { role: UserRoles.ADMIN },
+                { $set: { role: UserRoles.ADMIN } },
             );
 
             response.status(
