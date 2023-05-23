@@ -8,7 +8,7 @@ import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
 
 import { AdminService, UserService } from "@/api/service";
-import { generateTooltip, type UserRoles } from "@/common";
+import { generateTooltip, UserRoles } from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
 import styles from "./Dashboard.module.css";
@@ -47,25 +47,29 @@ export const Dashboard = ({
     }, [router]);
 
     const requestAdminAccess = React.useCallback(async () => {
-        const requestingToast = toast.loading("Requesting admin access...");
-        const { data } = await new AdminService().requestAdminAccess();
+        if (role === UserRoles.USER) {
+            const requestingToast = toast.loading("Requesting admin access...");
+            const { data } = await new AdminService().requestAdminAccess();
 
-        if (data) {
-            toast.update(requestingToast, {
-                autoClose: 1500,
-                isLoading: false,
-                render: "Successfully sent request!",
-                type: "success",
-            });
+            if (data) {
+                toast.update(requestingToast, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Successfully sent request!",
+                    type: "success",
+                });
+            } else {
+                toast.update(requestingToast, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Failed to send request",
+                    type: "error",
+                });
+            }
         } else {
-            toast.update(requestingToast, {
-                autoClose: 1500,
-                isLoading: false,
-                render: "Failed to send request",
-                type: "error",
-            });
+            toast.info("You already have admin permissions!");
         }
-    }, []);
+    }, [role]);
 
     const [showEditUsernameModal, setShowEditUsernameModal] =
         React.useState<boolean>(false);
