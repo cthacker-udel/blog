@@ -51,3 +51,12 @@
     left: calc(100% - 3em);
     bottom: calc(100% - 12em);
 }
+
+.add_post_button {
+    position: absolute;
+    border-radius: 2em;
+    width: 2.5em;
+    height: 2.5em;
+    left: calc(100% - 3em);
+    bottom: calc(100% - 15em);
+}

@@ -324,6 +324,65 @@ export const Dashboard = ({
                     <i className="fa-solid fa-info" id="user_info_icon" />
                 </Button>
             </OverlayTrigger>
+            {role === UserRoles.ADMIN && (
+                <OverlayTrigger
+                    overlay={(properties: OverlayInjectedProps): JSX.Element =>
+                        generateTooltip({
+                            content: "Add Post",
+                            props: properties,
+                        })
+                    }
+                    placement="left"
+                >
+                    <Button
+                        className={styles.add_post_button}
+                        onMouseEnter={(
+                            event: React.MouseEvent<HTMLButtonElement>,
+                        ): void => {
+                            const { target } = event;
+                            if (Boolean(target)) {
+                                const convertedTarget =
+                                    target as HTMLButtonElement;
+                                convertedTarget.className =
+                                    convertedTarget.className.replace(
+                                        "btn-dark",
+                                        "btn-light",
+                                    );
+                                const icon =
+                                    document.querySelector("#add_post_icon");
+                                if (Boolean(icon) && icon !== null) {
+                                    icon.className = `${icon.className} fa-shake`;
+                                }
+                            }
+                        }}
+                        onMouseLeave={(
+                            event: React.MouseEvent<HTMLButtonElement>,
+                        ): void => {
+                            const { target } = event;
+                            if (Boolean(target)) {
+                                const convertedTarget =
+                                    target as HTMLButtonElement;
+                                convertedTarget.className =
+                                    convertedTarget.className.replace(
+                                        "btn-light",
+                                        "btn-dark",
+                                    );
+                                const icon =
+                                    document.querySelector("#add_post_icon");
+                                if (Boolean(icon) && icon !== null) {
+                                    icon.className = icon.className.replaceAll(
+                                        " fa-shake",
+                                        "",
+                                    );
+                                }
+                            }
+                        }}
+                        variant="dark"
+                    >
+                        <i className="fa-solid fa-plus" id="add_post_icon" />
+                    </Button>
+                </OverlayTrigger>
+            )}
             <EditUsernameModal
                 onHide={closeEditUsernameModal}
                 showEditUsernameModal={showEditUsernameModal}
