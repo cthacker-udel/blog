@@ -5,6 +5,10 @@ export const Endpoints = {
         REJECT_ACCESS: "rejectAccess",
         REQUEST_ACCESS: "requestAccess",
     },
+    POST: {
+        ADD: "add",
+        BASE: "post/",
+    },
     USER: {
         BASE: "user/",
         DOES_USERNAME_EXIST: "doesUsernameExist",

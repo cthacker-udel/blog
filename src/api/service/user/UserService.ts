@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/indent -- disabled */
 
-import type { ApiResponse, User } from "@/@types";
+import type { ApiResponse, Post, User } from "@/@types";
 import { Endpoints } from "@/constants";
 
 import { ServiceBaseController } from "../base/ServiceBaseController";
@@ -68,6 +68,16 @@ export class UserService extends ServiceBaseController implements IUserService {
     ): Promise<ApiResponse<boolean>> => {
         const response = await this.get<boolean>(
             `${Endpoints.USER.BASE}${Endpoints.USER.DOES_USERNAME_EXIST}?username=${username}`,
+        );
+
+        return response;
+    };
+
+    /** @inheritdoc */
+    public addPost = async (title: string): Promise<ApiResponse<boolean>> => {
+        const response = await this.post<boolean, Pick<Post, "title">>(
+            `${Endpoints.POST.BASE}${Endpoints.POST.ADD}`,
+            { title },
         );
 
         return response;

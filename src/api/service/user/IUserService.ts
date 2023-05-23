@@ -50,4 +50,12 @@ export interface IUserService {
      * @returns Whether the username exists
      */
     doesUsernameExist: (_username: string) => Promise<ApiResponse<boolean>>;
+
+    /**
+     * Attempts to add a post to the posts collection
+     *
+     * @param _title - The title of the post to add
+     * @returns Whether the post was added successfully
+     */
+    addPost: (_title: string) => Promise<ApiResponse<boolean>>;
 }
