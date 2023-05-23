@@ -3,6 +3,8 @@ import type {
     NextApiResponse as ServerResponse,
 } from "next";
 
+import type { User } from "@/@types";
+
 /**
  * Shorten typing, just an abbreviation of Promise<void>
  */
@@ -75,4 +77,15 @@ export interface IUserApi {
         _request: ClientRequest,
         _response: ServerResponse,
     ) => PV;
+
+    /**
+     * [SERVER-SIDE ONLY (called from getServerSideProps)]
+     * Fetches the user dashboard props, which include the username and the role
+     *
+     * @param _request - The client request
+     * @returns The dashboard information pertaining to the user requesting
+     */
+    ssGetDashboardCredentials: (
+        _request: ClientRequest,
+    ) => Promise<Partial<Pick<User, "createdAt" | "role" | "username">>>;
 }

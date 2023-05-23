@@ -8,17 +8,27 @@ import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
 
 import { AdminService, UserService } from "@/api/service";
-import { generateTooltip } from "@/common";
+import { generateTooltip, UserRoles } from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
 import styles from "./Dashboard.module.css";
 import { EditUsernameModal } from "./EditUsernameModal";
 
+type DashboardProperties = {
+    createdAt: Date;
+    role: UserRoles;
+    username: string;
+};
+
 /**
  *
  * @returns
  */
-export const Dashboard = (): JSX.Element => {
+export const Dashboard = ({
+    createdAt,
+    role,
+    username,
+}: DashboardProperties): JSX.Element => {
     useBackground({
         imageConfig: {
             background:

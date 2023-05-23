@@ -249,4 +249,26 @@ export class UserApi extends DatabaseApi implements IUserApi {
             await this.closeMongoTransaction();
         }
     };
+
+    /** @inheritdoc */
+    public ssGetDashboardCredentials = async (
+        request: NextApiRequest,
+    ): Promise<Partial<Pick<User, "createdAt" | "role" | "username">>> => {
+        const username = parseCookie(request);
+
+        if (username === undefined) {
+            return {};
+        }
+
+        const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+        const foundUser = await userRepo.findOne(
+            { username },
+            {
+                projection: { createdAt: 1, role: 1, username: 1 },
+            },
+        );
+
+        return foundUser as Pick<User, "createdAt" | "role" | "username">;
+    };
 }
