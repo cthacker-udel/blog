@@ -9,7 +9,7 @@
     flex-direction: row;
     align-items: center;
     gap: 0.75em;
-    justify-content: start;
+    justify-content: flex-start;
 }
 
 .user_info_label {
