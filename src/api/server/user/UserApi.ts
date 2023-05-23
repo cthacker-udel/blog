@@ -1,6 +1,6 @@
 /* eslint-disable import/no-nodejs-modules -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { IncomingMessage } from "node:http";
 
 import { deleteCookie, setCookie } from "cookies-next";
 import { sign } from "jsonwebtoken";
@@ -167,8 +167,8 @@ export class UserApi extends DatabaseApi implements IUserApi {
 
     /** @inheritdoc */
     public logout = async (
-        request: IncomingMessage | NextApiRequest,
-        response: NextApiResponse | ServerResponse,
+        request: IncomingMessage,
+        response: NextApiResponse,
     ): Promise<void> => {
         try {
             await this.startMongoTransaction();
@@ -176,26 +176,11 @@ export class UserApi extends DatabaseApi implements IUserApi {
                 req: request,
                 res: response,
             });
-            if ((response as NextApiResponse) === undefined) {
-                (response as ServerResponse).write(
-                    JSON.stringify({ data: true }),
-                );
-            } else {
-                (response as NextApiResponse).send({ data: true });
-            }
+
+            response.status(200);
+            response.send({ data: true });
         } catch (error: unknown) {
             await this.logMongoError(error);
-            if ((response as NextApiResponse) === undefined) {
-                (response as ServerResponse).statusCode = 500;
-                (response as ServerResponse).write(
-                    JSON.stringify(convertErrorToApiResponse(error, false)),
-                );
-            } else {
-                (response as NextApiResponse).status(500);
-                (response as NextApiResponse).send(
-                    convertErrorToApiResponse(error, false),
-                );
-            }
         } finally {
             await this.closeMongoTransaction();
         }
