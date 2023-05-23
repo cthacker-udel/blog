@@ -1,5 +1,7 @@
 import type { ObjectId } from "mongodb";
 
+import { Endpoints } from "@/constants";
+
 /**
  * Generates a link to add into the email, which will be clicked by the admin confirming/rejecting the request
  *
@@ -14,6 +16,6 @@ export const generateRequestAdminAccessLink = (
 ): string =>
     `${window.location.protocol}//${window.location.hostname}:${
         window.location.port
-    }/api/${
-        confirm ? "confirm" : "reject"
-    }AdminAccessRequest?username=${username}&id=${id.toString()}`;
+    }/api/${Endpoints.ADMIN.BASE}${
+        confirm ? Endpoints.ADMIN.CONFIRM_ACCESS : Endpoints.ADMIN.REJECT_ACCESS
+    }?username=${username}&id=${id.toString()}`;

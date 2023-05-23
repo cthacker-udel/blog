@@ -1,4 +1,9 @@
 export const Endpoints = {
+    ADMIN: {
+        BASE: "admin/",
+        CONFIRM_ACCESS: "confirmAccess",
+        REJECT_ACCESS: "rejectAccess",
+    },
     USER: {
         BASE: "user/",
         LOGIN: "login",
