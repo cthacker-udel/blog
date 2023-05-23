@@ -54,4 +54,25 @@ export interface IUserApi {
      * @returns Whether the logout was successful
      */
     logout: (_request: ClientRequest, _response: ServerResponse) => PV;
+
+    /**
+     * Edits the user's username with the one sent in the POST body
+     *
+     * @param _request - The client request
+     * @param _response - The server response
+     * @returns Whether the edit was successful
+     */
+    editUsername: (_request: ClientRequest, _response: ServerResponse) => PV;
+
+    /**
+     * Checks in the database whether the username exists
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Whether the username exists
+     */
+    doesUsernameExist: (
+        _request: ClientRequest,
+        _response: ServerResponse,
+    ) => PV;
 }

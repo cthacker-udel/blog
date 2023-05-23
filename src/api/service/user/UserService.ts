@@ -49,4 +49,27 @@ export class UserService extends ServiceBaseController implements IUserService {
 
         return response;
     };
+
+    /** @inheritdoc */
+    public editUsername = async (
+        username: string,
+    ): Promise<ApiResponse<boolean>> => {
+        const response = await this.post<boolean, Pick<User, "username">>(
+            `${Endpoints.USER.BASE}${Endpoints.USER.EDIT_USERNAME}`,
+            { username },
+        );
+
+        return response;
+    };
+
+    /** @inheritdoc */
+    public doesUsernameExist = async (
+        username: string,
+    ): Promise<ApiResponse<boolean>> => {
+        const response = await this.get<boolean>(
+            `${Endpoints.USER.BASE}${Endpoints.USER.DOES_USERNAME_EXIST}?username=${username}`,
+        );
+
+        return response;
+    };
 }

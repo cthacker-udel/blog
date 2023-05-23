@@ -11,6 +11,7 @@ import { EncryptionService } from "@/api/service/encryption";
 import {
     convertErrorToApiResponse,
     generateEntityDateTimes,
+    parseCookie,
     UserRoles,
 } from "@/common";
 import { Collections } from "@/constants";
@@ -179,6 +180,69 @@ export class UserApi extends DatabaseApi implements IUserApi {
 
             response.status(200);
             response.send({ data: true });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public editUsername = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const { username: replacementUsername } = request.body as Pick<
+                User,
+                "username"
+            >;
+            const username = parseCookie(request);
+
+            if (replacementUsername === undefined) {
+                throw new Error("Must supply username in request body");
+            }
+
+            const updateResult = await userRepo.updateOne(
+                { username },
+                { username: replacementUsername },
+            );
+
+            response.status(updateResult.acknowledged ? 200 : 400);
+            response.send({ date: updateResult.acknowledged ? 200 : 400 });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public doesUsernameExist = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const username = request.query.username;
+
+            if (username === undefined) {
+                throw new Error(
+                    "Username must be supplied in checking if one exists",
+                );
+            }
+
+            const foundUsername = await userRepo.countDocuments({ username });
+
+            response.status(foundUsername > 0 ? 200 : 400);
+            response.send({ data: foundUsername > 0 });
         } catch (error: unknown) {
             await this.logMongoError(error);
         } finally {

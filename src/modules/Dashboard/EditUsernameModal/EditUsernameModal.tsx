@@ -59,7 +59,7 @@ export const EditUsernameModal = ({
             const editingUsernameToast = toast.loading("Editing username...");
             const { username } = getValues();
             const { data } = await new UserService().editUsername(username);
-            if (data) {
+            if (data ?? false) {
                 toast.update(editingUsernameToast, {
                     autoClose: 1500,
                     isLoading: false,

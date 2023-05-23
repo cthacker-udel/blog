@@ -34,4 +34,20 @@ export interface IUserService {
      * @returns Whether the logout was successful or not
      */
     logout: () => Promise<ApiResponse<boolean>>;
+
+    /**
+     * Replaces the current user's username, with the one requested
+     *
+     * @param _username - The username submitted for replacement
+     * @returns Whether the replacement was successful
+     */
+    editUsername: (_username: string) => Promise<ApiResponse<boolean>>;
+
+    /**
+     * Checks in the database if the username already exists
+     *
+     * @param _username - The username to check if it already exists
+     * @returns Whether the username exists
+     */
+    doesUsernameExist: (_username: string) => Promise<ApiResponse<boolean>>;
 }
