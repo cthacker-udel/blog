@@ -14,7 +14,7 @@ type GetServerSideProperties = {
 };
 
 type DashboardServerSideProperties = {
-    createdAt: Date;
+    createdAt: string;
     role: UserRoles;
     username: string;
 };
@@ -49,7 +49,7 @@ export const getServerSideProps: GetServerSideProps<
         return { redirect: { destination: "/", permanent: false } };
     }
 
-    return { props: { createdAt, role, username } };
+    return { props: { createdAt: createdAt.toString(), role, username } };
 };
 
 export { Dashboard as default } from "@/modules";

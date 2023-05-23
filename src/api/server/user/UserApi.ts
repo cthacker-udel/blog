@@ -254,7 +254,8 @@ export class UserApi extends DatabaseApi implements IUserApi {
     public ssGetDashboardCredentials = async (
         request: NextApiRequest,
     ): Promise<Partial<Pick<User, "createdAt" | "role" | "username">>> => {
-        const username = parseCookie(request);
+        await this.startMongoTransaction();
+        const { username } = parseCookie(request);
 
         if (username === undefined) {
             return {};
@@ -269,6 +270,11 @@ export class UserApi extends DatabaseApi implements IUserApi {
             },
         );
 
+        if (foundUser === null) {
+            throw new Error("Could not find user");
+        }
+
+        await this.closeMongoTransaction();
         return foundUser as Pick<User, "createdAt" | "role" | "username">;
     };
 }

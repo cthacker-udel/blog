@@ -8,14 +8,15 @@ import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
 
 import { AdminService, UserService } from "@/api/service";
-import { generateTooltip, UserRoles } from "@/common";
+import { generateTooltip, type UserRoles } from "@/common";
 import { useBackground, useLayoutInjector } from "@/hooks";
 
 import styles from "./Dashboard.module.css";
 import { EditUsernameModal } from "./EditUsernameModal";
+import { UserInfo } from "./UserInfo";
 
 type DashboardProperties = {
-    createdAt: Date;
+    createdAt: string;
     role: UserRoles;
     username: string;
 };
@@ -187,7 +188,7 @@ export const Dashboard = ({
                             }
                         }
                     }}
-                    variant="info"
+                    variant="danger"
                 >
                     <i
                         className="fa-solid fa-user-pen"
@@ -256,6 +257,67 @@ export const Dashboard = ({
                         className="fa-solid fa-unlock"
                         id="request_admin_access_icon"
                     />
+                </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+                overlay={(properties: OverlayInjectedProps): JSX.Element =>
+                    generateTooltip({
+                        content: (
+                            <UserInfo
+                                createdAt={createdAt}
+                                role={role}
+                                username={username}
+                            />
+                        ),
+                        props: properties,
+                    })
+                }
+                placement="left"
+            >
+                <Button
+                    className={styles.user_info_button}
+                    onMouseEnter={(
+                        event: React.MouseEvent<HTMLButtonElement>,
+                    ): void => {
+                        const { target } = event;
+                        if (Boolean(target)) {
+                            const convertedTarget = target as HTMLButtonElement;
+                            convertedTarget.className =
+                                convertedTarget.className.replace(
+                                    "btn-primary",
+                                    "btn-info",
+                                );
+                            const icon =
+                                document.querySelector("#user_info_icon");
+                            if (Boolean(icon) && icon !== null) {
+                                icon.className = `${icon.className} fa-spin`;
+                            }
+                        }
+                    }}
+                    onMouseLeave={(
+                        event: React.MouseEvent<HTMLButtonElement>,
+                    ): void => {
+                        const { target } = event;
+                        if (Boolean(target)) {
+                            const convertedTarget = target as HTMLButtonElement;
+                            convertedTarget.className =
+                                convertedTarget.className.replace(
+                                    "btn-primary",
+                                    "btn-info",
+                                );
+                            const icon =
+                                document.querySelector("#user_info_icon");
+                            if (Boolean(icon) && icon !== null) {
+                                icon.className = icon.className.replaceAll(
+                                    " fa-spin",
+                                    "",
+                                );
+                            }
+                        }
+                    }}
+                    variant="info"
+                >
+                    <i className="fa-solid fa-info" id="user_info_icon" />
                 </Button>
             </OverlayTrigger>
             <EditUsernameModal
