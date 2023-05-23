@@ -1,3 +1,3 @@
-import { UserApi } from "@/api/server";
+import { AdminApi } from "@/api/server";
 
-export default new UserApi().confirmAdminAccess;
+export default new AdminApi().confirmAdminAccess;

@@ -1,3 +1,3 @@
-import { UserApi } from "@/api/server";
+import { AdminApi } from "@/api/server";
 
-export default new UserApi().rejectAdminAccess;
+export default new AdminApi().rejectAdminAccess;
