@@ -83,4 +83,44 @@ export class PostApi extends DatabaseApi implements IPostApi {
             await this.closeMongoTransaction();
         }
     };
+
+    /** @inheritdoc */
+    public allAuthoredPosts = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const { username } = parseCookie(request);
+
+            if (username === undefined) {
+                throw new Error("Session cookie must be included in request");
+            }
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error("User does not exist");
+            }
+
+            const allAuthoredPosts = await postRepo
+                .find({
+                    author: foundUser._id,
+                })
+                .toArray();
+
+            response.status(200);
+            response.send({ data: allAuthoredPosts });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
 }

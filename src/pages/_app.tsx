@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- disabled */
 import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 
 import type { AppProps } from "next/app";
 import React from "react";
 import { ToastContainer } from "react-toastify";
+import { SWRConfig } from "swr/_internal";
 
+import type { ApiResponse } from "@/@types";
 import { Layout } from "@/common";
 
 /**
@@ -18,9 +21,28 @@ import { Layout } from "@/common";
  */
 const App = ({ Component, pageProps }: AppProps): JSX.Element => (
     <>
-        <Layout>
-            <Component {...pageProps} />
-        </Layout>
+        <SWRConfig
+            value={{
+                fetcher: async (resource: string, _init: any): Promise<any> => {
+                    const url = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api/`;
+                    const request = await fetch(`${url}${resource}`);
+
+                    if (request.status === 401) {
+                        throw new Error("Invalid user");
+                    }
+
+                    const jsonResult = await request.json();
+                    const convertedResult = jsonResult as ApiResponse;
+                    return convertedResult;
+                },
+                provider: () => new Map(),
+                refreshInterval: 3000,
+            }}
+        >
+            <Layout>
+                <Component {...pageProps} />
+            </Layout>
+        </SWRConfig>
         <ToastContainer
             autoClose={5000}
             closeOnClick

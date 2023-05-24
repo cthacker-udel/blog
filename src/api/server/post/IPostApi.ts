@@ -22,4 +22,16 @@ export interface IPostApi {
      * @returns Whether the user is the owner of the post being navigated to
      */
     isAuthorOfPost: (_userId: ObjectId, _postId: ObjectId) => Promise<boolean>;
+
+    /**
+     * Fetches all authored posts of the user requesting the endpoint
+     *
+     * @param _request - The client request
+     * @param _response - The server response
+     * @returns All authored posts of the user embedded within the request cookie
+     */
+    allAuthoredPosts: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
 }

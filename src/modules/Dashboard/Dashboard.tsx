@@ -14,6 +14,7 @@ import { useBackground, useLayoutInjector } from "@/hooks";
 import { AddPostModal } from "./AddPostModal";
 import styles from "./Dashboard.module.css";
 import { EditUsernameModal } from "./EditUsernameModal";
+import { PostsOffCanvas } from "./PostsOffCanvas";
 import { UserInfo } from "./UserInfo";
 
 type DashboardProperties = {
@@ -412,6 +413,9 @@ export const Dashboard = ({
             >
                 <Button
                     className={styles.view_posts_button}
+                    onClick={(): void => {
+                        setShowPostsOffCanvas(true);
+                    }}
                     onMouseEnter={(
                         event: React.MouseEvent<HTMLButtonElement>,
                     ): void => {
@@ -463,6 +467,10 @@ export const Dashboard = ({
             <AddPostModal
                 onHide={closeAddPostModal}
                 showAddPostModal={showAddPostModal}
+            />
+            <PostsOffCanvas
+                onHidePostsOffCanvas={closePostsOffCanvas}
+                showPostsOffCanvas={showPostsOffCanvas}
             />
         </>
     );

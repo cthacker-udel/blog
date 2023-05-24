@@ -7,6 +7,7 @@ export const Endpoints = {
     },
     POST: {
         ADD: "add",
+        ALL_AUTHORED: "allAuthored",
         BASE: "post/",
     },
     USER: {

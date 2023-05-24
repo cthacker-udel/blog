@@ -1,0 +1,39 @@
+.posts_offcanvas_content {
+    background: rgba(45, 66, 253, 0.95);
+    color: #fde82d;
+}
+
+.posts_offcanvas_header {
+    font-size: 2em;
+    text-align: center;
+    justify-content: center !important;
+    font-family: "Tilt Prism", sans-serif;
+}
+
+.posts_post_listing {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+.posts_post_title {
+    font-weight: bold;
+    transition: color 1s ease-in-out;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 1.15em;
+}
+
+.posts_post_title:hover {
+    cursor: pointer;
+    color: #2dfd80;
+}
+
+.posts_post_dates {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75em;
+}
+
+.posts_post_date {
+    font-family: "Radio Canada", sans-serif;
+}
