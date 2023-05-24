@@ -1,13 +1,15 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
 
-import { ApiResponse, Post } from "@/@types";
-import { Endpoints } from "@/constants";
+import { useRouter } from "next/router";
 import React from "react";
 import { Offcanvas } from "react-bootstrap";
 import useSWR from "swr";
+
+import type { ApiResponse, Post } from "@/@types";
+import { Endpoints } from "@/constants";
+
 import styles from "./PostsOffcanvas.module.css";
-import { useRouter } from "next/router";
 
 type PostsOffCanvasProperties = {
     onHidePostsOffCanvas: () => void;
