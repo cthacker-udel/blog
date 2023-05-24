@@ -1,3 +1,4 @@
+import type { ObjectId } from "mongodb";
 import type {
     NextApiRequest as ClientRequest,
     NextApiResponse as ServerResponse,
@@ -88,4 +89,13 @@ export interface IUserApi {
     ssGetDashboardCredentials: (
         _request: ClientRequest,
     ) => Promise<Partial<Pick<User, "createdAt" | "role" | "username">>>;
+
+    /**
+     * [SERVER-SIDE ONLY] (called from getServerSideProps)
+     * Fetches the user id from the database, takes in the username as a query string
+     *
+     * @param _username - The username of the user requesting their user id
+     * @returns The id of the user with the username sent in the request
+     */
+    getUserIdFromUsername: (_username: string) => Promise<ObjectId>;
 }

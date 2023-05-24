@@ -4,6 +4,7 @@ import type { IncomingMessage } from "node:http";
 
 import { deleteCookie, setCookie } from "cookies-next";
 import { sign } from "jsonwebtoken";
+import type { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { ApiResponse, User } from "@/@types";
@@ -276,5 +277,33 @@ export class UserApi extends DatabaseApi implements IUserApi {
 
         await this.closeMongoTransaction();
         return foundUser as Pick<User, "createdAt" | "role" | "username">;
+    };
+
+    /** @inheritdoc */
+    public getUserIdFromUsername = async (
+        username: string,
+    ): Promise<ObjectId> => {
+        try {
+            await this.startMongoTransaction();
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            if (username === undefined) {
+                throw new Error("Must supply cookie to get user id");
+            }
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error("Failed to find user");
+            }
+
+            return foundUser._id;
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            throw error;
+        } finally {
+            await this.closeMongoTransaction();
+        }
     };
 }

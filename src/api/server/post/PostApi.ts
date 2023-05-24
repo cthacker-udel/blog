@@ -1,3 +1,4 @@
+import type { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { Post, User } from "@/@types";
@@ -54,6 +55,30 @@ export class PostApi extends DatabaseApi implements IPostApi {
             await this.logMongoError(error);
             response.status(500);
             response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public isAuthorOfPost = async (
+        userId: ObjectId,
+        postId: ObjectId,
+    ): Promise<boolean> => {
+        try {
+            await this.startMongoTransaction();
+
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+
+            const foundPost = await postRepo.findOne({
+                _id: postId,
+                author: userId,
+            });
+
+            return foundPost !== null;
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            return false;
         } finally {
             await this.closeMongoTransaction();
         }

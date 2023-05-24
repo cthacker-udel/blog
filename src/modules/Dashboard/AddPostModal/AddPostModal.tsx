@@ -52,8 +52,8 @@ export const AddPostModal = ({
 
     const addPost = React.useCallback(async () => {
         if (
-            dirtyFields.title !== undefined &&
-            errors.title !== undefined &&
+            dirtyFields.title &&
+            errors.title === undefined &&
             isDirty &&
             !isValidating
         ) {
@@ -77,14 +77,7 @@ export const AddPostModal = ({
                 router.push(`post/${data.toString()}`);
             }
         }
-    }, [
-        dirtyFields.title,
-        errors.title,
-        getValues,
-        isDirty,
-        isValidating,
-        router,
-    ]);
+    }, [dirtyFields, errors, getValues, isDirty, isValidating, router]);
 
     const onClose = React.useCallback(() => {
         clearErrors();

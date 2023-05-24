@@ -79,7 +79,6 @@ export class DatabaseApi {
      * Starts the mongo transaction, connecting to the database
      */
     public startMongoTransaction = async (): Promise<void> => {
-        console.log("starting mongo client");
         await this.connectMongoClient();
     };
 
