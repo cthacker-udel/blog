@@ -86,6 +86,13 @@ export const Dashboard = ({
         setShowAddPostModal(false);
     }, []);
 
+    const [showPostsOffCanvas, setShowPostsOffCanvas] =
+        React.useState<boolean>(false);
+
+    const closePostsOffCanvas = React.useCallback(() => {
+        setShowPostsOffCanvas(false);
+    }, []);
+
     return (
         <>
             <div className={styles.title}>{"Posts"}</div>
@@ -394,6 +401,61 @@ export const Dashboard = ({
                     </Button>
                 </OverlayTrigger>
             )}
+            <OverlayTrigger
+                overlay={(properties: OverlayInjectedProps): JSX.Element =>
+                    generateTooltip({
+                        content: "View Posts",
+                        props: properties,
+                    })
+                }
+                placement="left"
+            >
+                <Button
+                    className={styles.view_posts_button}
+                    onMouseEnter={(
+                        event: React.MouseEvent<HTMLButtonElement>,
+                    ): void => {
+                        const { target } = event;
+                        if (Boolean(target)) {
+                            const convertedTarget = target as HTMLButtonElement;
+                            convertedTarget.className =
+                                convertedTarget.className.replace(
+                                    "btn-primary",
+                                    "btn-info",
+                                );
+                            const icon =
+                                document.querySelector("#view_posts_icon");
+                            if (Boolean(icon) && icon !== null) {
+                                icon.className = `${icon.className} fa-bounce`;
+                            }
+                        }
+                    }}
+                    onMouseLeave={(
+                        event: React.MouseEvent<HTMLButtonElement>,
+                    ): void => {
+                        const { target } = event;
+                        if (Boolean(target)) {
+                            const convertedTarget = target as HTMLButtonElement;
+                            convertedTarget.className =
+                                convertedTarget.className.replace(
+                                    "btn-primary",
+                                    "btn-info",
+                                );
+                            const icon =
+                                document.querySelector("#view_posts_icon");
+                            if (Boolean(icon) && icon !== null) {
+                                icon.className = icon.className.replaceAll(
+                                    " fa-bounce",
+                                    "",
+                                );
+                            }
+                        }
+                    }}
+                    variant="success"
+                >
+                    <i className="fa-solid fa-eye" id="view_posts_icon" />
+                </Button>
+            </OverlayTrigger>
             <EditUsernameModal
                 onHide={closeEditUsernameModal}
                 showEditUsernameModal={showEditUsernameModal}
