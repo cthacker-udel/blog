@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/indent -- disabled */
 import { ObjectId } from "mongodb";
 
 import type { Notification } from "@/classes";
