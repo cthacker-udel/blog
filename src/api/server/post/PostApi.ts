@@ -114,6 +114,10 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 .toArray();
 
             response.status(200);
+            response.setHeader(
+                "Cache-Control",
+                "max-age=7200, stale-while-revalidate=3600",
+            );
             response.send({ data: allAuthoredPosts });
         } catch (error: unknown) {
             await this.logMongoError(error);

@@ -52,7 +52,10 @@ export const Dashboard = ({
     const requestAdminAccess = React.useCallback(async () => {
         if (role === UserRoles.USER) {
             const requestingToast = toast.loading("Requesting admin access...");
-            const { data } = await new AdminService().requestAdminAccess();
+            const { data, error } =
+                await new AdminService().requestAdminAccess();
+
+            console.log(error);
 
             if (data) {
                 toast.update(requestingToast, {
@@ -65,7 +68,11 @@ export const Dashboard = ({
                 toast.update(requestingToast, {
                     autoClose: 1500,
                     isLoading: false,
-                    render: "Failed to send request",
+                    render: `${
+                        error === undefined
+                            ? "Failed to send request"
+                            : error.message
+                    }`,
                     type: "error",
                 });
             }
