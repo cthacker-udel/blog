@@ -41,8 +41,22 @@ export const getServerSideProps: GetServerSideProps<PostProperties> = async ({
             userId,
             new ObjectId(postId as string),
         );
+        const postDetails = await new PostApi().ssGetPostDetails(
+            postId as string,
+        );
 
-        return { props: { isAuthor, userId: userId.toString() } };
+        const createdAt = new Date(
+            postDetails.createdAt ?? Date.now(),
+        ).toUTCString();
+
+        return {
+            props: {
+                isAuthor,
+                userId: userId.toString(),
+                ...postDetails,
+                createdAt,
+            },
+        };
     } catch {
         return { redirect: { destination: "/", permanent: false } };
     }

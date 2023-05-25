@@ -1,6 +1,8 @@
 import type { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import type { Post } from "@/@types";
+
 export interface IPostApi {
     /**
      * Adds a post to the database, and returns the id of the post that was created, for immediate redirection
@@ -34,4 +36,15 @@ export interface IPostApi {
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;
+
+    /**
+     * [SERVER-SIDE ONLY]
+     * Fetches all the non-changing post details, such as the title, and the created date
+     *
+     * @param _postId - The id of the post to fetch
+     * @returns All the immutable post details
+     */
+    ssGetPostDetails: (
+        _postId: string,
+    ) => Promise<Partial<Pick<Post, "createdAt" | "title">>>;
 }

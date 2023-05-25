@@ -1,4 +1,4 @@
-import type { ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { Post, User } from "@/@types";
@@ -114,10 +114,6 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 .toArray();
 
             response.status(200);
-            response.setHeader(
-                "Cache-Control",
-                "max-age=7200, stale-while-revalidate=3600",
-            );
             response.send({ data: allAuthoredPosts });
         } catch (error: unknown) {
             await this.logMongoError(error);
@@ -126,5 +122,36 @@ export class PostApi extends DatabaseApi implements IPostApi {
         } finally {
             await this.closeMongoTransaction();
         }
+    };
+
+    /** @inheritdoc */
+    public ssGetPostDetails = async (
+        postId: string,
+    ): Promise<Partial<Pick<Post, "createdAt" | "title">>> => {
+        try {
+            await this.startMongoTransaction();
+
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+
+            if (postId === undefined) {
+                throw new Error("Must include post id in the body");
+            }
+
+            const foundPost = await postRepo.findOne({
+                _id: new ObjectId(postId),
+            });
+
+            if (foundPost === null) {
+                throw new Error("Post does not exist");
+            }
+
+            const { createdAt, title } = foundPost;
+            return { createdAt, title };
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+        } finally {
+            await this.closeMongoTransaction();
+        }
+        return {};
     };
 }

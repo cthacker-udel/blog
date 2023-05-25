@@ -1,8 +1,12 @@
 import { useRouter } from "next/router";
 import React from "react";
 
+import { useBackground } from "@/hooks";
+
 type PostProperties = {
+    createdAt: string;
     isAuthor: boolean;
+    title: string;
     userId: string;
 };
 
@@ -11,8 +15,19 @@ type PostProperties = {
  *
  * @returns The current post being viewed
  */
-export const Post = ({ isAuthor, userId }: PostProperties): JSX.Element => {
+export const Post = ({
+    createdAt,
+    isAuthor,
+    title,
+    userId,
+}: PostProperties): JSX.Element => {
     const router = useRouter();
+    useBackground({
+        imageConfig: {
+            background:
+                "linear-gradient(0deg, rgba(34,162,195,1) 0%, rgba(253,121,45,1) 100%)",
+        },
+    });
 
     const { postId } = router.query;
 
@@ -25,6 +40,8 @@ export const Post = ({ isAuthor, userId }: PostProperties): JSX.Element => {
             {postId}
             {isAuthor ? "\tIs author\t" : "\tIs not author\t"}
             {userId}
+            {title}
+            {createdAt}
         </div>
     );
 };
