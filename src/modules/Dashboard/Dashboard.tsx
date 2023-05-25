@@ -52,7 +52,24 @@ export const Dashboard = ({
     const router = useRouter();
 
     const logout = React.useCallback(async () => {
-        await new UserService().logout();
+        const loggingOutToast = toast.loading("Logging out...");
+        const { data: loggedOutSuccessfully } =
+            await new UserService().logout();
+        if (loggedOutSuccessfully) {
+            toast.update(loggingOutToast, {
+                autoClose: 1500,
+                isLoading: false,
+                render: "Logged out successfully!",
+                type: "success",
+            });
+        } else {
+            toast.update(loggingOutToast, {
+                autoClose: 1500,
+                isLoading: false,
+                render: "Failed to log out",
+                type: "error",
+            });
+        }
         router.push("/");
     }, [router]);
 
