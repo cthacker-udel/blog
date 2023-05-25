@@ -4,6 +4,7 @@
 export const Collections = {
     ADMIN_REQUESTS: "AdminRequests",
     ERRORS: "Errors",
+    NOTIFICATIONS: "Notifications",
     POSTS: "Posts",
     USERS: "Users",
 };
