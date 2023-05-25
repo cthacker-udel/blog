@@ -36,7 +36,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => (
                     return convertedResult;
                 },
                 provider: () => new Map(),
-                refreshInterval: 3000,
             }}
         >
             <Layout>

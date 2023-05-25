@@ -386,4 +386,25 @@ export class UserApi extends DatabaseApi implements IUserApi {
             await this.closeMongoTransaction();
         }
     };
+
+    /** @inheritdoc */
+    public validateSession = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            const { username } = parseCookie(request);
+
+            if (username === undefined) {
+                throw new Error("Session is invalid");
+            }
+
+            response.status(200);
+            response.send({ data: true });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(401);
+            response.send({ data: false });
+        }
+    };
 }

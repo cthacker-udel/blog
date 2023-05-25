@@ -19,5 +19,6 @@ export const Endpoints = {
         LOGOUT: "logout",
         REMOVE_NOTIFICATION: "removeNotification",
         SIGNUP: "signup",
+        VALIDATE_SESSION: "validateSession",
     },
 };

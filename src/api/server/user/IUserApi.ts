@@ -122,4 +122,13 @@ export interface IUserApi {
         _request: ClientRequest,
         _response: ServerResponse,
     ) => PV;
+
+    /**
+     *  Validates the user session, parsing the cookie sent, if one exists
+     *
+     * @param _request - The client request
+     * @param _response - The server response
+     * @returns Whether the session is valid
+     */
+    validateSession: (_request: ClientRequest, _response: ServerResponse) => PV;
 }

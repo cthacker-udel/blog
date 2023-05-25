@@ -18,9 +18,6 @@ export const useNotifications = (): void => {
     const { data } = useSWR<ApiResponse<Notification[]>, Error, string>(
         `${Endpoints.USER.BASE}${Endpoints.USER.ALL_NOTIFICATIONS}`,
         null,
-        {
-            refreshInterval: 2000,
-        },
     );
 
     const removeNotification = React.useCallback(
