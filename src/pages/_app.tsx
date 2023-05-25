@@ -45,9 +45,10 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => (
         <ToastContainer
             autoClose={5000}
             closeOnClick
-            draggable
+            draggable={false}
             hideProgressBar={false}
             newestOnTop={false}
+            pauseOnFocusLoss={false}
             pauseOnHover={false}
             position="top-right"
             rtl={false}
