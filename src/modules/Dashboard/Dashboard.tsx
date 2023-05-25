@@ -55,8 +55,6 @@ export const Dashboard = ({
             const { data, error } =
                 await new AdminService().requestAdminAccess();
 
-            console.log(error);
-
             if (data) {
                 toast.update(requestingToast, {
                     autoClose: 1500,
