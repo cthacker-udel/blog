@@ -37,3 +37,8 @@
 .posts_post_date {
     font-family: "Quicksand", sans-serif;
 }
+
+.no_posts_section {
+    text-align: center;
+    font-family: "DynaPuff", sans-serif;
+}

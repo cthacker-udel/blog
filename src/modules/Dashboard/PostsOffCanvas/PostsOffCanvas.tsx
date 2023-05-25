@@ -53,35 +53,41 @@ export const PostsOffCanvas = ({
             </Offcanvas.Header>
             <hr />
             <Offcanvas.Body>
-                {posts.map((eachPost: Post) => (
-                    <div
-                        className={styles.posts_post_listing}
-                        key={eachPost.title}
-                    >
+                {posts.length > 0 ? (
+                    posts.map((eachPost: Post) => (
                         <div
-                            className={styles.posts_post_title}
-                            onClick={(): void => {
-                                router.push(`post/${eachPost._id}`);
-                            }}
+                            className={styles.posts_post_listing}
+                            key={eachPost.title}
                         >
-                            {eachPost.title}
-                        </div>
-                        <div className={styles.posts_post_dates}>
-                            <div className={styles.posts_post_date}>
-                                {`Created ${new Date(
-                                    eachPost.createdAt,
-                                ).toLocaleString()}`}
+                            <div
+                                className={styles.posts_post_title}
+                                onClick={(): void => {
+                                    router.push(`post/${eachPost._id}`);
+                                }}
+                            >
+                                {eachPost.title}
                             </div>
-                            {eachPost.createdAt !== eachPost.modifiedAt && (
+                            <div className={styles.posts_post_dates}>
                                 <div className={styles.posts_post_date}>
-                                    {`Updated ${new Date(
-                                        eachPost.modifiedAt,
+                                    {`Created ${new Date(
+                                        eachPost.createdAt,
                                     ).toLocaleString()}`}
                                 </div>
-                            )}
+                                {eachPost.createdAt !== eachPost.modifiedAt && (
+                                    <div className={styles.posts_post_date}>
+                                        {`Updated ${new Date(
+                                            eachPost.modifiedAt,
+                                        ).toLocaleString()}`}
+                                    </div>
+                                )}
+                            </div>
                         </div>
+                    ))
+                ) : (
+                    <div className={styles.no_posts_section}>
+                        {"No Posts Available, start posting!"}
                     </div>
-                ))}
+                )}
             </Offcanvas.Body>
         </Offcanvas>
     );

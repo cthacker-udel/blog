@@ -45,6 +45,7 @@ const Home = (): JSX.Element => (
                 name="viewport"
             />
             <link href="/icon.ico" rel="icon" />
+            <title>{"Cameron's Blog"}</title>
         </Head>
         <Landing />
     </>
