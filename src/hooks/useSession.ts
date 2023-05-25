@@ -29,14 +29,18 @@ export const useSession = (): void => {
                 )
             ) {
                 toast.info("Session expired");
-                new UserService()
-                    .logout()
-                    .then(() => {
-                        router.push("/");
-                    })
-                    .catch(() => {
-                        router.push("/");
-                    });
+                try {
+                    new UserService()
+                        .logout()
+                        .then(() => {
+                            router.push("/");
+                        })
+                        .catch(() => {
+                            router.push("/");
+                        });
+                } catch {
+                    router.push("/");
+                }
             }
         }
     }, [router]);
@@ -46,14 +50,18 @@ export const useSession = (): void => {
             const { data: isSessionValid } = data;
             if (!isSessionValid || error !== undefined) {
                 toast.info("Session expired");
-                new UserService()
-                    .logout()
-                    .then(() => {
-                        router.push("/");
-                    })
-                    .catch(() => {
-                        router.push("/");
-                    });
+                try {
+                    new UserService()
+                        .logout()
+                        .then(() => {
+                            router.push("/");
+                        })
+                        .catch(() => {
+                            router.push("/");
+                        });
+                } catch {
+                    router.push("/");
+                }
             }
         }
     }, [data, error, router]);
