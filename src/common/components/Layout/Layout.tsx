@@ -26,7 +26,9 @@ export const Layout = ({
                 );
                 if (audioElement !== null) {
                     const convertedElement = audioElement as HTMLAudioElement;
-                    await convertedElement.play();
+                    const newAudioElement = document.createElement("audio");
+                    newAudioElement.src = convertedElement.src;
+                    await newAudioElement.play();
                 }
             } else if (status === "removed") {
                 const audioElement = document.querySelector(
@@ -34,7 +36,9 @@ export const Layout = ({
                 );
                 if (audioElement !== null) {
                     const convertedElement = audioElement as HTMLAudioElement;
-                    await convertedElement.play();
+                    const newAudioElement = document.createElement("audio");
+                    newAudioElement.src = convertedElement.src;
+                    await newAudioElement.play();
                 }
             }
         });

@@ -32,15 +32,19 @@ export class UserService extends ServiceBaseController implements IUserService {
         username: string,
         password: string,
     ): Promise<ApiResponse<boolean>> => {
-        const response = await this.post<
-            boolean,
-            Pick<User, "password" | "username">
-        >(`${Endpoints.USER.BASE}${Endpoints.USER.LOGIN}`, {
-            password,
-            username,
-        });
+        try {
+            const response = await this.post<
+                boolean,
+                Pick<User, "password" | "username">
+            >(`${Endpoints.USER.BASE}${Endpoints.USER.LOGIN}`, {
+                password,
+                username,
+            });
 
-        return response;
+            return response;
+        } catch {
+            return { data: false };
+        }
     };
 
     /** @inheritdoc */
