@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 import { AdminService, UserService } from "@/api/service";
 import { generateTooltip, UserRoles } from "@/common";
-import { useBackground, useLayoutInjector } from "@/hooks";
+import { useBackground, useLayoutInjector, useSession } from "@/hooks";
 
 import { AddPostModal } from "./AddPostModal";
 import styles from "./Dashboard.module.css";
@@ -40,6 +40,7 @@ export const Dashboard = ({
     });
 
     useLayoutInjector(styles.title_layout);
+    useSession();
 
     const router = useRouter();
 

@@ -1,7 +1,17 @@
+/* eslint-disable require-await -- disabled */
+/* eslint-disable @typescript-eslint/require-await -- disabled */
+/* eslint-disable import/no-nodejs-modules -- disabled */
+import type { IncomingMessage } from "node:http";
+
+import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import React from "react";
 
 import { Landing } from "@/modules";
+
+type GetServerSideProperties = {
+    req: IncomingMessage;
+};
 
 /**
  *
@@ -39,5 +49,25 @@ const Home = (): JSX.Element => (
         <Landing />
     </>
 );
+
+/**
+ * Gets the properties of the component server-side before rendering the component for the user
+ *
+ * @param props - The properties of the server-side props
+ * @returns The ssr properties of the component, and redirects if user is currently logged in
+ */
+export const getServerSideProps: GetServerSideProps = async ({
+    req,
+}: GetServerSideProperties) => {
+    const isLoggedIn = req.headers.cookie?.includes(
+        process.env.COOKIE_NAME as unknown as string,
+    );
+
+    if (isLoggedIn) {
+        return { redirect: { destination: "/dashboard", permanent: false } };
+    }
+
+    return { props: {} };
+};
 
 export default Home;
