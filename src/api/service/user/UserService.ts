@@ -86,4 +86,13 @@ export class UserService extends ServiceBaseController implements IUserService {
 
         return response;
     };
+
+    /** @inheritdoc */
+    public authoredPosts = async (): Promise<ApiResponse<Post[]>> => {
+        const response = await this.get<Post[]>(
+            `${Endpoints.POST.BASE}${Endpoints.POST.ALL_AUTHORED}`,
+        );
+
+        return response;
+    };
 }

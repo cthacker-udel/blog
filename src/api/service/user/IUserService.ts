@@ -1,6 +1,6 @@
 import type { ObjectId } from "mongodb";
 
-import type { ApiResponse } from "@/@types";
+import type { ApiResponse, Post } from "@/@types";
 
 /**
  * Interface for all methods involving the user
@@ -60,4 +60,11 @@ export interface IUserService {
      * @returns The id of the post that was created
      */
     addPost: (_title: string) => Promise<ApiResponse<ObjectId | null>>;
+
+    /**
+     * Fetches all posts the user made, searching in the mongo database for the posts
+     *
+     * @returns All authored posts by the user making the request
+     */
+    authoredPosts: () => Promise<ApiResponse<Post[]>>;
 }

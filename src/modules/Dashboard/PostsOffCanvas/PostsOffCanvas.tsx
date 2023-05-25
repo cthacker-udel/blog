@@ -4,10 +4,9 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { Offcanvas } from "react-bootstrap";
-import useSWR from "swr";
 
-import type { ApiResponse, Post } from "@/@types";
-import { Endpoints } from "@/constants";
+import type { Post } from "@/@types";
+import { UserService } from "@/api/service";
 
 import styles from "./PostsOffcanvas.module.css";
 
@@ -28,23 +27,20 @@ export const PostsOffCanvas = ({
     onHidePostsOffCanvas,
     showPostsOffCanvas,
 }: PostsOffCanvasProperties): JSX.Element => {
-    const { data, error, isLoading } = useSWR<
-        ApiResponse<Post[]>,
-        Error,
-        string
-    >(`${Endpoints.POST.BASE}${Endpoints.POST.ALL_AUTHORED}`);
+    const [posts, setPosts] = React.useState<Post[]>([]);
+
+    const fetchPosts = React.useCallback(async (): Promise<void> => {
+        const { data } = await new UserService().authoredPosts();
+        setPosts(data);
+    }, []);
+
+    React.useEffect(() => {
+        if (showPostsOffCanvas) {
+            fetchPosts();
+        }
+    }, [fetchPosts, showPostsOffCanvas]);
 
     const router = useRouter();
-
-    if (isLoading || data === undefined) {
-        return <div />;
-    }
-
-    if (error) {
-        router.push("/");
-    }
-
-    const { data: posts } = data;
 
     return (
         <Offcanvas
