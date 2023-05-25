@@ -1,7 +1,10 @@
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
 
 import { useBackground } from "@/hooks";
+
+import styles from "./Post.module.css";
 
 type PostProperties = {
     createdAt: string;
@@ -36,12 +39,18 @@ export const Post = ({
     }
 
     return (
-        <div>
-            {postId}
-            {isAuthor ? "\tIs author\t" : "\tIs not author\t"}
-            {userId}
-            {title}
-            {createdAt}
-        </div>
+        <>
+            <Head>
+                <title>{title}</title>
+            </Head>
+            <div className={styles.post_content}>
+                <div className={styles.post_title}>{title}</div>
+                {postId}
+                {isAuthor ? "\tIs author\t" : "\tIs not author\t"}
+                {userId}
+                {title}
+                {createdAt}
+            </div>
+        </>
     );
 };

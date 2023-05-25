@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
 import { Button, Form, InputGroup, OverlayTrigger } from "react-bootstrap";
@@ -67,6 +68,9 @@ export const Login = (): JSX.Element => {
 
     return (
         <>
+            <Head>
+                <title>{"Login"}</title>
+            </Head>
             <div className={`${styles.login_title}`} id="login_title">
                 {"Login"}
                 <OverlayTrigger

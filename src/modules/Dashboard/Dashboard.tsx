@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string -- disabled */
 /* eslint-disable no-extra-boolean-cast -- disabled */
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
+import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
 import { Button, OverlayTrigger } from "react-bootstrap";
@@ -81,7 +82,7 @@ export const Dashboard = ({
                 });
             }
         } else {
-            toast.info("You already have admin permissions!");
+            toast.success("You already have admin permissions!");
         }
     }, [role]);
 
@@ -108,6 +109,9 @@ export const Dashboard = ({
 
     return (
         <>
+            <Head>
+                <title>{"Dashboard"}</title>
+            </Head>
             <div className={styles.title}>{"Posts"}</div>
             <OverlayTrigger
                 overlay={(properties: OverlayInjectedProps): JSX.Element =>

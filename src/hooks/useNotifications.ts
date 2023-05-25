@@ -40,7 +40,6 @@ export const useNotifications = (): void => {
                     ).catch((error) => {
                         console.error(error);
                     });
-                    console.log("rendering notification", eachNotification);
                     switch (eachNotification.type) {
                         case NotificationType.INFO: {
                             toast.info(eachNotification.message);

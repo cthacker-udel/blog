@@ -48,7 +48,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => (
             draggable
             hideProgressBar={false}
             newestOnTop={false}
-            pauseOnHover
+            pauseOnHover={false}
             position="top-right"
             rtl={false}
             theme="light"

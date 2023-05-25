@@ -30,6 +30,13 @@ const Document = (): JSX.Element => (
                 href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@500&family=Golos+Text&family=Oswald:wght@300&family=Radio+Canada&family=Inter&family=Tilt+Prism&family=Zeyada&family=Quicksand&display=swap"
                 rel="stylesheet"
             />
+            <audio id="notification_info" src="/notification_info.wav" />
+            <audio id="notification_success" src="/notification_success.wav" />
+            <audio id="notification_warning" src="/notification_warning.wav" />
+            <audio id="notification_error" src="/notification_error.wav" />
+            <audio id="notification_default" src="/notification_default.wav" />
+            <audio id="notification_removed" src="/notification_removed.wav" />
+            <link href="/icon.ico" rel="icon" />
         </Head>
         <body>
             <Main />
