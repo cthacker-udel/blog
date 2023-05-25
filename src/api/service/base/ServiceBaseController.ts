@@ -40,7 +40,9 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { ...data, response } as ApiResponse<T>;
+        const convertedData = data as Pick<ApiResponse<T>, "data" | "error">;
+
+        return { ...convertedData, response } as ApiResponse<T>;
     };
 
     /**
@@ -81,7 +83,9 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { ...data, response } as ApiResponse<T>;
+        const convertedData = data as Pick<ApiResponse<T>, "data" | "error">;
+
+        return { ...convertedData, response } as ApiResponse<T>;
     };
 
     /**
@@ -122,7 +126,9 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { ...data, response } as ApiResponse<T>;
+        const convertedData = data as Pick<ApiResponse<T>, "data" | "error">;
+
+        return { ...convertedData, response } as ApiResponse<T>;
     };
 
     /**
@@ -163,7 +169,9 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { ...data, response } as ApiResponse<T>;
+        const convertedData = data as Pick<ApiResponse<T>, "data" | "error">;
+
+        return { ...convertedData, response } as ApiResponse<T>;
     };
 
     /**
@@ -204,6 +212,8 @@ export class ServiceBaseController {
 
         const data = await response.json();
 
-        return { ...data, response } as ApiResponse<T>;
+        const convertedData = data as Pick<ApiResponse<T>, "data" | "error">;
+
+        return { ...convertedData, response } as ApiResponse<T>;
     };
 }

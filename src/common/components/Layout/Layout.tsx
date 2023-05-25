@@ -1,7 +1,5 @@
 import React from "react";
 
-import { useNotifications } from "@/hooks";
-
 import styles from "./Layout.module.css";
 
 type LayoutProperties = {
@@ -17,14 +15,11 @@ type LayoutProperties = {
 export const Layout = ({
     children,
     containerOverride,
-}: React.PropsWithChildren<LayoutProperties>): JSX.Element => {
-    useNotifications();
-    return (
-        <div
-            className={`${styles.container} ${containerOverride ?? ""}`.trim()}
-            id="layout"
-        >
-            {children}
-        </div>
-    );
-};
+}: React.PropsWithChildren<LayoutProperties>): JSX.Element => (
+    <div
+        className={`${styles.container} ${containerOverride ?? ""}`.trim()}
+        id="layout"
+    >
+        {children}
+    </div>
+);

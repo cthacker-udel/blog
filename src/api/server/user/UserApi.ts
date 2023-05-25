@@ -362,7 +362,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
         try {
             await this.startMongoTransaction();
 
-            const id = request.body.id;
+            const id = (JSON.parse(request.body) as { id: string }).id;
 
             if (id === undefined) {
                 throw new Error("Must provide id when removing request");
@@ -373,7 +373,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
             );
 
             const removalResult = await notificationRepo.deleteOne({
-                _id: new ObjectId(id as string),
+                _id: new ObjectId(id),
             });
 
             response.status(removalResult.acknowledged ? 200 : 400);
