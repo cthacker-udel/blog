@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 import { NotificationType } from "@/common";
 
 /**
@@ -12,7 +14,7 @@ export class Notification {
     /**
      * The ObjectID of the receiver (the _id field of the entry in the database)
      */
-    public receiver: string;
+    public receiver: ObjectId;
 
     /**
      * The contents of the notification
@@ -32,12 +34,12 @@ export class Notification {
      * @param type - The type of notification (error, info, etc)
      */
     public constructor(
-        receiver?: string,
+        receiver: string,
         message?: string,
         type?: NotificationType,
     ) {
         this.createdAt = new Date(Date.now());
-        this.receiver = receiver ?? "";
+        this.receiver = new ObjectId(receiver);
         this.message = message ?? "";
         this.type = type ?? NotificationType.INFO;
     }
@@ -82,7 +84,7 @@ export class Notification {
      * @returns The modified instance
      */
     public setReceiver = (receiver: string): this => {
-        this.receiver = receiver;
+        this.receiver = new ObjectId(receiver);
         return this;
     };
 }

@@ -6,15 +6,18 @@ import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { AdminRequest, User } from "@/@types";
+import { Notification } from "@/classes";
 import {
     convertErrorToApiResponse,
     generateRequestAdminAccessLink,
+    NotificationType,
     parseCookie,
     UserRoles,
 } from "@/common";
 import { Collections } from "@/constants";
 
 import { DatabaseApi } from "../database";
+import { NotificationApi } from "../notification";
 import type { IAdminApi } from "./IAdminApi";
 
 /**
@@ -155,13 +158,22 @@ export class AdminApi extends DatabaseApi implements IAdminApi {
                 { $set: { role: UserRoles.ADMIN } },
             );
 
-            response.status(
-                deleteResult.acknowledged && updateResult.acknowledged
-                    ? 200
-                    : 400,
-            );
+            const wasSuccessful =
+                deleteResult.acknowledged && updateResult.acknowledged;
+
+            if (wasSuccessful) {
+                await new NotificationApi(this).addNotification(
+                    new Notification(
+                        id,
+                        "Admin request accepted!",
+                        NotificationType.SUCCESS,
+                    ),
+                );
+            }
+
+            response.status(wasSuccessful ? 200 : 400);
             response.send({
-                data: deleteResult.acknowledged && updateResult.acknowledged,
+                data: wasSuccessful,
             });
         } catch (error: unknown) {
             await this.logMongoError(error);
@@ -202,8 +214,20 @@ export class AdminApi extends DatabaseApi implements IAdminApi {
 
             const deleteResult = await requestRepo.deleteOne(foundRequest);
 
-            response.status(deleteResult.acknowledged ? 200 : 400);
-            response.send({ data: deleteResult.acknowledged });
+            const wasDeleted = deleteResult.acknowledged;
+
+            if (wasDeleted) {
+                await new NotificationApi(this).addNotification(
+                    new Notification(
+                        id,
+                        "Admin request was denied",
+                        NotificationType.WARNING,
+                    ),
+                );
+            }
+
+            response.status(wasDeleted ? 200 : 400);
+            response.send({ data: wasDeleted });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);
