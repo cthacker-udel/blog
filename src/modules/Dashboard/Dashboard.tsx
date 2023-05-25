@@ -310,14 +310,14 @@ export const Dashboard = ({
                 }
                 placement="left"
             >
-                <Button
+                <div
                     className={styles.user_info_button}
                     onMouseEnter={(
-                        event: React.MouseEvent<HTMLButtonElement>,
+                        event: React.MouseEvent<HTMLDivElement>,
                     ): void => {
                         const { target } = event;
                         if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
+                            const convertedTarget = target as HTMLDivElement;
                             convertedTarget.className =
                                 convertedTarget.className.replace(
                                     "btn-primary",
@@ -331,11 +331,11 @@ export const Dashboard = ({
                         }
                     }}
                     onMouseLeave={(
-                        event: React.MouseEvent<HTMLButtonElement>,
+                        event: React.MouseEvent<HTMLDivElement>,
                     ): void => {
                         const { target } = event;
                         if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
+                            const convertedTarget = target as HTMLDivElement;
                             convertedTarget.className =
                                 convertedTarget.className.replace(
                                     "btn-primary",
@@ -351,10 +351,9 @@ export const Dashboard = ({
                             }
                         }
                     }}
-                    variant="info"
                 >
                     <i className="fa-solid fa-info" id="user_info_icon" />
-                </Button>
+                </div>
             </OverlayTrigger>
             {role === UserRoles.ADMIN && (
                 <OverlayTrigger

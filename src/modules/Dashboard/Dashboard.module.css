@@ -58,6 +58,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    background-color: #0dcaf0;
 }
 
 .add_post_button {
