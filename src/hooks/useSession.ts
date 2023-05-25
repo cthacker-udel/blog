@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 import { useRouter } from "next/router";
 import React from "react";
+import { toast } from "react-toastify";
 import useSWR from "swr";
 
 import type { ApiResponse } from "@/@types";
@@ -27,6 +28,7 @@ export const useSession = (): void => {
                     process.env.NEXT_PUBLIC_COOKIE_NAME as unknown as string,
                 )
             ) {
+                toast.info("Session expired");
                 new UserService()
                     .logout()
                     .then(() => {
@@ -43,6 +45,7 @@ export const useSession = (): void => {
         if (data !== undefined) {
             const { data: isSessionValid } = data;
             if (!isSessionValid || error !== undefined) {
+                toast.info("Session expired");
                 new UserService()
                     .logout()
                     .then(() => {

@@ -57,11 +57,23 @@ export const Login = (): JSX.Element => {
             Object.keys(errors).length === 0
         ) {
             const { password, username } = getValues();
+            const loggingInToast = toast.loading("Logging in");
             const { data } = await new UserService().login(username, password);
             if (data) {
+                toast.update(loggingInToast, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Successfully logged in!",
+                    type: "success",
+                });
                 router.push("/dashboard");
             } else {
-                toast.error("Failed to login");
+                toast.update(loggingInToast, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Failed to login",
+                    type: "error",
+                });
             }
         }
     }, [dirtyFields, errors, isDirty, getValues, router]);

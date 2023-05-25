@@ -20,7 +20,7 @@ export const Layout = ({
     React.useEffect(() => {
         const unsubscribe = toast.onChange(async (payload: ToastItem) => {
             const { status, type } = payload;
-            if (status === "added") {
+            if (status === "added" || status === "updated") {
                 const audioElement = document.querySelector(
                     `#notification_${type}`,
                 );
