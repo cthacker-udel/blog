@@ -7,6 +7,11 @@ import { NotificationType } from "@/common";
  */
 export class Notification {
     /**
+     * The id of the notification
+     */
+    public _id?: ObjectId;
+
+    /**
      * When the notification was created
      */
     public createdAt: Date;

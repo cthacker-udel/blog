@@ -164,7 +164,7 @@ export class AdminApi extends DatabaseApi implements IAdminApi {
             if (wasSuccessful) {
                 await new NotificationApi(this).addNotification(
                     new Notification(
-                        id,
+                        user_id.toString(),
                         "Admin request accepted!",
                         NotificationType.SUCCESS,
                     ),
