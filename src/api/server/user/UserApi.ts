@@ -4,11 +4,12 @@ import type { IncomingMessage } from "node:http";
 
 import { deleteCookie, setCookie } from "cookies-next";
 import { sign } from "jsonwebtoken";
-import type { ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { ApiResponse, User } from "@/@types";
 import { EncryptionService } from "@/api/service/encryption";
+import type { Notification } from "@/classes";
 import {
     convertErrorToApiResponse,
     generateEntityDateTimes,
@@ -302,6 +303,85 @@ export class UserApi extends DatabaseApi implements IUserApi {
         } catch (error: unknown) {
             await this.logMongoError(error);
             throw error;
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public allUserNotifications = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const { username } = parseCookie(request);
+
+            if (username === undefined) {
+                throw new Error(
+                    "Failed to get username from cookie, make sure you have a valid cookie, or try signing in again.",
+                );
+            }
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+            const notificationRepo = this.getMongoRepo<Notification>(
+                Collections.NOTIFICATIONS,
+            );
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error(
+                    "The user whom the session cookie belongs to does not exist",
+                );
+            }
+
+            const foundNotifications = await notificationRepo
+                .find({
+                    receiver: foundUser._id,
+                })
+                .toArray();
+
+            response.status(200);
+            response.send({ data: foundNotifications });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send({ data: [] });
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public removeNotification = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const id = request.body.id;
+
+            if (id === undefined) {
+                throw new Error("Must provide id when removing request");
+            }
+
+            const notificationRepo = this.getMongoRepo<Notification>(
+                Collections.NOTIFICATIONS,
+            );
+
+            const removalResult = await notificationRepo.deleteOne({
+                _id: new ObjectId(id as string),
+            });
+
+            response.status(removalResult.acknowledged ? 200 : 400);
+            response.send({ data: removalResult.acknowledged });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send({ data: false });
         } finally {
             await this.closeMongoTransaction();
         }

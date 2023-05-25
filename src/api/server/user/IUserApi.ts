@@ -98,4 +98,28 @@ export interface IUserApi {
      * @returns The id of the user with the username sent in the request
      */
     getUserIdFromUsername: (_username: string) => Promise<ObjectId>;
+
+    /**
+     * Fetches all requester's notifications (requester being the one who sent the request)
+     *
+     * @param _request - The client request
+     * @param _response - The server response
+     * @returns All notifications belonging to the requester
+     */
+    allUserNotifications: (
+        _request: ClientRequest,
+        _response: ServerResponse,
+    ) => PV;
+
+    /**
+     * Removes the notification specified by the id provided in the payload
+     *
+     * @param _request - The client request
+     * @param _response - The server response
+     * @returns Whether the notification was removed
+     */
+    removeNotification: (
+        _request: ClientRequest,
+        _response: ServerResponse,
+    ) => PV;
 }

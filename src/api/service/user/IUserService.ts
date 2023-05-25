@@ -67,4 +67,12 @@ export interface IUserService {
      * @returns All authored posts by the user making the request
      */
     authoredPosts: () => Promise<ApiResponse<Post[]>>;
+
+    /**
+     * Removes the notification from the database
+     *
+     * @param _id - The id of the notification to remove
+     * @returns Whether the notification was removed
+     */
+    removeNotification: (_id: string) => Promise<ApiResponse<boolean>>;
 }

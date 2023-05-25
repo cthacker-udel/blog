@@ -95,4 +95,16 @@ export class UserService extends ServiceBaseController implements IUserService {
 
         return response;
     };
+
+    /** @inheritdoc */
+    public removeNotification = async (
+        id: string,
+    ): Promise<ApiResponse<boolean>> => {
+        const response = await this.post<boolean, { id: string }>(
+            `${Endpoints.USER.BASE}${Endpoints.USER.REMOVE_NOTIFICATION}`,
+            { id },
+        );
+
+        return response;
+    };
 }
