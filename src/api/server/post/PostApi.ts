@@ -154,4 +154,39 @@ export class PostApi extends DatabaseApi implements IPostApi {
         }
         return {};
     };
+
+    /** @inheritdoc */
+    public getPostContent = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const postId = request.query.postId;
+
+            if (postId === undefined) {
+                throw new Error("Post id must be supplied in query string");
+            }
+
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+
+            const foundPost = await postRepo.findOne({
+                _id: new ObjectId(postId as string),
+            });
+
+            if (foundPost === null) {
+                throw new Error("Post was unable to be found");
+            }
+
+            response.status(200);
+            response.send({ data: foundPost.content ?? "" });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
 }

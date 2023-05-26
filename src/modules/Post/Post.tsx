@@ -1,7 +1,16 @@
+/* eslint-disable @typescript-eslint/indent -- disabled */
+/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
+
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
+import { Button, OverlayTrigger } from "react-bootstrap";
+import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import useSWR from "swr";
 
+import type { ApiResponse, Post as PostType } from "@/@types";
+import { generateTooltip } from "@/common";
+import { Endpoints } from "@/constants";
 import { useBackground } from "@/hooks";
 
 import styles from "./Post.module.css";
@@ -31,12 +40,31 @@ export const Post = ({
                 "linear-gradient(0deg, rgba(34,162,195,1) 0%, rgba(253,121,45,1) 100%)",
         },
     });
+    const [editPost, setEditPost] = React.useState<boolean>(false);
+
+    const toggleEditPost = React.useCallback(() => {
+        setEditPost((oldValue: boolean) => !oldValue);
+    }, []);
 
     const { postId } = router.query;
 
-    if (postId === undefined) {
+    const { data, error, isLoading } = useSWR<
+        ApiResponse<Pick<PostType, "content">>,
+        Error,
+        string
+    >(`${Endpoints.POST.BASE}${Endpoints.POST.CONTENT}?postId=${postId}`);
+
+    if (postId === undefined || isLoading || data === undefined) {
         return <div />;
     }
+
+    if (error) {
+        router.push("/");
+    }
+
+    const { data: postContent } = data;
+
+    console.log(postContent);
 
     return (
         <>
@@ -44,7 +72,36 @@ export const Post = ({
                 <title>{title}</title>
             </Head>
             <div className={styles.post_content}>
-                <div className={styles.post_title}>{title}</div>
+                <div className={styles.post_title}>
+                    {title}
+                    {isAuthor && (
+                        <OverlayTrigger
+                            overlay={(
+                                properties: OverlayInjectedProps,
+                            ): JSX.Element =>
+                                generateTooltip({
+                                    content: editPost
+                                        ? "Cancel Edit"
+                                        : "Edit Post",
+                                    props: properties,
+                                })
+                            }
+                            placement="top"
+                        >
+                            <Button
+                                className={styles.edit_post_button}
+                                onClick={toggleEditPost}
+                                variant="outline-primary"
+                            >
+                                <i
+                                    className={`fa-solid ${
+                                        editPost ? "fa-cancel" : "fa-pencil"
+                                    } fa-xs`}
+                                />
+                            </Button>
+                        </OverlayTrigger>
+                    )}
+                </div>
                 {postId}
                 {isAuthor ? "\tIs author\t" : "\tIs not author\t"}
                 {userId}

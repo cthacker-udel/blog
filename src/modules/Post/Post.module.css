@@ -6,4 +6,14 @@
 
 .post_title {
     font-size: 3.75em;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.edit_post_button {
+    height: 2.5em;
+    border-radius: 3em;
+    width: 2.5em;
 }

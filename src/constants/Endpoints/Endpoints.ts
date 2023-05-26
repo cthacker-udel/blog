@@ -9,6 +9,7 @@ export const Endpoints = {
         ADD: "add",
         ALL_AUTHORED: "allAuthored",
         BASE: "post/",
+        CONTENT: "content",
     },
     USER: {
         ALL_NOTIFICATIONS: "allNotifications",

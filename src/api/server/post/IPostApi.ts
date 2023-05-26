@@ -47,4 +47,16 @@ export interface IPostApi {
     ssGetPostDetails: (
         _postId: string,
     ) => Promise<Partial<Pick<Post, "createdAt" | "title">>>;
+
+    /**
+     * Fetches the content of the post from parsing the id of the post from the query string
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns The content of the post, the id of the post required in the query string
+     */
+    getPostContent: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
 }
