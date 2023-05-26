@@ -1,0 +1,19 @@
+.editor_toggles {
+    display: flex;
+    flex-direction: row;
+}
+
+.editor_toggles > button {
+    width: fit-content;
+    font-size: 0.75em;
+}
+
+.color_input {
+    width: 0.001%;
+    height: 0.001%;
+    position: absolute;
+    opacity: 0%;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+}
