@@ -14,6 +14,7 @@ import { Endpoints } from "@/constants";
 import { useBackground } from "@/hooks";
 
 import styles from "./Post.module.css";
+import { EditPostModal } from "./EditPostModal";
 
 type PostProperties = {
     createdAt: string;
@@ -62,7 +63,9 @@ export const Post = ({
         router.push("/");
     }
 
-    const { data: postContent } = data;
+    const {
+        data: { content: postContent },
+    } = data;
 
     console.log(postContent);
 
@@ -108,6 +111,13 @@ export const Post = ({
                 {title}
                 {createdAt}
             </div>
+            <EditPostModal
+                content={postContent}
+                onHideEditPostModal={toggleEditPost}
+                postId={postId as string}
+                showEditPostModal={editPost}
+                title={title}
+            />
         </>
     );
 };
