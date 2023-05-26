@@ -13,8 +13,8 @@ import { generateTooltip } from "@/common";
 import { Endpoints } from "@/constants";
 import { useBackground } from "@/hooks";
 
-import styles from "./Post.module.css";
 import { EditPostModal } from "./EditPostModal";
+import styles from "./Post.module.css";
 
 type PostProperties = {
     createdAt: string;
