@@ -78,7 +78,7 @@ export const Post = ({
         async (updatedContent: string): Promise<void> => {
             await mutate({ data: updatedContent } as ApiResponse<string>, {
                 optimisticData: { data: updatedContent },
-                revalidate: false,
+                revalidate: true,
             });
         },
         [mutate],

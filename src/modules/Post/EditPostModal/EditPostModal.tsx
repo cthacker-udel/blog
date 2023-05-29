@@ -99,6 +99,12 @@ export const EditPostModal = ({
     const confirmEdit = React.useCallback(async (): Promise<void> => {
         if (editor !== null) {
             const htmlContent = editor?.getHTML();
+
+            if (content === htmlContent) {
+                toast.error("No changes detected");
+                return;
+            }
+
             const updatingPostContent = toast.loading(
                 "Updating post content...",
             );
@@ -115,6 +121,7 @@ export const EditPostModal = ({
                 });
                 await mutateContent(htmlContent);
                 closeModal();
+                editor.commands.setContent(htmlContent);
             } else {
                 toast.update(updatingPostContent, {
                     autoClose: 1500,
@@ -124,7 +131,7 @@ export const EditPostModal = ({
                 });
             }
         }
-    }, [closeModal, editor, mutateContent, postId]);
+    }, [closeModal, content, editor, mutateContent, postId]);
 
     const tabOverride = React.useCallback(
         (event: React.KeyboardEvent<HTMLDivElement>): void => {
