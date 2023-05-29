@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { Button, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import sanitize from "sanitize-html";
 import useSWR from "swr";
 
 import type { ApiResponse } from "@/@types";
@@ -73,7 +74,7 @@ export const Post = ({
 
                 if (element !== null) {
                     const { data: postContent } = fetchedData;
-                    element.innerHTML = postContent;
+                    element.innerHTML = sanitize(postContent);
                 }
             },
         },
@@ -137,7 +138,7 @@ export const Post = ({
                 </div>
                 <div
                     className={styles.post_content_container}
-                    dangerouslySetInnerHTML={{ __html: postContent }}
+                    dangerouslySetInnerHTML={{ __html: sanitize(postContent) }}
                     id="post_content_container"
                 />
                 <div className={styles.post_credits}>
