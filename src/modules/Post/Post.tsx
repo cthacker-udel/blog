@@ -1,3 +1,5 @@
+/* eslint-disable react/no-danger -- disabled */
+/* eslint-disable unicorn/no-null -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 
@@ -8,7 +10,7 @@ import { Button, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import useSWR from "swr";
 
-import type { ApiResponse, Post as PostType } from "@/@types";
+import type { ApiResponse } from "@/@types";
 import { generateTooltip } from "@/common";
 import { Endpoints } from "@/constants";
 import { useBackground } from "@/hooks";
@@ -29,10 +31,10 @@ type PostProperties = {
  * @returns The current post being viewed
  */
 export const Post = ({
-    createdAt,
+    createdAt: _createdAt,
     isAuthor,
     title,
-    userId,
+    userId: _userId,
 }: PostProperties): JSX.Element => {
     const router = useRouter();
     useBackground({
@@ -50,22 +52,32 @@ export const Post = ({
     const { postId } = router.query;
 
     const { data, error, isLoading, mutate } = useSWR<
-        ApiResponse<Pick<PostType, "content">>,
+        ApiResponse<string>,
         Error,
         string
-    >(`${Endpoints.POST.BASE}${Endpoints.POST.CONTENT}?postId=${postId}`);
+    >(
+        `${Endpoints.POST.BASE}${Endpoints.POST.CONTENT}?postId=${postId}`,
+        null,
+        {
+            onSuccess: (fetchedData: ApiResponse<string>) => {
+                const element = document.querySelector(
+                    "#post_content_container",
+                );
+
+                if (element !== null) {
+                    const { data: postContent } = fetchedData;
+                    element.innerHTML = postContent;
+                }
+            },
+        },
+    );
 
     const mutateContent = React.useCallback(
         async (updatedContent: string): Promise<void> => {
-            await mutate(
-                { data: { content: updatedContent } } as ApiResponse<
-                    Pick<PostType, "content">
-                >,
-                {
-                    optimisticData: { data: { content: updatedContent } },
-                    revalidate: false,
-                },
-            );
+            await mutate({ data: updatedContent } as ApiResponse<string>, {
+                optimisticData: { data: updatedContent },
+                revalidate: false,
+            });
         },
         [mutate],
     );
@@ -74,13 +86,11 @@ export const Post = ({
         return <div />;
     }
 
+    const { data: postContent } = data;
+
     if (error) {
         router.push("/");
     }
-
-    const {
-        data: { content: postContent },
-    } = data;
 
     return (
         <>
@@ -118,12 +128,11 @@ export const Post = ({
                         </OverlayTrigger>
                     )}
                 </div>
-                {postId}
-                {postContent}
-                {isAuthor ? "\tIs author\t" : "\tIs not author\t"}
-                {userId}
-                {title}
-                {createdAt}
+                <div
+                    className={styles.post_content_container}
+                    dangerouslySetInnerHTML={{ __html: postContent }}
+                    id="post_content_container"
+                />
             </div>
             <EditPostModal
                 content={postContent}

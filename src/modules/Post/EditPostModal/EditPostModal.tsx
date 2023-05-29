@@ -7,6 +7,7 @@
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
+import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -73,6 +74,10 @@ export const EditPostModal = ({
                 lowlight,
             }),
             Highlight.configure({ multicolor: true }),
+            TextAlign.configure({
+                alignments: ["left", "center", "right"],
+                types: ["heading", "paragraph"],
+            }),
         ],
     });
 
@@ -83,6 +88,13 @@ export const EditPostModal = ({
             colorInputReference.current.click();
         }
     }, [colorInputReference]);
+
+    const closeModal = React.useCallback(() => {
+        if (content !== undefined) {
+            editor?.commands.setContent(content);
+            onHideEditPostModal();
+        }
+    }, [content, editor?.commands, onHideEditPostModal]);
 
     const confirmEdit = React.useCallback(async (): Promise<void> => {
         if (editor !== null) {
@@ -102,6 +114,7 @@ export const EditPostModal = ({
                     type: "success",
                 });
                 await mutateContent(htmlContent);
+                closeModal();
             } else {
                 toast.update(updatingPostContent, {
                     autoClose: 1500,
@@ -111,14 +124,7 @@ export const EditPostModal = ({
                 });
             }
         }
-    }, [editor, mutateContent, postId]);
-
-    const closeModal = React.useCallback(() => {
-        if (content !== undefined) {
-            editor?.commands.setContent(content);
-            onHideEditPostModal();
-        }
-    }, [content, editor?.commands, onHideEditPostModal]);
+    }, [closeModal, editor, mutateContent, postId]);
 
     const tabOverride = React.useCallback(
         (event: React.KeyboardEvent<HTMLDivElement>): void => {
@@ -222,6 +228,54 @@ export const EditPostModal = ({
                             }
                         >
                             <i className="fa-solid fa-highlighter" />
+                        </Button>
+                        <Button
+                            onClick={(): void => {
+                                editor
+                                    .chain()
+                                    .focus()
+                                    .setTextAlign("left")
+                                    .run();
+                            }}
+                            variant={
+                                editor.isActive({ textAlign: "left" })
+                                    ? editorToggleOnVariant
+                                    : editorToggleOffVariant
+                            }
+                        >
+                            <i className="fa-solid fa-align-left" />
+                        </Button>
+                        <Button
+                            onClick={(): void => {
+                                editor
+                                    .chain()
+                                    .focus()
+                                    .setTextAlign("center")
+                                    .run();
+                            }}
+                            variant={
+                                editor.isActive({ textAlign: "center" })
+                                    ? editorToggleOnVariant
+                                    : editorToggleOffVariant
+                            }
+                        >
+                            <i className="fa-solid fa-align-center" />
+                        </Button>
+                        <Button
+                            onClick={(): void => {
+                                editor
+                                    .chain()
+                                    .focus()
+                                    .setTextAlign("right")
+                                    .run();
+                            }}
+                            variant={
+                                editor.isActive({ textAlign: "right" })
+                                    ? editorToggleOnVariant
+                                    : editorToggleOffVariant
+                            }
+                        >
+                            <i className="fa-solid fa-align-right" />
                         </Button>
                     </div>
                     <div className={styles.post_editor_container}>

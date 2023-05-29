@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent -- disabled */
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -197,6 +198,39 @@ export class PostApi extends DatabaseApi implements IPostApi {
     ): Promise<void> => {
         try {
             await this.startMongoTransaction();
+
+            const { content, id } = JSON.parse(request.body) as Pick<
+                Post,
+                "content"
+            > & {
+                id: string;
+            };
+
+            if (content === undefined || id === undefined) {
+                throw new Error(
+                    "Cannot update content without necessary fields sent",
+                );
+            }
+
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+
+            const foundPost = await postRepo.findOne({ _id: new ObjectId(id) });
+
+            if (foundPost === null) {
+                throw new Error("Post is not in database");
+            }
+
+            const updateResult = await postRepo.updateOne(
+                { _id: foundPost._id },
+                {
+                    $set: {
+                        content,
+                    },
+                },
+            );
+
+            response.status(updateResult.acknowledged ? 200 : 400);
+            response.send({ data: updateResult.acknowledged ? 200 : 400 });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);
