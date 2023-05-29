@@ -4,8 +4,6 @@
 /* eslint-disable import/no-named-as-default -- disabled */
 /* eslint-disable import/no-extraneous-dependencies -- disabled (for now, after refresh delete) */
 
-import "./EditPostModalGlobal.module.scss";
-
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
