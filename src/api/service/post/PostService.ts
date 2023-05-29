@@ -10,17 +10,19 @@ import type { IPostService } from "./IPostService";
  */
 export class PostService extends ServiceBaseController implements IPostService {
     /** @inheritdoc */
-    public updateContent = async (
+    public updatePost = async (
         content: string,
+        title: string,
         postId: string,
     ): Promise<ApiResponse<boolean>> => {
         try {
             const response = await this.post<
                 boolean,
-                { content: string; id: string }
+                { content: string; id: string; title: string }
             >(`${Endpoints.POST.BASE}${Endpoints.POST.UPDATE_CONTENT}`, {
                 content,
                 id: postId,
+                title,
             });
 
             return response;

@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-boolean-cast -- disabled */
 /* eslint-disable newline-per-chained-call -- disabled */
 /* eslint-disable jest/require-hook -- disabled */
 /* eslint-disable node/no-extraneous-import -- disabled */
@@ -17,7 +18,7 @@ import ts from "highlight.js/lib/languages/typescript";
 import html from "highlight.js/lib/languages/xml";
 import { lowlight } from "lowlight";
 import React from "react";
-import { Button, Modal, OverlayTrigger } from "react-bootstrap";
+import { Button, Form, Modal, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
 import { Key } from "ts-key-enum";
@@ -34,6 +35,7 @@ type EditPostModalProperties = {
     postId: string;
     showEditPostModal: boolean;
     title: string;
+    updateTitle: (_updatedTitle: string) => void;
 };
 
 lowlight.registerLanguage("html", html);
@@ -56,7 +58,10 @@ export const EditPostModal = ({
     postId,
     showEditPostModal,
     title,
+    updateTitle,
 }: EditPostModalProperties): JSX.Element => {
+    const [updatedTitle, setUpdatedTitle] = React.useState<string>(title);
+
     const editor = useEditor({
         content: content ?? "",
         editorProps: {
@@ -100,7 +105,7 @@ export const EditPostModal = ({
         if (editor !== null) {
             const htmlContent = editor?.getHTML();
 
-            if (content === htmlContent) {
+            if (content === htmlContent && title === updatedTitle) {
                 toast.error("No changes detected");
                 return;
             }
@@ -108,8 +113,9 @@ export const EditPostModal = ({
             const updatingPostContent = toast.loading(
                 "Updating post content...",
             );
-            const { data: didUpdate } = await new PostService().updateContent(
+            const { data: didUpdate } = await new PostService().updatePost(
                 htmlContent,
+                updatedTitle,
                 postId,
             );
             if (didUpdate) {
@@ -122,6 +128,9 @@ export const EditPostModal = ({
                 await mutateContent(htmlContent);
                 closeModal();
                 editor.commands.setContent(htmlContent);
+                if (title !== updatedTitle) {
+                    updateTitle(updatedTitle);
+                }
             } else {
                 toast.update(updatingPostContent, {
                     autoClose: 1500,
@@ -131,7 +140,16 @@ export const EditPostModal = ({
                 });
             }
         }
-    }, [closeModal, content, editor, mutateContent, postId]);
+    }, [
+        closeModal,
+        content,
+        editor,
+        mutateContent,
+        postId,
+        title,
+        updateTitle,
+        updatedTitle,
+    ]);
 
     const tabOverride = React.useCallback(
         (event: React.KeyboardEvent<HTMLDivElement>): void => {
@@ -157,7 +175,20 @@ export const EditPostModal = ({
                 size="xl"
             >
                 <Modal.Header className={styles.edit_post_modal_header}>
-                    {`Edit ${title}`}
+                    {"Edit"}
+                    <Form.Control
+                        onChange={(
+                            event: React.ChangeEvent<HTMLInputElement>,
+                        ): void => {
+                            const { target } = event;
+                            if (Boolean(target)) {
+                                const { value } = target;
+                                setUpdatedTitle(value);
+                            }
+                        }}
+                        type="text"
+                        value={updatedTitle}
+                    />
                 </Modal.Header>
                 <Modal.Body>
                     <div className={styles.editor_toggles}>

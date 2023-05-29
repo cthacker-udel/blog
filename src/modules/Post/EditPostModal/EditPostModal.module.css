@@ -33,4 +33,7 @@
 
 .edit_post_modal_header {
     font-size: 1.75em;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75em;
 }

@@ -46,6 +46,11 @@ export const Post = ({
         },
     });
     const [editPost, setEditPost] = React.useState<boolean>(false);
+    const [currentTitle, setCurrentTitle] = React.useState<string>(title);
+
+    const updateTitle = React.useCallback((updatedTitle: string) => {
+        setCurrentTitle(updatedTitle);
+    }, []);
 
     const toggleEditPost = React.useCallback(() => {
         setEditPost((oldValue: boolean) => !oldValue);
@@ -97,11 +102,11 @@ export const Post = ({
     return (
         <>
             <Head>
-                <title>{title}</title>
+                <title>{currentTitle}</title>
             </Head>
             <div className={styles.post_content}>
                 <div className={styles.post_title}>
-                    {title}
+                    {currentTitle}
                     {isAuthor && (
                         <OverlayTrigger
                             overlay={(
@@ -150,6 +155,7 @@ export const Post = ({
                 postId={postId as string}
                 showEditPostModal={editPost}
                 title={title}
+                updateTitle={updateTitle}
             />
         </>
     );

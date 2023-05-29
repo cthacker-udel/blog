@@ -211,14 +211,18 @@ export class PostApi extends DatabaseApi implements IPostApi {
         try {
             await this.startMongoTransaction();
 
-            const { content, id } = JSON.parse(request.body) as Pick<
+            const { content, id, title } = JSON.parse(request.body) as Pick<
                 Post,
-                "content"
+                "content" | "title"
             > & {
                 id: string;
             };
 
-            if (content === undefined || id === undefined) {
+            if (
+                content === undefined ||
+                id === undefined ||
+                title === undefined
+            ) {
                 throw new Error(
                     "Cannot update content without necessary fields sent",
                 );
@@ -237,6 +241,7 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 {
                     $set: {
                         content,
+                        title,
                     },
                 },
             );
