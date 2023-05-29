@@ -49,11 +49,26 @@ export const Post = ({
 
     const { postId } = router.query;
 
-    const { data, error, isLoading } = useSWR<
+    const { data, error, isLoading, mutate } = useSWR<
         ApiResponse<Pick<PostType, "content">>,
         Error,
         string
     >(`${Endpoints.POST.BASE}${Endpoints.POST.CONTENT}?postId=${postId}`);
+
+    const mutateContent = React.useCallback(
+        async (updatedContent: string): Promise<void> => {
+            await mutate(
+                { data: { content: updatedContent } } as ApiResponse<
+                    Pick<PostType, "content">
+                >,
+                {
+                    optimisticData: { data: { content: updatedContent } },
+                    revalidate: false,
+                },
+            );
+        },
+        [mutate],
+    );
 
     if (postId === undefined || isLoading || data === undefined) {
         return <div />;
@@ -113,6 +128,7 @@ export const Post = ({
             </div>
             <EditPostModal
                 content={postContent}
+                mutateContent={mutateContent}
                 onHideEditPostModal={toggleEditPost}
                 postId={postId as string}
                 showEditPostModal={editPost}

@@ -27,6 +27,7 @@ import styles from "./EditPostModal.module.css";
 
 type EditPostModalProperties = {
     content: string | undefined;
+    mutateContent: (_content: string) => Promise<void>;
     onHideEditPostModal: () => void;
     postId: string;
     showEditPostModal: boolean;
@@ -48,6 +49,7 @@ const editorToggleOnVariant = "dark";
  */
 export const EditPostModal = ({
     content,
+    mutateContent,
     onHideEditPostModal,
     postId,
     showEditPostModal,
@@ -98,6 +100,7 @@ export const EditPostModal = ({
                     render: "Successfully updated post content!",
                     type: "success",
                 });
+                await mutateContent(htmlContent);
             } else {
                 toast.update(updatingPostContent, {
                     autoClose: 1500,
@@ -107,7 +110,7 @@ export const EditPostModal = ({
                 });
             }
         }
-    }, [editor, postId]);
+    }, [editor, mutateContent, postId]);
 
     const closeModal = React.useCallback(() => {
         if (content !== undefined) {
