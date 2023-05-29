@@ -1,6 +1,7 @@
 .posts_offcanvas_content {
     background: rgba(45, 66, 253, 0.95);
     color: #fde82d;
+    width: 35vw !important;
 }
 
 .posts_offcanvas_header {

@@ -11,11 +11,6 @@
     animation: appear_anim 1s ease-in-out forwards;
 }
 
-.title {
-    opacity: 0%;
-    font-size: 5em;
-}
-
 .logout_button {
     width: 2.5em;
     height: 2.5em;
@@ -85,4 +80,20 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+}
+
+.each_post_container {
+    opacity: 0%;
+    width: 75vw;
+    flex-direction: column;
+    display: flex;
+    gap: 1em;
+}
+
+.each_post {
+    padding: 1em;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 1em;
+    font-family: "JetBrains Mono", monospace;
+    color: snow;
 }

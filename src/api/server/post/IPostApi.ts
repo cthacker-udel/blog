@@ -63,11 +63,23 @@ export interface IPostApi {
     /**
      * Updates the content of the post specified by the id passed in the request body
      *
-     * @param _request
-     * @param _response
-     * @returns
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Whether the content was updated
      */
     updateContent: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
+
+    /**
+     * Gets the most recent posts from the database
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns All the most recent posts from the database
+     */
+    getMostRecentPosts: (
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;

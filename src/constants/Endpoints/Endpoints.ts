@@ -10,6 +10,7 @@ export const Endpoints = {
         ALL_AUTHORED: "allAuthored",
         BASE: "post/",
         CONTENT: "content",
+        MOST_RECENT: "mostRecent",
         UPDATE_CONTENT: "updateContent",
     },
     USER: {

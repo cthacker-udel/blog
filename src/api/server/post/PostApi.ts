@@ -241,6 +241,7 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 {
                     $set: {
                         content,
+                        modifiedAt: new Date(Date.now()),
                         title,
                     },
                 },
@@ -248,6 +249,32 @@ export class PostApi extends DatabaseApi implements IPostApi {
 
             response.status(updateResult.acknowledged ? 200 : 400);
             response.send({ data: updateResult.acknowledged ? 200 : 400 });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public getMostRecentPosts = async (
+        _request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+
+            const mostRecentPosts = await postRepo
+                .find()
+                .sort({ modifiedAt: -1 })
+                .toArray();
+
+            response.status(200);
+            response.send({ data: mostRecentPosts });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);

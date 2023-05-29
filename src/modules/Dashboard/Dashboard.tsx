@@ -1,15 +1,19 @@
+/* eslint-disable @typescript-eslint/indent -- disabled */
 /* eslint-disable sonarjs/no-duplicate-string -- disabled */
 /* eslint-disable no-extra-boolean-cast -- disabled */
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
-import { Button, OverlayTrigger } from "react-bootstrap";
+import { Button, ListGroup, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
+import useSWR from "swr";
 
+import type { ApiResponse, Post } from "@/@types";
 import { AdminService, UserService } from "@/api/service";
 import { generateTooltip, UserRoles } from "@/common";
+import { Endpoints } from "@/constants";
 import {
     useBackground,
     useLayoutInjector,
@@ -48,6 +52,14 @@ export const Dashboard = ({
     useLayoutInjector(styles.title_layout);
     useSession();
     useNotifications();
+
+    const { data: mostRecentPosts } = useSWR<
+        ApiResponse<Post[]>,
+        Error,
+        string
+    >(`${Endpoints.POST.BASE}${Endpoints.POST.MOST_RECENT}`);
+
+    console.log(mostRecentPosts);
 
     const router = useRouter();
 
@@ -129,7 +141,16 @@ export const Dashboard = ({
             <Head>
                 <title>{"Dashboard"}</title>
             </Head>
-            <div className={styles.title}>{"Posts"}</div>
+            <div className={styles.each_post_container}>
+                {mostRecentPosts?.data.map((eachPost: Post) => (
+                    <div
+                        className={styles.each_post}
+                        key={eachPost._id?.toString() ?? ""}
+                    >
+                        {eachPost.title}
+                    </div>
+                ))}
+            </div>
             <OverlayTrigger
                 overlay={(properties: OverlayInjectedProps): JSX.Element =>
                     generateTooltip({ content: "Log Out", props: properties })
