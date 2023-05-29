@@ -19,6 +19,7 @@ import React from "react";
 import { Button, Modal, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
+import { Key } from "ts-key-enum";
 
 import { PostService } from "@/api/service/post";
 import { generateTooltip } from "@/common";
@@ -119,6 +120,17 @@ export const EditPostModal = ({
         }
     }, [content, editor?.commands, onHideEditPostModal]);
 
+    const tabOverride = React.useCallback(
+        (event: React.KeyboardEvent<HTMLDivElement>): void => {
+            const { key } = event;
+            if (key === Key.Tab) {
+                editor?.commands.insertContent("      ");
+                event.preventDefault();
+            }
+        },
+        [editor?.commands],
+    );
+
     if (!editor) {
         return <span />;
     }
@@ -213,7 +225,10 @@ export const EditPostModal = ({
                         </Button>
                     </div>
                     <div className={styles.post_editor_container}>
-                        <EditorContent editor={editor} />
+                        <EditorContent
+                            editor={editor}
+                            onKeyDown={tabOverride}
+                        />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

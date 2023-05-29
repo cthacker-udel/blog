@@ -82,8 +82,6 @@ export const Post = ({
         data: { content: postContent },
     } = data;
 
-    console.log(postContent);
-
     return (
         <>
             <Head>
@@ -121,6 +119,7 @@ export const Post = ({
                     )}
                 </div>
                 {postId}
+                {postContent}
                 {isAuthor ? "\tIs author\t" : "\tIs not author\t"}
                 {userId}
                 {title}
