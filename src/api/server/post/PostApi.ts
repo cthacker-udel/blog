@@ -128,11 +128,14 @@ export class PostApi extends DatabaseApi implements IPostApi {
     /** @inheritdoc */
     public ssGetPostDetails = async (
         postId: string,
-    ): Promise<Partial<Pick<Post, "createdAt" | "title">>> => {
+    ): Promise<
+        Partial<Pick<Post, "createdAt" | "title"> & { authorUsername: string }>
+    > => {
         try {
             await this.startMongoTransaction();
 
             const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
 
             if (postId === undefined) {
                 throw new Error("Must include post id in the body");
@@ -146,8 +149,17 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 throw new Error("Post does not exist");
             }
 
-            const { createdAt, title } = foundPost;
-            return { createdAt, title };
+            const { author: authorId, createdAt, title } = foundPost;
+
+            const foundUser = await userRepo.findOne({ _id: authorId });
+
+            if (foundUser === null) {
+                throw new Error("Author of post does not exist");
+            }
+
+            const { username } = foundUser;
+
+            return { authorUsername: username, createdAt, title };
         } catch (error: unknown) {
             await this.logMongoError(error);
         } finally {

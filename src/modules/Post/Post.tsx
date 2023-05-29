@@ -19,6 +19,7 @@ import { EditPostModal } from "./EditPostModal";
 import styles from "./Post.module.css";
 
 type PostProperties = {
+    authorUsername: string;
     createdAt: string;
     isAuthor: boolean;
     title: string;
@@ -31,6 +32,7 @@ type PostProperties = {
  * @returns The current post being viewed
  */
 export const Post = ({
+    authorUsername,
     createdAt: _createdAt,
     isAuthor,
     title,
@@ -134,9 +136,11 @@ export const Post = ({
                     id="post_content_container"
                 />
                 <div className={styles.post_credits}>
-                    {`Created by ${"author"} at ${new Date(
-                        _createdAt,
-                    ).toLocaleString()}`}
+                    {"Created by "}
+                    <span className={styles.post_author_username}>
+                        {authorUsername ?? "N/A"}
+                    </span>
+                    {` at ${new Date(_createdAt).toLocaleString()}`}
                 </div>
             </div>
             <EditPostModal

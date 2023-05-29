@@ -24,7 +24,11 @@
 }
 
 .post_credits {
-    font-size: 0.65em;
-    color: rgba(128, 128, 128, 0.75);
+    font-size: 0.7em;
+    color: rgba(128, 128, 128, 0.85);
     align-self: flex-end;
+}
+
+.post_author_username {
+    font-weight: bold;
 }
