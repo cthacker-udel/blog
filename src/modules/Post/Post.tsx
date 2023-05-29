@@ -133,6 +133,11 @@ export const Post = ({
                     dangerouslySetInnerHTML={{ __html: postContent }}
                     id="post_content_container"
                 />
+                <div className={styles.post_credits}>
+                    {`Created by ${"author"} at ${new Date(
+                        _createdAt,
+                    ).toLocaleString()}`}
+                </div>
             </div>
             <EditPostModal
                 content={postContent}
