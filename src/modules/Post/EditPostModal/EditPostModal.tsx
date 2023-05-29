@@ -3,6 +3,9 @@
 /* eslint-disable node/no-extraneous-import -- disabled */
 /* eslint-disable import/no-named-as-default -- disabled */
 /* eslint-disable import/no-extraneous-dependencies -- disabled (for now, after refresh delete) */
+
+import "./EditPostModalGlobal.module.scss";
+
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -15,7 +18,12 @@ import ts from "highlight.js/lib/languages/typescript";
 import html from "highlight.js/lib/languages/xml";
 import { lowlight } from "lowlight";
 import React from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, OverlayTrigger } from "react-bootstrap";
+import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import { toast } from "react-toastify";
+
+import { PostService } from "@/api/service/post";
+import { generateTooltip } from "@/common";
 
 import styles from "./EditPostModal.module.css";
 
@@ -49,11 +57,20 @@ export const EditPostModal = ({
 }: EditPostModalProperties): JSX.Element => {
     const editor = useEditor({
         content: content ?? "",
+        editorProps: {
+            attributes: {
+                class: `${styles.post_editor} shadow-lg`,
+            },
+        },
         extensions: [
-            StarterKit,
+            StarterKit.configure({
+                codeBlock: false,
+            }),
             Placeholder,
             Underline,
-            CodeBlockLowlight.configure({ lowlight }),
+            CodeBlockLowlight.configure({
+                lowlight,
+            }),
             Highlight.configure({ multicolor: true }),
         ],
     });
@@ -66,14 +83,56 @@ export const EditPostModal = ({
         }
     }, [colorInputReference]);
 
+    const confirmEdit = React.useCallback(async (): Promise<void> => {
+        if (editor !== null) {
+            const htmlContent = editor?.getHTML();
+            const updatingPostContent = toast.loading(
+                "Updating post content...",
+            );
+            const { data: didUpdate } = await new PostService().updateContent(
+                htmlContent,
+                postId,
+            );
+            if (didUpdate) {
+                toast.update(updatingPostContent, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Successfully updated post content!",
+                    type: "success",
+                });
+            } else {
+                toast.update(updatingPostContent, {
+                    autoClose: 1500,
+                    isLoading: false,
+                    render: "Failed to update post content",
+                    type: "error",
+                });
+            }
+        }
+    }, [editor, postId]);
+
+    const closeModal = React.useCallback(() => {
+        if (content !== undefined) {
+            editor?.commands.setContent(content);
+            onHideEditPostModal();
+        }
+    }, [content, editor?.commands, onHideEditPostModal]);
+
     if (!editor) {
         return <span />;
     }
 
     return (
         <>
-            <Modal onHide={onHideEditPostModal} show={showEditPostModal}>
-                <Modal.Header>{`Edit ${title}`}</Modal.Header>
+            <Modal
+                centered
+                onHide={onHideEditPostModal}
+                show={showEditPostModal}
+                size="xl"
+            >
+                <Modal.Header className={styles.edit_post_modal_header}>
+                    {`Edit ${title}`}
+                </Modal.Header>
                 <Modal.Body>
                     <div className={styles.editor_toggles}>
                         <Button
@@ -152,8 +211,53 @@ export const EditPostModal = ({
                             <i className="fa-solid fa-highlighter" />
                         </Button>
                     </div>
-                    <EditorContent editor={editor} />
+                    <div className={styles.post_editor_container}>
+                        <EditorContent editor={editor} />
+                    </div>
                 </Modal.Body>
+                <Modal.Footer>
+                    <OverlayTrigger
+                        overlay={(
+                            properties: OverlayInjectedProps,
+                        ): JSX.Element =>
+                            generateTooltip({
+                                content: "Cancel",
+                                props: properties,
+                            })
+                        }
+                    >
+                        <Button
+                            onClick={(): void => {
+                                closeModal();
+                            }}
+                            tabIndex={-1}
+                            variant="outline-secondary"
+                        >
+                            <i className="fa-solid fa-ban" />
+                        </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                        overlay={(
+                            properties: OverlayInjectedProps,
+                        ): JSX.Element =>
+                            generateTooltip({
+                                content: "Confirm",
+                                props: properties,
+                            })
+                        }
+                        placement="bottom"
+                    >
+                        <Button
+                            onClick={async (): Promise<void> => {
+                                await confirmEdit();
+                            }}
+                            tabIndex={-1}
+                            variant="outline-success"
+                        >
+                            <i className="fa-solid fa-check" />
+                        </Button>
+                    </OverlayTrigger>
+                </Modal.Footer>
             </Modal>
             <input
                 className={styles.color_input}

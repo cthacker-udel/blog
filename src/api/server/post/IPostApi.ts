@@ -59,4 +59,16 @@ export interface IPostApi {
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;
+
+    /**
+     * Updates the content of the post specified by the id passed in the request body
+     *
+     * @param _request
+     * @param _response
+     * @returns
+     */
+    updateContent: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
 }

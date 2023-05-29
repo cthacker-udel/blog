@@ -27,7 +27,7 @@ const Document = (): JSX.Element => (
                 rel="stylesheet"
             />
             <link
-                href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@500&family=Golos+Text&family=Oswald:wght@300&family=Radio+Canada&family=Inter&family=Tilt+Prism&family=Zeyada&family=Quicksand&display=swap"
+                href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@500&family=Golos+Text&family=Oswald:wght@300&family=Radio+Canada&family=Inter&family=Tilt+Prism&family=Zeyada&family=Quicksand&&family=JetBrains+Mono&display=swap"
                 rel="stylesheet"
             />
             <audio id="notification_info" src="/notification_info.wav" />

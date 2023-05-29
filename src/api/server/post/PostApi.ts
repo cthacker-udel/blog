@@ -189,4 +189,20 @@ export class PostApi extends DatabaseApi implements IPostApi {
             await this.closeMongoTransaction();
         }
     };
+
+    /** @inheritdoc */
+    public updateContent = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
 }
