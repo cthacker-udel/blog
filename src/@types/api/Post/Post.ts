@@ -6,5 +6,6 @@ export type Post = {
     createdAt: Date;
     content?: string;
     modifiedAt: Date;
+    textContent?: string;
     title: string;
 };

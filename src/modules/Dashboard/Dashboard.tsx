@@ -5,7 +5,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
-import { Button, ListGroup, OverlayTrigger } from "react-bootstrap";
+import { Button, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
 import useSWR from "swr";
@@ -23,6 +23,7 @@ import {
 
 import { AddPostModal } from "./AddPostModal";
 import styles from "./Dashboard.module.css";
+import { DashboardPost } from "./DashboardPost";
 import { EditUsernameModal } from "./EditUsernameModal";
 import { PostsOffCanvas } from "./PostsOffCanvas";
 import { UserInfo } from "./UserInfo";
@@ -143,12 +144,10 @@ export const Dashboard = ({
             </Head>
             <div className={styles.each_post_container}>
                 {mostRecentPosts?.data.map((eachPost: Post) => (
-                    <div
-                        className={styles.each_post}
+                    <DashboardPost
                         key={eachPost._id?.toString() ?? ""}
-                    >
-                        {eachPost.title}
-                    </div>
+                        {...eachPost}
+                    />
                 ))}
             </div>
             <OverlayTrigger
