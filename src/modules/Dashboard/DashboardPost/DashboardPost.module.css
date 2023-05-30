@@ -2,6 +2,50 @@
     padding: 1em;
     background-color: rgba(255, 255, 255, 0.25);
     border-radius: 1em;
-    font-family: "JetBrains Mono", monospace;
     color: snow;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 15%;
+}
+
+.each_post > div {
+    width: 50%;
+}
+
+.each_post > * {
+    font-family: "JetBrains Mono", monospace;
+}
+
+.each_post_headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+}
+
+.each_post_title {
+    font-size: 1.5em;
+    width: fit-content;
+    align-self: center;
+}
+
+.each_post_description {
+    align-self: center;
+    opacity: 50%;
+    font-size: 0.75em;
+}
+
+.each_post_information {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    font-size: 0.85em;
+    opacity: 65%;
+}
+
+.each_post_singular_info {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    align-items: center;
 }
