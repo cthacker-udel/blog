@@ -1,3 +1,4 @@
+/* eslint-disable no-confusing-arrow -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -282,7 +283,9 @@ export class PostApi extends DatabaseApi implements IPostApi {
             const foundUsers = await Promise.all(findMongoUsers);
             const foundUsersUsernames = foundUsers
                 .filter(Boolean)
-                .map((eachUser) => eachUser.username);
+                .map((eachUser) =>
+                    eachUser === null ? "" : eachUser.username,
+                );
 
             const modifiedPosts: MostRecentPost[] = mostRecentPosts.map(
                 (eachPost: Post, eachPostIndex: number) => ({

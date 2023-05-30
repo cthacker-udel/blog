@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/indent -- disabled */
 import type { ApiResponse, UpdatePostPayload } from "@/@types";
 import { Endpoints } from "@/constants";
 
