@@ -2,7 +2,7 @@
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import type { Post, User } from "@/@types";
+import type { Post, UpdatePostPayload, User } from "@/@types";
 import { convertErrorToApiResponse, parseCookie } from "@/common";
 import { Collections } from "@/constants";
 
@@ -211,15 +211,13 @@ export class PostApi extends DatabaseApi implements IPostApi {
         try {
             await this.startMongoTransaction();
 
-            const { content, id, title } = JSON.parse(request.body) as Pick<
-                Post,
-                "content" | "title"
-            > & {
-                id: string;
-            };
+            const { htmlContent, id, textContent, title } = JSON.parse(
+                request.body,
+            ) as UpdatePostPayload;
 
             if (
-                content === undefined ||
+                htmlContent === undefined ||
+                textContent === undefined ||
                 id === undefined ||
                 title === undefined
             ) {
@@ -240,8 +238,9 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 { _id: foundPost._id },
                 {
                     $set: {
-                        content,
+                        content: htmlContent,
                         modifiedAt: new Date(Date.now()),
+                        textContent,
                         title,
                     },
                 },

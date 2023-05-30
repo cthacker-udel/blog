@@ -17,6 +17,7 @@ export const DashboardPost = ({
     createdAt,
     content,
     modifiedAt,
+    textContent,
     title,
 }: DashboardPostProperties): JSX.Element => (
     <div className={styles.each_post}>{title}</div>

@@ -104,6 +104,7 @@ export const EditPostModal = ({
     const confirmEdit = React.useCallback(async (): Promise<void> => {
         if (editor !== null) {
             const htmlContent = editor?.getHTML();
+            const textContent = editor?.getText();
 
             if (content === htmlContent && title === updatedTitle) {
                 toast.error("No changes detected");
@@ -115,6 +116,7 @@ export const EditPostModal = ({
             );
             const { data: didUpdate } = await new PostService().updatePost(
                 htmlContent,
+                textContent,
                 updatedTitle,
                 postId,
             );

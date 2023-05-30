@@ -4,13 +4,15 @@ export interface IPostService {
     /**
      * Updates the post specified by `_postId` with the content specified in `content`
      *
-     * @param _content - The content to update the post with
+     * @param _htmlContent - The html content to update the post's content field with
+     * @param _textContent - The raw text content of the post to update the post's text content field with
      * @param _title - The updated title of the post
      * @param _postId - The id of the post we are updating
      * @returns Whether the update was successful
      */
     updatePost: (
-        _content: string,
+        _htmlContent: string,
+        _textContent: string,
         _title: string,
         _postId: string,
     ) => Promise<ApiResponse<boolean>>;

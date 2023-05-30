@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/indent -- disabled */
-import type { ApiResponse } from "@/@types";
+import type { ApiResponse, UpdatePostPayload } from "@/@types";
 import { Endpoints } from "@/constants";
 
 import { ServiceBaseController } from "../base";
@@ -11,19 +11,21 @@ import type { IPostService } from "./IPostService";
 export class PostService extends ServiceBaseController implements IPostService {
     /** @inheritdoc */
     public updatePost = async (
-        content: string,
+        htmlContent: string,
+        textContent: string,
         title: string,
         postId: string,
     ): Promise<ApiResponse<boolean>> => {
         try {
-            const response = await this.post<
-                boolean,
-                { content: string; id: string; title: string }
-            >(`${Endpoints.POST.BASE}${Endpoints.POST.UPDATE_CONTENT}`, {
-                content,
-                id: postId,
-                title,
-            });
+            const response = await this.post<boolean, UpdatePostPayload>(
+                `${Endpoints.POST.BASE}${Endpoints.POST.UPDATE_CONTENT}`,
+                {
+                    htmlContent,
+                    id: postId,
+                    textContent,
+                    title,
+                },
+            );
 
             return response;
         } catch {
