@@ -180,6 +180,7 @@ export class UserApi extends DatabaseApi implements IUserApi {
                 res: response,
             });
 
+            response.setHeader("Cache-Control", "no-cache");
             response.status(200);
             response.send({ data: true });
         } catch (error: unknown) {
