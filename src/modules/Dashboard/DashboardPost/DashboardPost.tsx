@@ -4,13 +4,13 @@ import React from "react";
 import { Button, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 
-import type { Post } from "@/@types";
+import type { MostRecentPost } from "@/@types";
 import { generateTooltip } from "@/common";
 import { truncate } from "@/common/helpers/truncate";
 
 import styles from "./DashboardPost.module.css";
 
-type DashboardPostProperties = Post;
+type DashboardPostProperties = MostRecentPost;
 
 /**
  * The dashboard post component, which receives a post and displays it to the user
@@ -19,12 +19,13 @@ type DashboardPostProperties = Post;
  */
 export const DashboardPost = ({
     _id,
-    author,
+    author: _author,
     createdAt,
     content: _content,
     modifiedAt,
     textContent,
     title,
+    username,
 }: DashboardPostProperties): JSX.Element => {
     const router = useRouter();
 
@@ -56,7 +57,7 @@ export const DashboardPost = ({
                         >
                             <i className="fa-solid fa-user" />
                         </OverlayTrigger>
-                        <span>{author.toString()}</span>
+                        <span>{username}</span>
                     </div>
                     <div className={styles.each_post_singular_info}>
                         <OverlayTrigger

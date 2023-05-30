@@ -2,7 +2,7 @@
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import type { Post, UpdatePostPayload, User } from "@/@types";
+import type { MostRecentPost, Post, UpdatePostPayload, User } from "@/@types";
 import { convertErrorToApiResponse, parseCookie } from "@/common";
 import { Collections } from "@/constants";
 
@@ -266,14 +266,33 @@ export class PostApi extends DatabaseApi implements IPostApi {
             await this.startMongoTransaction();
 
             const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
 
             const mostRecentPosts = await postRepo
                 .find()
                 .sort({ modifiedAt: -1 })
                 .toArray();
 
+            const findMongoUsers: Promise<User | null>[] = [];
+
+            for (const eachPost of mostRecentPosts) {
+                findMongoUsers.push(userRepo.findOne({ _id: eachPost.author }));
+            }
+
+            const foundUsers = await Promise.all(findMongoUsers);
+            const foundUsersUsernames = foundUsers
+                .filter(Boolean)
+                .map((eachUser) => eachUser.username);
+
+            const modifiedPosts: MostRecentPost[] = mostRecentPosts.map(
+                (eachPost: Post, eachPostIndex: number) => ({
+                    ...eachPost,
+                    username: foundUsersUsernames[eachPostIndex],
+                }),
+            );
+
             response.status(200);
-            response.send({ data: mostRecentPosts });
+            response.send({ data: modifiedPosts });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);

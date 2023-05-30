@@ -10,7 +10,7 @@ import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 
-import type { ApiResponse, Post } from "@/@types";
+import type { ApiResponse, MostRecentPost } from "@/@types";
 import { AdminService, UserService } from "@/api/service";
 import { generateTooltip, UserRoles } from "@/common";
 import { Endpoints } from "@/constants";
@@ -55,12 +55,10 @@ export const Dashboard = ({
     useNotifications();
 
     const { data: mostRecentPosts } = useSWR<
-        ApiResponse<Post[]>,
+        ApiResponse<MostRecentPost[]>,
         Error,
         string
     >(`${Endpoints.POST.BASE}${Endpoints.POST.MOST_RECENT}`);
-
-    console.log(mostRecentPosts);
 
     const router = useRouter();
 
@@ -143,7 +141,7 @@ export const Dashboard = ({
                 <title>{"Dashboard"}</title>
             </Head>
             <div className={styles.each_post_container}>
-                {mostRecentPosts?.data.map((eachPost: Post) => (
+                {mostRecentPosts?.data.map((eachPost: MostRecentPost) => (
                     <DashboardPost
                         key={eachPost._id?.toString() ?? ""}
                         {...eachPost}
