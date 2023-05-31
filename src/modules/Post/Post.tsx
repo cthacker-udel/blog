@@ -14,7 +14,7 @@ import sanitize from "sanitize-html";
 import useSWR from "swr";
 import { Key } from "ts-key-enum";
 
-import type { ApiResponse } from "@/@types";
+import type { ApiResponse, CommentWithUsername } from "@/@types";
 import { PostService } from "@/api/service/post";
 import { generateTooltip } from "@/common";
 import { Endpoints } from "@/constants";
@@ -22,6 +22,7 @@ import { useBackground } from "@/hooks";
 
 import { EditPostModal } from "./EditPostModal";
 import styles from "./Post.module.css";
+import { PostComment } from "./PostComment";
 
 type PostProperties = {
     authorUsername: string;
@@ -65,8 +66,6 @@ export const Post = ({
         defaultValues: FORM_DEFAULT_VALUES,
         mode: "all",
     });
-    const [currentCommentsPage, setCurrentCommentsPage] =
-        React.useState<number>(0);
 
     const { dirtyFields, isDirty, isValidating } = formState;
 
@@ -99,6 +98,15 @@ export const Post = ({
                 }
             },
         },
+    );
+
+    const {
+        data: allCommentsData,
+        error: allCommentsError,
+        isLoading: allCommentsLoading,
+        mutate: mutateAllComments,
+    } = useSWR<ApiResponse<CommentWithUsername[]>, Error, string>(
+        `${Endpoints.POST.BASE}${Endpoints.POST.ALL_COMMENTS}?postId=${postId}`,
     );
 
     const mutateContent = React.useCallback(
@@ -144,13 +152,20 @@ export const Post = ({
         [dirtyFields.comment, getValues, postId, reset],
     );
 
-    if (postId === undefined || isLoading || data === undefined) {
+    if (
+        postId === undefined ||
+        isLoading ||
+        data === undefined ||
+        allCommentsData === undefined ||
+        allCommentsLoading
+    ) {
         return <div />;
     }
 
     const { data: postContent } = data;
+    const { data: allComments } = allCommentsData;
 
-    if (error) {
+    if (error || allCommentsError) {
         router.push("/");
     }
 
@@ -201,6 +216,14 @@ export const Post = ({
                         {authorUsername ?? "N/A"}
                     </span>
                     {` at ${new Date(_createdAt).toLocaleString()}`}
+                </div>
+                <div className={styles.post_comments}>
+                    {allComments.map((eachComment: CommentWithUsername) => (
+                        <PostComment
+                            {...eachComment}
+                            key={eachComment._id?.toString()}
+                        />
+                    ))}
                 </div>
                 <InputGroup onKeyDown={onCommentEnterKey}>
                     <Form.Control

@@ -7,6 +7,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type {
     AddCommentPayload,
     Comment,
+    CommentWithUsername,
     MostRecentPost,
     Post,
     UpdatePostPayload,
@@ -402,14 +403,14 @@ export class PostApi extends DatabaseApi implements IPostApi {
     };
 
     /** @inheritdoc */
-    public getComments = async (
+    public allComments = async (
         request: NextApiRequest,
         response: NextApiResponse,
     ): Promise<void> => {
         try {
             await this.startMongoTransaction();
 
-            const { page, postId } = request.query;
+            const { postId } = request.query;
 
             if (postId === undefined) {
                 throw new Error("Must supply post id when fetching comments");
@@ -425,16 +426,11 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 _id: new ObjectId(postId as string),
             });
 
-            if (foundPost === null || page === undefined) {
+            if (foundPost === null) {
                 throw new Error("Find post comments was invalid");
             }
 
-            const start = 10 * Number.parseInt(page as string, 10);
-
-            const allPostComments = foundPost.comments?.slice(
-                start,
-                start + 11,
-            );
+            const allPostComments = foundPost.comments;
 
             if (allPostComments === undefined) {
                 response.status(200);
@@ -479,7 +475,7 @@ export class PostApi extends DatabaseApi implements IPostApi {
                             username:
                                 filteredCommentUsernames[eachCommentIndex]
                                     .username,
-                        } as Comment & { username: string }),
+                        } as CommentWithUsername),
                 );
 
                 response.status(200);

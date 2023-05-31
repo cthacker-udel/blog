@@ -9,6 +9,7 @@ export const Endpoints = {
         ADD: "add",
         ADD_COMMENT: "addComment",
         ALL_AUTHORED: "allAuthored",
+        ALL_COMMENTS: "allComments",
         BASE: "post/",
         CONTENT: "content",
         MOST_RECENT: "mostRecent",

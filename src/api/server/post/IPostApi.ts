@@ -103,7 +103,7 @@ export interface IPostApi {
      * @param _response - The client response=
      * @returns All the comments associated with the post
      */
-    getComments: (
+    allComments: (
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;
