@@ -95,4 +95,16 @@ export interface IPostApi {
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;
+
+    /**
+     * Gets all the comments of an associated post from the request body
+     *
+     * @param _request - The client request
+     * @param _response - The client response=
+     * @returns All the comments associated with the post
+     */
+    getComments: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
 }

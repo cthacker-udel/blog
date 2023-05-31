@@ -9,11 +9,13 @@ import React from "react";
 import { Button, Form, InputGroup, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import sanitize from "sanitize-html";
 import useSWR from "swr";
 import { Key } from "ts-key-enum";
 
 import type { ApiResponse } from "@/@types";
+import { PostService } from "@/api/service/post";
 import { generateTooltip } from "@/common";
 import { Endpoints } from "@/constants";
 import { useBackground } from "@/hooks";
@@ -58,11 +60,13 @@ export const Post = ({
     });
     const [editPost, setEditPost] = React.useState<boolean>(false);
     const [currentTitle, setCurrentTitle] = React.useState<string>(title);
-    const { formState, register } = useForm<FormValues>({
+    const { formState, getValues, register, reset } = useForm<FormValues>({
         criteriaMode: "all",
         defaultValues: FORM_DEFAULT_VALUES,
         mode: "all",
     });
+    const [currentCommentsPage, setCurrentCommentsPage] =
+        React.useState<number>(0);
 
     const { dirtyFields, isDirty, isValidating } = formState;
 
@@ -108,14 +112,36 @@ export const Post = ({
     );
 
     const onCommentEnterKey = React.useCallback(
-        async (event: React.KeyboardEvent<HTMLDivElement>) => {
+        async (event: React.KeyboardEvent<HTMLDivElement>): Promise<void> => {
             const { key, shiftKey } = event;
-            if (key === Key.Enter && shiftKey) {
+            if (key === Key.Enter && shiftKey && dirtyFields.comment) {
                 event.preventDefault();
-                console.log(event);
+                const { comment } = getValues();
+                const addingCommentToast = toast.loading("Adding comment...");
+                const { data: didAddComment } =
+                    await new PostService().addComment(
+                        comment,
+                        postId as string,
+                    );
+                if (didAddComment) {
+                    toast.update(addingCommentToast, {
+                        autoClose: 1500,
+                        isLoading: false,
+                        render: "Successfully added comment!",
+                        type: "success",
+                    });
+                    reset();
+                } else {
+                    toast.update(addingCommentToast, {
+                        autoClose: 1500,
+                        isLoading: false,
+                        render: "Failed to add comment",
+                        type: "error",
+                    });
+                }
             }
         },
-        [],
+        [dirtyFields.comment, getValues, postId, reset],
     );
 
     if (postId === undefined || isLoading || data === undefined) {

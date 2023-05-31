@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- disabled (only went 2/3 over) */
 /* eslint-disable no-confusing-arrow -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
 import { ObjectId } from "mongodb";
@@ -377,18 +378,113 @@ export class PostApi extends DatabaseApi implements IPostApi {
             const updatePostResult = await postRepo.updateOne(
                 { _id: new ObjectId(postId) },
                 {
-                    comments:
-                        foundPost.comments === undefined
-                            ? [new ObjectId(createdCommentId)]
-                            : [
-                                  ...foundPost.comments,
-                                  new ObjectId(createdCommentId),
-                              ],
+                    $set: {
+                        comments:
+                            foundPost.comments === undefined
+                                ? [new ObjectId(createdCommentId)]
+                                : [
+                                      ...foundPost.comments,
+                                      new ObjectId(createdCommentId),
+                                  ],
+                    },
                 },
             );
 
             response.status(200);
             response.send({ data: updatePostResult.acknowledged });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public getComments = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const { page, postId } = request.query;
+
+            if (postId === undefined) {
+                throw new Error("Must supply post id when fetching comments");
+            }
+
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+            const commentRepo = this.getMongoRepo<Comment>(
+                Collections.COMMENTS,
+            );
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const foundPost = await postRepo.findOne({
+                _id: new ObjectId(postId as string),
+            });
+
+            if (foundPost === null || page === undefined) {
+                throw new Error("Find post comments was invalid");
+            }
+
+            const start = 10 * Number.parseInt(page as string, 10);
+
+            const allPostComments = foundPost.comments?.slice(
+                start,
+                start + 11,
+            );
+
+            if (allPostComments === undefined) {
+                response.status(200);
+                response.send({ data: [] });
+            } else {
+                const findingComments: Promise<Comment | null>[] = [];
+
+                for (const eachCommentId of allPostComments) {
+                    findingComments.push(
+                        commentRepo.findOne({ _id: eachCommentId }),
+                    );
+                }
+
+                const foundComments = await Promise.all(findingComments);
+                const filteredComments = foundComments.filter(
+                    (eachComment) => eachComment !== null,
+                ) as Comment[];
+
+                const findingCommentUsernames: Promise<User | null>[] = [];
+
+                for (const eachFilteredComment of filteredComments) {
+                    findingCommentUsernames.push(
+                        userRepo.findOne(
+                            { _id: eachFilteredComment.author },
+                            { projection: { username: 1 } },
+                        ),
+                    );
+                }
+
+                const foundCommentUsernames = await Promise.all(
+                    findingCommentUsernames,
+                );
+
+                const filteredCommentUsernames = foundCommentUsernames.filter(
+                    (eachUser) => eachUser !== null,
+                ) as User[];
+
+                const modifiedFilteredComments = filteredComments.map(
+                    (eachComment: Comment, eachCommentIndex: number) =>
+                        ({
+                            ...eachComment,
+                            username:
+                                filteredCommentUsernames[eachCommentIndex]
+                                    .username,
+                        } as Comment & { username: string }),
+                );
+
+                response.status(200);
+                response.send({ data: modifiedFilteredComments });
+            }
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);
