@@ -1,12 +1,11 @@
 import type { ObjectId } from "mongodb";
 
-export type Post = {
+export type Comment = {
     _id?: ObjectId;
     author: ObjectId;
+    comment: string;
     createdAt: Date;
-    content?: string;
-    comments?: ObjectId[];
+    dislikes: number;
+    likes: number;
     modifiedAt: Date;
-    textContent?: string;
-    title: string;
 };

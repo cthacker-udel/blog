@@ -3,7 +3,14 @@
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import type { MostRecentPost, Post, UpdatePostPayload, User } from "@/@types";
+import type {
+    AddCommentPayload,
+    Comment,
+    MostRecentPost,
+    Post,
+    UpdatePostPayload,
+    User,
+} from "@/@types";
 import { convertErrorToApiResponse, parseCookie } from "@/common";
 import { Collections } from "@/constants";
 
@@ -296,6 +303,92 @@ export class PostApi extends DatabaseApi implements IPostApi {
 
             response.status(200);
             response.send({ data: modifiedPosts });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public addComment = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const { username } = parseCookie(request);
+
+            if (username === undefined) {
+                throw new Error("Sent invalid cookie");
+            }
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error("User making request does not exist");
+            }
+
+            const commentRepo = this.getMongoRepo<Comment>(
+                Collections.COMMENTS,
+            );
+            const postRepo = this.getMongoRepo<Post>(Collections.POSTS);
+
+            const { comment, postId } = JSON.parse(
+                request.body,
+            ) as AddCommentPayload;
+
+            if (comment === undefined || postId === undefined) {
+                throw new Error(
+                    "Must supply valid values when sending post request to add comment to a post",
+                );
+            }
+
+            const foundPost = await postRepo.findOne({
+                _id: new ObjectId(postId),
+            });
+
+            if (foundPost === null) {
+                throw new Error(
+                    "Post that is receiving comment does not exist in database",
+                );
+            }
+
+            const createComment = await commentRepo.insertOne({
+                author: foundUser._id,
+                comment,
+                createdAt: new Date(Date.now()),
+                dislikes: 0,
+                likes: 0,
+                modifiedAt: new Date(Date.now()),
+            });
+
+            if (!createComment.acknowledged) {
+                throw new Error("Unable to create comment");
+            }
+
+            const createdCommentId = createComment.insertedId;
+
+            const updatePostResult = await postRepo.updateOne(
+                { _id: new ObjectId(postId) },
+                {
+                    comments:
+                        foundPost.comments === undefined
+                            ? [new ObjectId(createdCommentId)]
+                            : [
+                                  ...foundPost.comments,
+                                  new ObjectId(createdCommentId),
+                              ],
+                },
+            );
+
+            response.status(200);
+            response.send({ data: updatePostResult.acknowledged });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);

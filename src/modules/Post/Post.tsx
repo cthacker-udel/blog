@@ -6,10 +6,12 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
-import { Button, OverlayTrigger } from "react-bootstrap";
+import { Button, Form, InputGroup, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import { useForm } from "react-hook-form";
 import sanitize from "sanitize-html";
 import useSWR from "swr";
+import { Key } from "ts-key-enum";
 
 import type { ApiResponse } from "@/@types";
 import { generateTooltip } from "@/common";
@@ -25,6 +27,14 @@ type PostProperties = {
     isAuthor: boolean;
     title: string;
     userId: string;
+};
+
+type FormValues = {
+    comment: string;
+};
+
+const FORM_DEFAULT_VALUES: FormValues = {
+    comment: "",
 };
 
 /**
@@ -48,6 +58,13 @@ export const Post = ({
     });
     const [editPost, setEditPost] = React.useState<boolean>(false);
     const [currentTitle, setCurrentTitle] = React.useState<string>(title);
+    const { formState, register } = useForm<FormValues>({
+        criteriaMode: "all",
+        defaultValues: FORM_DEFAULT_VALUES,
+        mode: "all",
+    });
+
+    const { dirtyFields, isDirty, isValidating } = formState;
 
     const updateTitle = React.useCallback((updatedTitle: string) => {
         setCurrentTitle(updatedTitle);
@@ -88,6 +105,17 @@ export const Post = ({
             });
         },
         [mutate],
+    );
+
+    const onCommentEnterKey = React.useCallback(
+        async (event: React.KeyboardEvent<HTMLDivElement>) => {
+            const { key, shiftKey } = event;
+            if (key === Key.Enter && shiftKey) {
+                event.preventDefault();
+                console.log(event);
+            }
+        },
+        [],
     );
 
     if (postId === undefined || isLoading || data === undefined) {
@@ -148,6 +176,53 @@ export const Post = ({
                     </span>
                     {` at ${new Date(_createdAt).toLocaleString()}`}
                 </div>
+                <InputGroup onKeyDown={onCommentEnterKey}>
+                    <Form.Control
+                        as="textarea"
+                        className={styles.post_comment_input}
+                        type="text"
+                        {...register("comment")}
+                    />
+                    <OverlayTrigger
+                        overlay={(
+                            properties: OverlayInjectedProps,
+                        ): JSX.Element =>
+                            generateTooltip({
+                                content: "Remove comment",
+                                props: properties,
+                            })
+                        }
+                        placement="bottom"
+                    >
+                        <Button variant="outline-secondary">
+                            <i className="fa-solid fa-ban" />
+                        </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                        overlay={(
+                            properties: OverlayInjectedProps,
+                        ): JSX.Element =>
+                            generateTooltip({
+                                content: "Submit comment",
+                                props: properties,
+                            })
+                        }
+                        placement="right"
+                    >
+                        <Button
+                            disabled={
+                                !isDirty || !dirtyFields.comment || isValidating
+                            }
+                            variant={
+                                !isDirty && !dirtyFields.comment
+                                    ? "outline-success"
+                                    : "success"
+                            }
+                        >
+                            <i className="fa-solid fa-check" />
+                        </Button>
+                    </OverlayTrigger>
+                </InputGroup>
             </div>
             <EditPostModal
                 content={postContent}

@@ -3,6 +3,7 @@
  */
 export const Collections = {
     ADMIN_REQUESTS: "AdminRequests",
+    COMMENTS: "Comments",
     ERRORS: "Errors",
     NOTIFICATIONS: "Notifications",
     POSTS: "Posts",

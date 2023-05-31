@@ -83,4 +83,16 @@ export interface IPostApi {
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;
+
+    /**
+     * Adds a comment to the post
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Adds a comment to a post specified in the request body
+     */
+    addComment: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
 }

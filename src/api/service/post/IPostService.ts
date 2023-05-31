@@ -16,4 +16,16 @@ export interface IPostService {
         _title: string,
         _postId: string,
     ) => Promise<ApiResponse<boolean>>;
+
+    /**
+     * Adds a comment to the post
+     *
+     * @param _comment - The comment to add
+     * @param _postId - The id of the post we are adding the comment to
+     * @returns Whether the comment was added successfully
+     */
+    addComment: (
+        _comment: string,
+        _postId: string,
+    ) => Promise<ApiResponse<boolean>>;
 }
