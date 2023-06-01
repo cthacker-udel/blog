@@ -229,10 +229,6 @@ export const Post = ({
         setEditPost((oldValue: boolean) => !oldValue);
     }, []);
 
-    React.useEffect(() => {
-        console.log(userDislikes, userLikes);
-    }, [userDislikes, userLikes]);
-
     if (
         postId === undefined ||
         isLoading ||
