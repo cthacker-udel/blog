@@ -499,7 +499,6 @@ export class PostApi extends DatabaseApi implements IPostApi {
             await this.startMongoTransaction();
 
             const { commentId, reactionType } = request.query;
-            let removed = false;
 
             if (commentId === undefined || reactionType === undefined) {
                 throw new Error(
@@ -537,6 +536,8 @@ export class PostApi extends DatabaseApi implements IPostApi {
 
             const likes = [...(foundUser.likes ?? [])];
             const dislikes = [...(foundUser.dislikes ?? [])];
+            let { dislikes: foundCommentDislikes, likes: foundCommentLikes } =
+                foundComment;
 
             const convertedEnum = Number.parseInt(
                 reactionType as string,
@@ -554,21 +555,31 @@ export class PostApi extends DatabaseApi implements IPostApi {
                     (commentId as string).toLowerCase(),
             );
 
-            console.log(doesLikeExist, doesDislikeExist);
-
             if (convertedEnum === ReactionType.LIKE) {
                 if (doesLikeExist === -1) {
                     likes.push(new ObjectId(commentId as string));
+                    foundCommentLikes += 1;
                 } else {
                     likes.splice(doesLikeExist, 1);
-                    removed = true;
+                    foundCommentLikes -= 1;
+                }
+
+                if (doesDislikeExist !== -1) {
+                    dislikes.splice(doesDislikeExist, 1);
+                    foundCommentDislikes -= 1;
                 }
             } else if (convertedEnum === ReactionType.DISLIKE) {
                 if (doesDislikeExist === -1) {
                     dislikes.push(new ObjectId(commentId as string));
+                    foundCommentDislikes += 1;
                 } else {
                     dislikes.splice(doesDislikeExist, 1);
-                    removed = true;
+                    foundCommentDislikes -= 1;
+                }
+
+                if (doesLikeExist !== -1) {
+                    likes.splice(doesLikeExist, 1);
+                    foundCommentLikes -= 1;
                 }
             }
 
@@ -586,20 +597,8 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 { _id: new ObjectId(commentId as string) },
                 {
                     $set: {
-                        dislikes:
-                            convertedEnum === ReactionType.DISLIKE
-                                ? foundComment.dislikes -
-                                  (removed
-                                      ? 1
-                                      : doesDislikeExist === -1
-                                      ? -1
-                                      : 0)
-                                : foundComment.dislikes,
-                        likes:
-                            convertedEnum === ReactionType.LIKE
-                                ? foundComment.likes -
-                                  (removed ? 1 : doesLikeExist === -1 ? -1 : 0)
-                                : foundComment.likes,
+                        dislikes: foundCommentDislikes,
+                        likes: foundCommentLikes,
                     },
                 },
             );

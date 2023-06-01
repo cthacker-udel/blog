@@ -1,4 +1,3 @@
-import type { ObjectId } from "mongodb";
 import React from "react";
 import { Button } from "react-bootstrap";
 import { toast } from "react-toastify";
@@ -38,7 +37,6 @@ export const PostComment = ({
     mutateComment,
     username,
 }: PostCommentProperties): JSX.Element => {
-    // TODO: Add way to detect if user already liked/disliked comment to color the reactions on the page
     const reactToComment = React.useCallback(
         async (reactType: ReactionType): Promise<void> => {
             if (_id !== undefined) {
