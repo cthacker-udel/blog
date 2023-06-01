@@ -1,3 +1,5 @@
+import type { ObjectId } from "mongodb";
+
 import type { ApiResponse } from "@/@types";
 
 export interface IPostService {
@@ -28,4 +30,12 @@ export interface IPostService {
         _comment: string,
         _postId: string,
     ) => Promise<ApiResponse<boolean>>;
+
+    /**
+     * Likes a comment made on a post
+     *
+     * @param _commentId - The comment to like
+     * @returns Whether the comment was liked or not
+     */
+    likeComment: (_commentId: ObjectId) => Promise<ApiResponse<boolean>>;
 }

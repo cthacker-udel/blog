@@ -1,3 +1,5 @@
+import type { ObjectId } from "mongodb";
+
 import type {
     AddCommentPayload,
     ApiResponse,
@@ -45,6 +47,23 @@ export class PostService extends ServiceBaseController implements IPostService {
             const response = await this.post<boolean, AddCommentPayload>(
                 `${Endpoints.POST.BASE}${Endpoints.POST.ADD_COMMENT}`,
                 { comment, postId },
+            );
+
+            return response;
+        } catch {
+            return { data: false };
+        }
+    };
+
+    /** @inheritdoc */
+    public likeComment = async (
+        commentId: ObjectId,
+    ): Promise<ApiResponse<boolean>> => {
+        try {
+            const response = await this.get<boolean>(
+                `${Endpoints.POST.BASE}${
+                    Endpoints.POST.LIKE_COMMENT
+                }?commentId=${commentId.toString()}`,
             );
 
             return response;

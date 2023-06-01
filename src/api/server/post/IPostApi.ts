@@ -107,4 +107,40 @@ export interface IPostApi {
         _request: NextApiRequest,
         _response: NextApiResponse,
     ) => Promise<void>;
+
+    /**
+     * Likes a comment made on a post
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Whether the like was added to the comment successfully
+     */
+    likeComment: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
+
+    /**
+     * Dislikes a comment, removing it from the likes if it's present in there
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Whether the dislike was added successfully
+     */
+    dislikeComment: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
+
+    /**
+     * Removes the user's reaction from the comment
+     *
+     * @param _request - The client request
+     * @param _response - The client response
+     * @returns Whether the reaction was removed or not
+     */
+    removeCommentReaction: (
+        _request: NextApiRequest,
+        _response: NextApiResponse,
+    ) => Promise<void>;
 }

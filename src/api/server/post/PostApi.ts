@@ -1,7 +1,7 @@
 /* eslint-disable max-statements -- disabled (only went 2/3 over) */
 /* eslint-disable no-confusing-arrow -- disabled */
 /* eslint-disable @typescript-eslint/indent -- disabled */
-import { ObjectId } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type {
@@ -481,6 +481,202 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 response.status(200);
                 response.send({ data: modifiedFilteredComments });
             }
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, []));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public likeComment = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const { commentId } = request.query;
+
+            if (commentId === undefined) {
+                throw new Error(
+                    "Must include commentId in request when liking comment",
+                );
+            }
+
+            const { username } = parseCookie(request);
+
+            if (username === undefined) {
+                throw new Error("Invalid cookie");
+            }
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error(
+                    "User associated with session token could not be found",
+                );
+            }
+
+            const likes = [
+                ...foundUser.likes,
+                new ObjectId(commentId as string),
+            ];
+
+            const dislikes = [...foundUser.dislikes];
+
+            const foundCommentIndex = dislikes.findIndex(
+                (eachDislikeId) =>
+                    eachDislikeId.toString().toLowerCase() ===
+                    (commentId as string).toLowerCase(),
+            );
+
+            if (foundCommentIndex !== -1) {
+                dislikes.splice(foundCommentIndex, 1);
+            }
+
+            const updateUser = await userRepo.updateOne(
+                { _id: foundUser._id },
+                { dislikes, likes },
+            );
+
+            response.status(updateUser.acknowledged ? 200 : 400);
+            response.send({ data: updateUser.acknowledged });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public dislikeComment = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const { commentId } = request.query;
+
+            if (commentId === undefined) {
+                throw new Error(
+                    "Must include comment id when disliking comment",
+                );
+            }
+
+            const { username } = parseCookie(request);
+
+            if (username === undefined) {
+                throw new Error("Invalid cookie");
+            }
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error("User is unable to be found");
+            }
+
+            const likes = [...foundUser.likes];
+
+            const foundCommentIndex = likes.findIndex(
+                (eachLikeId) =>
+                    eachLikeId.toString().toLowerCase() ===
+                    (commentId as string).toLowerCase(),
+            );
+
+            if (foundCommentIndex !== -1) {
+                likes.splice(foundCommentIndex, 1);
+            }
+
+            const dislikes = [...foundUser.dislikes, commentId as string];
+
+            const updateUser = await userRepo.updateOne(
+                { _id: foundUser._id },
+                { dislikes, likes },
+            );
+
+            response.status(updateUser.acknowledged ? 200 : 400);
+            response.send({ data: updateUser.acknowledged });
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            response.status(500);
+            response.send(convertErrorToApiResponse(error, false));
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
+
+    /** @inheritdoc */
+    public removeCommentReaction = async (
+        request: NextApiRequest,
+        response: NextApiResponse,
+    ): Promise<void> => {
+        try {
+            await this.startMongoTransaction();
+
+            const { commentId } = request.query;
+
+            if (commentId === undefined) {
+                throw new Error(
+                    "Comment ID must be included when removing reaction from comment",
+                );
+            }
+
+            const { username } = parseCookie(request);
+
+            if (username === undefined) {
+                throw new Error("Cookie is invalid");
+            }
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error(
+                    "User attributed with session cookie is unable to be found",
+                );
+            }
+
+            const likes = [...foundUser.likes];
+            const dislikes = [...foundUser.dislikes];
+
+            const likesIndex = likes.findIndex(
+                (eachLikeId) =>
+                    eachLikeId.toString().toLowerCase() ===
+                    (commentId as string).toLowerCase(),
+            );
+
+            if (likesIndex !== -1) {
+                likes.splice(likesIndex, 1);
+            }
+
+            const dislikesIndex = dislikes.findIndex(
+                (eachDislikeId) =>
+                    eachDislikeId.toString().toLowerCase() ===
+                    (commentId as string).toLowerCase(),
+            );
+
+            if (dislikesIndex !== -1) {
+                dislikes.splice(dislikesIndex, 1);
+            }
+
+            const updateUser = await userRepo.updateOne(
+                { _id: foundUser._id },
+                { dislikes, likes },
+            );
+
+            response.status(updateUser.acknowledged ? 200 : 400);
+            response.send({ data: updateUser.acknowledged });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);
