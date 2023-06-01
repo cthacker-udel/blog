@@ -15,6 +15,9 @@ type PostCommentProperties = CommentWithUsername & {
     mutateComment: (
         _index: number,
         _reactionType: ReactionType,
+        _commentId: string,
+        _doesDislike: boolean,
+        _doesLike: boolean,
     ) => Promise<void>;
 };
 
@@ -58,7 +61,13 @@ export const PostComment = ({
                         } comment!`,
                         type: "success",
                     });
-                    await mutateComment(index, reactType);
+                    await mutateComment(
+                        index,
+                        reactType,
+                        _id.toString().toLowerCase(),
+                        doesLike,
+                        doesDislike,
+                    );
                 } else {
                     toast.update(reactingToast, {
                         autoClose: 1500,
@@ -71,7 +80,7 @@ export const PostComment = ({
                 }
             }
         },
-        [_id, index, mutateComment],
+        [_id, doesDislike, doesLike, index, mutateComment],
     );
 
     return (

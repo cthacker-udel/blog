@@ -120,67 +120,72 @@ export const Post = ({
     );
 
     const mutateComment = React.useCallback(
-        async (index: number, reactionType: ReactionType): Promise<void> => {
-            if (allCommentsData !== undefined) {
-                const allCommentsDataClone = [...allCommentsData.data];
-                const [foundComment] = allCommentsDataClone.splice(index, 1);
-                if (reactionType === ReactionType.LIKE) {
-                    const alreadyLikes = likes?.findIndex(
-                        (eachId: string) =>
-                            eachId ===
-                            foundComment._id?.toString().toLowerCase(),
-                    );
+        async (
+            index: number,
+            reactionType: ReactionType,
+            commentId: string,
+            doesAlreadyLike: boolean,
+            doesAlreadyDislike: boolean,
+        ): Promise<void> => {
+            setUserLikes((oldUserLikes: string[]) => {
+                const doesLikeAlreadyExist = oldUserLikes.indexOf(commentId);
 
-                    if (alreadyLikes === -1) {
-                        setUserLikes(
-                            (oldDislikes: string[]) =>
-                                [
-                                    ...oldDislikes,
-                                    foundComment._id?.toString().toLowerCase(),
-                                ] as string[],
-                        );
-                    } else {
-                        setUserLikes((oldDislikes: string[]) =>
-                            oldDislikes.filter(
-                                (_, dislikesIndex: number) =>
-                                    dislikesIndex !== alreadyLikes,
-                            ),
-                        );
-                    }
-                } else {
-                    const alreadyDislikes = dislikes?.findIndex(
-                        (eachId: string) =>
-                            eachId ===
-                            foundComment._id?.toString().toLowerCase(),
-                    );
-
-                    if (alreadyDislikes === -1) {
-                        setUserDislikes(
-                            (oldDislikes: string[]) =>
-                                [
-                                    ...oldDislikes,
-                                    foundComment._id?.toString().toLowerCase(),
-                                ] as string[],
-                        );
-                    } else {
-                        setUserDislikes((oldDislikes: string[]) =>
-                            oldDislikes.filter(
-                                (_, dislikesIndex: number) =>
-                                    dislikesIndex !== alreadyDislikes,
-                            ),
-                        );
-                    }
-
-                    foundComment.dislikes -= alreadyDislikes === -1 ? 1 : -1;
+                if (
+                    doesLikeAlreadyExist === -1 &&
+                    reactionType === ReactionType.LIKE
+                ) {
+                    return [...oldUserLikes, commentId];
                 }
-                allCommentsDataClone.splice(index, 0, foundComment);
-                await mutateAllComments({
-                    ...allCommentsData,
-                    data: allCommentsDataClone,
-                });
-            }
+                return [...oldUserLikes].filter(
+                    (_, oldUserLikeIndex: number) =>
+                        oldUserLikeIndex !== doesLikeAlreadyExist,
+                );
+            });
+
+            setUserDislikes((oldUserDislikes: string[]) => {
+                const doesDislikeAlreadyExist =
+                    oldUserDislikes.indexOf(commentId);
+
+                if (
+                    doesDislikeAlreadyExist === -1 &&
+                    reactionType === ReactionType.DISLIKE
+                ) {
+                    return [...oldUserDislikes, commentId];
+                }
+                return [...oldUserDislikes].filter(
+                    (_, oldUserDislikeIndex: number) =>
+                        oldUserDislikeIndex !== doesDislikeAlreadyExist,
+                );
+            });
+
+            await mutateAllComments(
+                (
+                    currentData: ApiResponse<CommentWithUsername[]> | undefined,
+                ) => {
+                    if (currentData !== undefined) {
+                        const { data: allCurrentComments } = currentData;
+
+                        allCurrentComments[index].likes +=
+                            reactionType === ReactionType.LIKE
+                                ? doesAlreadyLike
+                                    ? -1
+                                    : 1
+                                : 0;
+                        allCurrentComments[index].dislikes +=
+                            reactionType === ReactionType.DISLIKE
+                                ? doesAlreadyDislike
+                                    ? -1
+                                    : 1
+                                : 0;
+                        currentData.data = allCurrentComments;
+                        return currentData;
+                    }
+
+                    return currentData;
+                },
+            );
         },
-        [allCommentsData, dislikes, likes, mutateAllComments],
+        [mutateAllComments],
     );
 
     const onCommentEnterKey = React.useCallback(
@@ -223,6 +228,10 @@ export const Post = ({
     const toggleEditPost = React.useCallback(() => {
         setEditPost((oldValue: boolean) => !oldValue);
     }, []);
+
+    React.useEffect(() => {
+        console.log(userDislikes, userLikes);
+    }, [userDislikes, userLikes]);
 
     if (
         postId === undefined ||
