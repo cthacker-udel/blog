@@ -1,10 +1,11 @@
 import React from "react";
+import { toast } from "react-toastify";
 
 import type { CommentWithUsername } from "@/@types";
+import { PostService } from "@/api/service/post";
+import { ReactionType } from "@/common";
 
 import styles from "./PostComment.module.css";
-import { PostService } from "@/api/service/post";
-import { toast } from "react-toastify";
 
 type PostCommentProperties = CommentWithUsername;
 
@@ -23,27 +24,41 @@ export const PostComment = ({
     modifiedAt,
     username,
 }: PostCommentProperties): JSX.Element => {
-    const likePost = React.useCallback(async () => {
-        const likingToast = toast.loading("Liking comment...");
-        const { data: likeCommentResponse } =
-            await new PostService().likeComment(_id);
-
-        if (likeCommentResponse) {
-            toast.update(likingToast, {
-                autoClose: 1500,
-                isLoading: false,
-                render: "Successfully liked comment!",
-                type: "success",
-            });
-        } else {
-            toast.update(likingToast, {
-                autoClose: 1500,
-                isLoading: false,
-                render: "Failed to like comment",
-                type: "error",
-            });
-        }
-    }, [_id]);
+    const reactToComment = React.useCallback(
+        async (reactType: ReactionType): Promise<void> => {
+            if (_id !== undefined) {
+                const reactingToast = toast.loading(
+                    `${
+                        reactType === ReactionType.LIKE ? "Liking" : "Disliking"
+                    } comment...`,
+                );
+                const { data: reactionProcessed } =
+                    await new PostService().reactComment(_id, reactType);
+                if (reactionProcessed) {
+                    toast.update(reactingToast, {
+                        autoClose: 1500,
+                        isLoading: false,
+                        render: `${
+                            reactType === ReactionType.LIKE
+                                ? "Liked"
+                                : "Disliked"
+                        } comment!`,
+                        type: "success",
+                    });
+                } else {
+                    toast.update(reactingToast, {
+                        autoClose: 1500,
+                        isLoading: false,
+                        render: `Failed to ${
+                            reactType === ReactionType.LIKE ? "like" : "dislike"
+                        } comment`,
+                        type: "error",
+                    });
+                }
+            }
+        },
+        [_id],
+    );
 
     return (
         <div className={`${styles.post_content} shadow-lg`}>

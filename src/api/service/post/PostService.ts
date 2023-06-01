@@ -5,6 +5,7 @@ import type {
     ApiResponse,
     UpdatePostPayload,
 } from "@/@types";
+import type { ReactionType } from "@/common";
 import { Endpoints } from "@/constants";
 
 import { ServiceBaseController } from "../base";
@@ -56,14 +57,15 @@ export class PostService extends ServiceBaseController implements IPostService {
     };
 
     /** @inheritdoc */
-    public likeComment = async (
+    public reactComment = async (
         commentId: ObjectId,
+        reactionType: ReactionType,
     ): Promise<ApiResponse<boolean>> => {
         try {
             const response = await this.get<boolean>(
                 `${Endpoints.POST.BASE}${
-                    Endpoints.POST.LIKE_COMMENT
-                }?commentId=${commentId.toString()}`,
+                    Endpoints.POST.REACT_TO_COMMENT
+                }?commentId=${commentId.toString()}&reactionType=${reactionType.valueOf()}`,
             );
 
             return response;

@@ -12,8 +12,8 @@ export const Endpoints = {
         ALL_COMMENTS: "allComments",
         BASE: "post/",
         CONTENT: "content",
-        LIKE_COMMENT: "likeComment",
         MOST_RECENT: "mostRecent",
+        REACT_TO_COMMENT: "reactToComment",
         UPDATE_CONTENT: "updateContent",
     },
     USER: {

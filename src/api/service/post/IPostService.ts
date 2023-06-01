@@ -1,6 +1,7 @@
 import type { ObjectId } from "mongodb";
 
 import type { ApiResponse } from "@/@types";
+import type { ReactionType } from "@/common";
 
 export interface IPostService {
     /**
@@ -35,7 +36,11 @@ export interface IPostService {
      * Likes a comment made on a post
      *
      * @param _commentId - The comment to like
+     * @param _reactionType - The type of reaction
      * @returns Whether the comment was liked or not
      */
-    likeComment: (_commentId: ObjectId) => Promise<ApiResponse<boolean>>;
+    reactComment: (
+        _commentId: ObjectId,
+        _reactionType: ReactionType,
+    ) => Promise<ApiResponse<boolean>>;
 }
