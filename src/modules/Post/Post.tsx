@@ -104,6 +104,10 @@ export const Post = ({
 
     const [editPost, setEditPost] = React.useState<boolean>(false);
     const [currentTitle, setCurrentTitle] = React.useState<string>(title);
+    const [userLikes, setUserLikes] = React.useState<string[]>(likes ?? []);
+    const [userDislikes, setUserDislikes] = React.useState<string[]>(
+        dislikes ?? [],
+    );
 
     const mutateContent = React.useCallback(
         async (updatedContent: string): Promise<void> => {
@@ -121,21 +125,53 @@ export const Post = ({
                 const allCommentsDataClone = [...allCommentsData.data];
                 const [foundComment] = allCommentsDataClone.splice(index, 1);
                 if (reactionType === ReactionType.LIKE) {
-                    const alreadyLikes = likes?.some(
+                    const alreadyLikes = likes?.findIndex(
                         (eachId: string) =>
                             eachId ===
                             foundComment._id?.toString().toLowerCase(),
                     );
 
-                    foundComment.likes -= alreadyLikes ? 1 : -1;
+                    if (alreadyLikes === -1) {
+                        setUserLikes(
+                            (oldDislikes: string[]) =>
+                                [
+                                    ...oldDislikes,
+                                    foundComment._id?.toString().toLowerCase(),
+                                ] as string[],
+                        );
+                    } else {
+                        setUserLikes((oldDislikes: string[]) =>
+                            oldDislikes.filter(
+                                (_, dislikesIndex: number) =>
+                                    dislikesIndex !== alreadyLikes,
+                            ),
+                        );
+                    }
                 } else {
-                    const alreadyDislikes = dislikes?.some(
+                    const alreadyDislikes = dislikes?.findIndex(
                         (eachId: string) =>
                             eachId ===
                             foundComment._id?.toString().toLowerCase(),
                     );
 
-                    foundComment.dislikes -= alreadyDislikes ? 1 : -1;
+                    if (alreadyDislikes === -1) {
+                        setUserDislikes(
+                            (oldDislikes: string[]) =>
+                                [
+                                    ...oldDislikes,
+                                    foundComment._id?.toString().toLowerCase(),
+                                ] as string[],
+                        );
+                    } else {
+                        setUserDislikes((oldDislikes: string[]) =>
+                            oldDislikes.filter(
+                                (_, dislikesIndex: number) =>
+                                    dislikesIndex !== alreadyDislikes,
+                            ),
+                        );
+                    }
+
+                    foundComment.dislikes -= alreadyDislikes === -1 ? 1 : -1;
                 }
                 allCommentsDataClone.splice(index, 0, foundComment);
                 await mutateAllComments({
@@ -259,13 +295,13 @@ export const Post = ({
                             eachComment: CommentWithUsername,
                             eachCommentIndex: number,
                         ) => {
-                            const doesDislike = dislikes?.some(
+                            const doesDislike = userDislikes?.some(
                                 (eachDislikeId: string) =>
                                     eachDislikeId ===
                                     eachComment._id?.toString().toLowerCase(),
                             );
 
-                            const doesLike = likes?.some(
+                            const doesLike = userLikes?.some(
                                 (eachLikeId: string) =>
                                     eachLikeId ===
                                     eachComment._id?.toString().toLowerCase(),
