@@ -16,7 +16,7 @@ import { Key } from "ts-key-enum";
 
 import type { ApiResponse, CommentWithUsername } from "@/@types";
 import { PostService } from "@/api/service/post";
-import { generateTooltip } from "@/common";
+import { generateTooltip, ReactionType } from "@/common";
 import { Endpoints } from "@/constants";
 import { useBackground } from "@/hooks";
 
@@ -27,7 +27,9 @@ import { PostComment } from "./PostComment";
 type PostProperties = {
     authorUsername: string;
     createdAt: string;
+    dislikes?: string[];
     isAuthor: boolean;
+    likes?: string[];
     title: string;
     userId: string;
 };
@@ -48,19 +50,20 @@ const FORM_DEFAULT_VALUES: FormValues = {
 export const Post = ({
     authorUsername,
     createdAt: _createdAt,
+    dislikes,
     isAuthor,
+    likes,
     title,
     userId: _userId,
 }: PostProperties): JSX.Element => {
     const router = useRouter();
+    const { postId } = router.query;
     useBackground({
         imageConfig: {
             background:
                 "linear-gradient(0deg, rgba(34,162,195,1) 0%, rgba(253,121,45,1) 100%)",
         },
     });
-    const [editPost, setEditPost] = React.useState<boolean>(false);
-    const [currentTitle, setCurrentTitle] = React.useState<string>(title);
     const { formState, getValues, register, reset } = useForm<FormValues>({
         criteriaMode: "all",
         defaultValues: FORM_DEFAULT_VALUES,
@@ -68,16 +71,6 @@ export const Post = ({
     });
 
     const { dirtyFields, isDirty, isValidating } = formState;
-
-    const updateTitle = React.useCallback((updatedTitle: string) => {
-        setCurrentTitle(updatedTitle);
-    }, []);
-
-    const toggleEditPost = React.useCallback(() => {
-        setEditPost((oldValue: boolean) => !oldValue);
-    }, []);
-
-    const { postId } = router.query;
 
     const { data, error, isLoading, mutate } = useSWR<
         ApiResponse<string>,
@@ -109,6 +102,9 @@ export const Post = ({
         `${Endpoints.POST.BASE}${Endpoints.POST.ALL_COMMENTS}?postId=${postId}`,
     );
 
+    const [editPost, setEditPost] = React.useState<boolean>(false);
+    const [currentTitle, setCurrentTitle] = React.useState<string>(title);
+
     const mutateContent = React.useCallback(
         async (updatedContent: string): Promise<void> => {
             await mutate({ data: updatedContent } as ApiResponse<string>, {
@@ -117,6 +113,38 @@ export const Post = ({
             });
         },
         [mutate],
+    );
+
+    const mutateComment = React.useCallback(
+        async (index: number, reactionType: ReactionType): Promise<void> => {
+            if (allCommentsData !== undefined) {
+                const allCommentsDataClone = [...allCommentsData.data];
+                const [foundComment] = allCommentsDataClone.splice(index, 1);
+                if (reactionType === ReactionType.LIKE) {
+                    const alreadyLikes = likes?.some(
+                        (eachId: string) =>
+                            eachId ===
+                            foundComment._id?.toString().toLowerCase(),
+                    );
+
+                    foundComment.likes -= alreadyLikes ? 1 : -1;
+                } else {
+                    const alreadyDislikes = dislikes?.some(
+                        (eachId: string) =>
+                            eachId ===
+                            foundComment._id?.toString().toLowerCase(),
+                    );
+
+                    foundComment.dislikes -= alreadyDislikes ? 1 : -1;
+                }
+                allCommentsDataClone.splice(index, 0, foundComment);
+                await mutateAllComments({
+                    ...allCommentsData,
+                    data: allCommentsDataClone,
+                });
+            }
+        },
+        [allCommentsData, dislikes, likes, mutateAllComments],
     );
 
     const onCommentEnterKey = React.useCallback(
@@ -151,6 +179,14 @@ export const Post = ({
         },
         [dirtyFields.comment, getValues, postId, reset],
     );
+
+    const updateTitle = React.useCallback((updatedTitle: string) => {
+        setCurrentTitle(updatedTitle);
+    }, []);
+
+    const toggleEditPost = React.useCallback(() => {
+        setEditPost((oldValue: boolean) => !oldValue);
+    }, []);
 
     if (
         postId === undefined ||
@@ -218,12 +254,35 @@ export const Post = ({
                     {` at ${new Date(_createdAt).toLocaleString()}`}
                 </div>
                 <div className={styles.post_comments}>
-                    {allComments.map((eachComment: CommentWithUsername) => (
-                        <PostComment
-                            {...eachComment}
-                            key={eachComment._id?.toString()}
-                        />
-                    ))}
+                    {allComments.map(
+                        (
+                            eachComment: CommentWithUsername,
+                            eachCommentIndex: number,
+                        ) => {
+                            const doesDislike = dislikes?.some(
+                                (eachDislikeId: string) =>
+                                    eachDislikeId ===
+                                    eachComment._id?.toString().toLowerCase(),
+                            );
+
+                            const doesLike = likes?.some(
+                                (eachLikeId: string) =>
+                                    eachLikeId ===
+                                    eachComment._id?.toString().toLowerCase(),
+                            );
+
+                            return (
+                                <PostComment
+                                    {...eachComment}
+                                    doesDislike={doesDislike ?? false}
+                                    doesLike={doesLike ?? false}
+                                    index={eachCommentIndex}
+                                    key={eachComment._id?.toString()}
+                                    mutateComment={mutateComment}
+                                />
+                            );
+                        },
+                    )}
                 </div>
                 <InputGroup onKeyDown={onCommentEnterKey}>
                     <Form.Control

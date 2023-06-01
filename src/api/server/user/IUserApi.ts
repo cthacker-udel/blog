@@ -131,4 +131,16 @@ export interface IUserApi {
      * @returns Whether the session is valid
      */
     validateSession: (_request: ClientRequest, _response: ServerResponse) => PV;
+
+    /**
+     * [SERVER-SIDE ONLY]
+     * Gets all the user's likes and dislikes, used for loading in post, detects if the user already liked/disliked the comment or not.
+     * Used when mutating the cache as well in the event if a user either freshly likes the comment, switches to dislike, or re-likes to cancel it out.
+     *
+     * @param _username - The username of the current logged in user
+     * @returns The likes and dislikes of the user currently
+     */
+    getLikesAndDislikes: (
+        _username: string,
+    ) => Promise<Pick<User, "dislikes" | "likes">>;
 }

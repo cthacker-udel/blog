@@ -11,6 +11,6 @@ export type User = {
     passwordSalt: string;
     profilePictureUrl?: string;
     role: UserRoles;
-    likes: ObjectId[];
-    dislikes: ObjectId[];
+    likes?: ObjectId[];
+    dislikes?: ObjectId[];
 };

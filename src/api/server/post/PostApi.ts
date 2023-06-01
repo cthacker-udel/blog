@@ -499,6 +499,7 @@ export class PostApi extends DatabaseApi implements IPostApi {
             await this.startMongoTransaction();
 
             const { commentId, reactionType } = request.query;
+            let removed = false;
 
             if (commentId === undefined || reactionType === undefined) {
                 throw new Error(
@@ -513,8 +514,14 @@ export class PostApi extends DatabaseApi implements IPostApi {
             }
 
             const userRepo = this.getMongoRepo<User>(Collections.USERS);
+            const commentRepo = this.getMongoRepo<Comment>(
+                Collections.COMMENTS,
+            );
 
             const foundUser = await userRepo.findOne({ username });
+            const foundComment = await commentRepo.findOne({
+                _id: new ObjectId(commentId as string),
+            });
 
             if (foundUser === null) {
                 throw new Error(
@@ -522,45 +529,91 @@ export class PostApi extends DatabaseApi implements IPostApi {
                 );
             }
 
-            const likes = [...foundUser.likes];
-            const dislikes = [...foundUser.dislikes];
+            if (foundComment === null) {
+                throw new Error(
+                    "Comment ID does not correlate to comment in the database",
+                );
+            }
+
+            const likes = [...(foundUser.likes ?? [])];
+            const dislikes = [...(foundUser.dislikes ?? [])];
 
             const convertedEnum = Number.parseInt(
                 reactionType as string,
                 10,
             ) as ReactionType;
 
-            const doesLikeExist = likes.indexOf(
-                new ObjectId(commentId as string),
+            const doesLikeExist = likes.findIndex(
+                (eachLikeObjectId) =>
+                    eachLikeObjectId.toString().toLowerCase() ===
+                    (commentId as string).toLowerCase(),
             );
-            const doesDislikeExist = dislikes.indexOf(
-                new ObjectId(commentId as string),
+            const doesDislikeExist = dislikes.findIndex(
+                (eachDislikeObjectId) =>
+                    eachDislikeObjectId.toString().toLowerCase() ===
+                    (commentId as string).toLowerCase(),
             );
+
+            console.log(doesLikeExist, doesDislikeExist);
 
             if (convertedEnum === ReactionType.LIKE) {
                 if (doesLikeExist === -1) {
                     likes.push(new ObjectId(commentId as string));
                 } else {
                     likes.splice(doesLikeExist, 1);
+                    removed = true;
                 }
             } else if (convertedEnum === ReactionType.DISLIKE) {
                 if (doesDislikeExist === -1) {
                     dislikes.push(new ObjectId(commentId as string));
                 } else {
                     dislikes.splice(doesDislikeExist, 1);
+                    removed = true;
                 }
             }
 
             const userUpdateResult = await userRepo.updateOne(
                 { _id: foundUser._id },
                 {
-                    dislikes,
-                    likes,
+                    $set: {
+                        dislikes,
+                        likes,
+                    },
                 },
             );
 
-            response.status(userUpdateResult.acknowledged ? 200 : 400);
-            response.send({ data: userUpdateResult.acknowledged });
+            const updatedComment = await commentRepo.updateOne(
+                { _id: new ObjectId(commentId as string) },
+                {
+                    $set: {
+                        dislikes:
+                            convertedEnum === ReactionType.DISLIKE
+                                ? foundComment.dislikes -
+                                  (removed
+                                      ? 1
+                                      : doesDislikeExist === -1
+                                      ? -1
+                                      : 0)
+                                : foundComment.dislikes,
+                        likes:
+                            convertedEnum === ReactionType.LIKE
+                                ? foundComment.likes -
+                                  (removed ? 1 : doesLikeExist === -1 ? -1 : 0)
+                                : foundComment.likes,
+                    },
+                },
+            );
+
+            response.status(
+                userUpdateResult.acknowledged && updatedComment.acknowledged
+                    ? 200
+                    : 400,
+            );
+            response.send({
+                data:
+                    userUpdateResult.acknowledged &&
+                    updatedComment.acknowledged,
+            });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);

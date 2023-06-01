@@ -408,4 +408,30 @@ export class UserApi extends DatabaseApi implements IUserApi {
             response.send({ data: false });
         }
     };
+
+    /** @inheritdoc */
+    public getLikesAndDislikes = async (
+        username: string,
+    ): Promise<Pick<User, "dislikes" | "likes">> => {
+        try {
+            await this.startMongoTransaction();
+
+            const userRepo = this.getMongoRepo<User>(Collections.USERS);
+
+            const foundUser = await userRepo.findOne({ username });
+
+            if (foundUser === null) {
+                throw new Error("Unable to find user associated with request");
+            }
+
+            const { dislikes, likes } = foundUser;
+
+            return { dislikes, likes };
+        } catch (error: unknown) {
+            await this.logMongoError(error);
+            throw error;
+        } finally {
+            await this.closeMongoTransaction();
+        }
+    };
 }

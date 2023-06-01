@@ -1,4 +1,6 @@
+import type { ObjectId } from "mongodb";
 import React from "react";
+import { Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 
 import type { CommentWithUsername } from "@/@types";
@@ -7,7 +9,15 @@ import { ReactionType } from "@/common";
 
 import styles from "./PostComment.module.css";
 
-type PostCommentProperties = CommentWithUsername;
+type PostCommentProperties = CommentWithUsername & {
+    doesDislike: boolean;
+    doesLike: boolean;
+    index: number;
+    mutateComment: (
+        _index: number,
+        _reactionType: ReactionType,
+    ) => Promise<void>;
+};
 
 /**
  *
@@ -20,8 +30,12 @@ export const PostComment = ({
     comment,
     createdAt,
     dislikes,
+    doesDislike,
+    doesLike,
+    index,
     likes,
     modifiedAt,
+    mutateComment,
     username,
 }: PostCommentProperties): JSX.Element => {
     // TODO: Add way to detect if user already liked/disliked comment to color the reactions on the page
@@ -46,6 +60,7 @@ export const PostComment = ({
                         } comment!`,
                         type: "success",
                     });
+                    await mutateComment(index, reactType);
                 } else {
                     toast.update(reactingToast, {
                         autoClose: 1500,
@@ -58,7 +73,7 @@ export const PostComment = ({
                 }
             }
         },
-        [_id],
+        [_id, index, mutateComment],
     );
 
     return (
@@ -81,12 +96,28 @@ export const PostComment = ({
             <div className={styles.post_comment}>{comment}</div>
             <div className={styles.post_metrics}>
                 <div className={styles.post_metric}>
-                    <i className="fa-solid fa-thumbs-up" />
-                    <span>{likes}</span>
+                    <Button
+                        onClick={async (): Promise<void> => {
+                            await reactToComment(ReactionType.LIKE);
+                        }}
+                        variant={`${doesLike ? "success" : "outline-success"}`}
+                    >
+                        <i className="fa-solid fa-thumbs-up" />
+                    </Button>
+                    <span className={styles.post_metric_amount}>{likes}</span>
                 </div>
                 <div className={styles.post_metric}>
-                    <i className="fa-solid fa-thumbs-down" />
-                    <span>{dislikes}</span>
+                    <Button
+                        onClick={async (): Promise<void> => {
+                            await reactToComment(ReactionType.DISLIKE);
+                        }}
+                        variant={`${doesDislike ? "danger" : "outline-danger"}`}
+                    >
+                        <i className="fa-solid fa-thumbs-down" />
+                    </Button>
+                    <span className={styles.post_metric_amount}>
+                        {dislikes}
+                    </span>
                 </div>
             </div>
         </div>

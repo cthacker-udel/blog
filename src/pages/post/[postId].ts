@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent -- disabled */
 /* eslint-disable import/no-nodejs-modules -- disabled */
 
 import type { IncomingMessage } from "node:http";
@@ -16,7 +17,12 @@ type GetServerSideProperties = {
 };
 
 type PostProperties = {
+    authorUsername?: string;
+    createdAt: string;
+    dislikes?: string[];
     isAuthor: boolean;
+    likes?: string[];
+    title?: string;
     userId: string;
 };
 
@@ -37,6 +43,8 @@ export const getServerSideProps: GetServerSideProps<PostProperties> = async ({
         }
 
         const userId = await new UserApi().getUserIdFromUsername(username);
+        const { dislikes: foundDislikes, likes: foundLikes } =
+            await new UserApi().getLikesAndDislikes(username);
         const isAuthor = await new PostApi().isAuthorOfPost(
             userId,
             new ObjectId(postId as string),
@@ -49,9 +57,23 @@ export const getServerSideProps: GetServerSideProps<PostProperties> = async ({
             postDetails.createdAt ?? Date.now(),
         ).toUTCString();
 
+        const dislikes =
+            foundDislikes === undefined
+                ? []
+                : foundDislikes.map((eachId) =>
+                      eachId.toString().toLowerCase(),
+                  );
+
+        const likes =
+            foundLikes === undefined
+                ? []
+                : foundLikes.map((eachId) => eachId.toString().toLowerCase());
+
         return {
             props: {
+                dislikes,
                 isAuthor,
+                likes,
                 userId: userId.toString(),
                 ...postDetails,
                 createdAt,
