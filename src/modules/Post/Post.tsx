@@ -327,7 +327,7 @@ export const Post = ({
                     </span>
                     {` at ${new Date(_createdAt).toLocaleString()}`}
                 </div>
-                <div className={styles.post_comments}>
+                <div className={styles.post_comments} id="post_comments">
                     {allComments.map(
                         (
                             eachComment: CommentWithUsername,
@@ -351,6 +351,10 @@ export const Post = ({
                                     doesDislike={doesDislike ?? false}
                                     doesLike={doesLike ?? false}
                                     index={eachCommentIndex}
+                                    isLast={
+                                        eachCommentIndex ===
+                                        allComments.length - 1
+                                    }
                                     key={eachComment._id?.toString()}
                                     mutateComment={mutateComment}
                                 />

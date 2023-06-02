@@ -12,6 +12,7 @@ type PostCommentProperties = CommentWithUsername & {
     doesDislike: boolean;
     doesLike: boolean;
     index: number;
+    isLast: boolean;
     mutateComment: (
         _index: number,
         _reactionType: ReactionType,
@@ -22,9 +23,21 @@ type PostCommentProperties = CommentWithUsername & {
 };
 
 /**
+ * Represents a comment made to a post
  *
- * @param param0
- * @returns
+ * @param props - Properties of the post comment component
+ * @param props._id - The ObjectID of the comment
+ * @param props.author - The author of the comment
+ * @param props.comment - The content of the comment
+ * @param props.dislikes - The # of dislikes the comment has
+ * @param props.index - The index of the comment (in relation to the array of all comments)
+ * @param props.isLast - Whether the comment is the last in the array (auto-scrolls to bottom)
+ * @param props.likes - The # of likes the comment has
+ * @param props.modifiedAt - The last moment the comment was modified
+ * @param props.mutateComment - Mutation function that modifies the internal cache storing the comment
+ * @param props.username - The author's username
+ *
+ * @returns The post with multiple interaction components within it
  */
 export const PostComment = ({
     _id,
@@ -35,6 +48,7 @@ export const PostComment = ({
     doesDislike,
     doesLike,
     index,
+    isLast,
     likes,
     modifiedAt,
     mutateComment,
@@ -82,6 +96,22 @@ export const PostComment = ({
         },
         [_id, doesDislike, doesLike, index, mutateComment],
     );
+
+    React.useEffect(() => {
+        if (isLast) {
+            const postComments = document.querySelector("#post_comments");
+            if (postComments !== null) {
+                const convertedPostComments = postComments as HTMLDivElement;
+                const lastElement =
+                    convertedPostComments.children[
+                        convertedPostComments.childElementCount - 1
+                    ];
+                if (lastElement !== null) {
+                    lastElement.scrollIntoView({ behavior: "smooth" });
+                }
+            }
+        }
+    }, [isLast]);
 
     return (
         <div className={`${styles.post_content} shadow-lg`}>
