@@ -7,8 +7,7 @@
     width: 95vw;
     border-radius: 1em;
     gap: 2em;
-    min-height: 50vh;
-    max-height: 95vh;
+    height: fit-content;
     overflow: auto;
 }
 
