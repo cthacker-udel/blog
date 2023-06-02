@@ -362,6 +362,7 @@ export const Post = ({
                     <Form.Control
                         as="textarea"
                         className={styles.post_comment_input}
+                        placeholder="Shift + Enter to add!"
                         type="text"
                         {...register("comment")}
                     />

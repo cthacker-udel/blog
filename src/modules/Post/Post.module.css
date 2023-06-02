@@ -4,9 +4,12 @@
     align-items: center;
     background-color: rgba(248, 248, 255, 0.75);
     padding: 2em;
-    width: 75vw;
+    width: 95vw;
     border-radius: 1em;
     gap: 2em;
+    min-height: 50vh;
+    max-height: 95vh;
+    overflow: auto;
 }
 
 .post_title {
@@ -44,4 +47,7 @@
     width: 100%;
     border-radius: 1em;
     padding: 1em;
+    max-height: 45vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
