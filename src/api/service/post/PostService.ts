@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent -- disabled */
 import type { ObjectId } from "mongodb";
 
 import type {
@@ -43,16 +44,19 @@ export class PostService extends ServiceBaseController implements IPostService {
     public addComment = async (
         comment: string,
         postId: string,
-    ): Promise<ApiResponse<boolean>> => {
+    ): Promise<ApiResponse<[boolean, ObjectId | undefined]>> => {
         try {
-            const response = await this.post<boolean, AddCommentPayload>(
-                `${Endpoints.POST.BASE}${Endpoints.POST.ADD_COMMENT}`,
-                { comment, postId },
-            );
+            const response = await this.post<
+                [boolean, ObjectId | undefined],
+                AddCommentPayload
+            >(`${Endpoints.POST.BASE}${Endpoints.POST.ADD_COMMENT}`, {
+                comment,
+                postId,
+            });
 
             return response;
         } catch {
-            return { data: false };
+            return { data: [false, undefined] };
         }
     };
 

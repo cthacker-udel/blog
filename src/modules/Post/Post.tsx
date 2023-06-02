@@ -12,7 +12,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import sanitize from "sanitize-html";
 import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
 import { Key } from "ts-key-enum";
 
 import type { ApiResponse, CommentWithUsername } from "@/@types";
@@ -33,6 +32,7 @@ type PostProperties = {
     likes?: string[];
     title: string;
     userId: string;
+    username: string;
 };
 
 type FormValues = {
@@ -46,6 +46,15 @@ const FORM_DEFAULT_VALUES: FormValues = {
 /**
  * Page that displays the current post being viewed
  *
+ * @param props - The properties of the Post component, which displays a post created in the blog
+ * @param props.authorUsername - The username of the author of the post
+ * @param props.createdAt - The time the post was created
+ * @param props.dislikes - The # of dislikes the post has
+ * @param props.isAuthor - Whether the current logged in user is the author of the post
+ * @param props.likes - The # of likes the post has
+ * @param props.title - The title of the post
+ * @param props.userId - The id of the current logged in user
+ * @param props.username - The username of the currently logged in user
  * @returns The current post being viewed
  */
 export const Post = ({
@@ -194,10 +203,9 @@ export const Post = ({
     const addComment = React.useCallback(async (): Promise<void> => {
         const { comment } = getValues();
         const addingCommentToast = toast.loading("Adding comment...");
-        const { data: didAddComment } = await new PostService().addComment(
-            comment,
-            postId as string,
-        );
+        const {
+            data: [didAddComment, addedCommentId],
+        } = await new PostService().addComment(comment, postId as string);
         if (didAddComment) {
             toast.update(addingCommentToast, {
                 autoClose: 1500,
@@ -206,6 +214,25 @@ export const Post = ({
                 type: "success",
             });
             reset();
+            mutateAllComments(
+                (
+                    currentData: ApiResponse<CommentWithUsername[]> | undefined,
+                ) => ({
+                    ...currentData,
+                    data: [
+                        ...(currentData === undefined ? [] : currentData.data),
+                        {
+                            _id: addedCommentId,
+                            comment,
+                            createdAt: new Date(Date.now()),
+                            dislikes: 0,
+                            likes: 0,
+                            modifiedAt: new Date(Date.now()),
+                        } as CommentWithUsername,
+                    ],
+                }),
+                { revalidate: true },
+            );
         } else {
             toast.update(addingCommentToast, {
                 autoClose: 1500,
@@ -214,7 +241,7 @@ export const Post = ({
                 type: "error",
             });
         }
-    }, [getValues, postId, reset]);
+    }, [getValues, mutateAllComments, postId, reset]);
 
     const onCommentEnterKey = React.useCallback(
         async (event: React.KeyboardEvent<HTMLDivElement>): Promise<void> => {

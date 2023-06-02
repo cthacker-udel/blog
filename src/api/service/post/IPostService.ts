@@ -25,12 +25,12 @@ export interface IPostService {
      *
      * @param _comment - The comment to add
      * @param _postId - The id of the post we are adding the comment to
-     * @returns Whether the comment was added successfully
+     * @returns Array consisting of [Post added successfully, the id of the created post]
      */
     addComment: (
         _comment: string,
         _postId: string,
-    ) => Promise<ApiResponse<boolean>>;
+    ) => Promise<ApiResponse<[boolean, ObjectId | undefined]>>;
 
     /**
      * Likes a comment made on a post

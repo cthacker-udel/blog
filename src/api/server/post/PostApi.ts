@@ -392,11 +392,13 @@ export class PostApi extends DatabaseApi implements IPostApi {
             );
 
             response.status(200);
-            response.send({ data: updatePostResult.acknowledged });
+            response.send({
+                data: [updatePostResult.acknowledged, createdCommentId],
+            });
         } catch (error: unknown) {
             await this.logMongoError(error);
             response.status(500);
-            response.send(convertErrorToApiResponse(error, false));
+            response.send(convertErrorToApiResponse(error, [false, undefined]));
         } finally {
             await this.closeMongoTransaction();
         }
