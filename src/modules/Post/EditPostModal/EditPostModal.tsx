@@ -47,9 +47,17 @@ const editorToggleOffVariant = "outline-dark";
 const editorToggleOnVariant = "dark";
 
 /**
+ * Allows for the user to edit the post they created
  *
- * @param param0
- * @returns
+ * @param props - The properties of the EditPostModal component
+ * @param props.content - The content of the post
+ * @param props.mutateContent - Used for mutating the client-side data before refetching from the server, improves user experience
+ * @param props.onHideEditPostModal - Callback that hides the EditPostModal component from the user's screen
+ * @param props.postId - The id of the post that is being edited
+ * @param props.showEditPostModal - Whether the modal is shown
+ * @param props.title - The title of the post
+ * @param props.updateTitle - Callback used to update the title of the post
+ * @returns The modal used for editing the post
  */
 export const EditPostModal = ({
     content,

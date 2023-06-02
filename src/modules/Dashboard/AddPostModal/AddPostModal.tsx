@@ -30,8 +30,13 @@ const ADD_POST_DEFAULT_VALUES: FormValues = {
 };
 
 /**
+ * The modal used for adding a post both to the database and to the application as a whole
  *
- * @returns
+ * @param props - The properties of the AddPostModal component
+ * @param props.onHide - The callback that is fired when the modal is hiding
+ * @param props.showAddPostModal - The boolean that controls whether the modal is shown
+ *
+ * @returns - The modal used for adding a post to the blog
  */
 export const AddPostModal = ({
     onHide,

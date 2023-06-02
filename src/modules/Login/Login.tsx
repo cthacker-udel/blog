@@ -25,8 +25,9 @@ const LOGIN_FORM_DEFAULT_VALUES: LoginFormValues = {
 };
 
 /**
+ * Logs the user into the application
  *
- * @returns
+ * @returns The main page used for logging the user in
  */
 export const Login = (): JSX.Element => {
     useBackground({

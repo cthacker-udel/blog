@@ -10,8 +10,9 @@ import { useBackground, useCancelAnimations, useLayoutInjector } from "@/hooks";
 import styles from "./Landing.module.css";
 
 /**
+ * The base page the user lands on when first entering the web application
  *
- * @returns
+ * @returns The landing page
  */
 export const Landing = (): JSX.Element => {
     useBackground({

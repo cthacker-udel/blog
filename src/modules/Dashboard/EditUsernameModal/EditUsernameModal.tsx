@@ -30,8 +30,13 @@ const EDIT_USERNAME_FORM_DEFAULT_VALUES: FormValues = {
 };
 
 /**
+ *  Modal used for editing the currently logged in user's username
  *
  * @param props - The properties of the Edit Username Modal component
+ * @param props.showEditUsernameModal - Whether the modal is shown
+ * @param props.onHide - The callback that is fired when this modal is closing
+ *
+ * @returns - The modal used to edit the currently logged in user's username
  */
 export const EditUsernameModal = ({
     showEditUsernameModal,

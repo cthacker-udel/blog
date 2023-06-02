@@ -35,8 +35,9 @@ type DashboardProperties = {
 };
 
 /**
+ * The dashboard represents visualizing and displaying all the options the user has within the application.
  *
- * @returns
+ * @returns The dashboard component, containing all the options/data the user can interact/observe
  */
 export const Dashboard = ({
     createdAt,
