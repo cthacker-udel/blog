@@ -141,12 +141,19 @@ export const Dashboard = ({
                 <title>{"Dashboard"}</title>
             </Head>
             <div className={styles.each_post_container}>
-                {mostRecentPosts?.data.map((eachPost: MostRecentPost) => (
-                    <DashboardPost
-                        key={eachPost._id?.toString() ?? ""}
-                        {...eachPost}
-                    />
-                ))}
+                {mostRecentPosts?.data.length !== undefined &&
+                mostRecentPosts.data.length > 0 ? (
+                    mostRecentPosts?.data.map((eachPost: MostRecentPost) => (
+                        <DashboardPost
+                            key={eachPost._id?.toString() ?? ""}
+                            {...eachPost}
+                        />
+                    ))
+                ) : (
+                    <div className={styles.no_posts_display}>
+                        {"Post something!"}
+                    </div>
+                )}
             </div>
             <OverlayTrigger
                 overlay={(properties: OverlayInjectedProps): JSX.Element =>

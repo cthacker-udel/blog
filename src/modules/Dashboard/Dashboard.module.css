@@ -101,3 +101,8 @@
     font-family: "JetBrains Mono", monospace;
     color: snow;
 }
+
+.no_posts_display {
+    text-align: center;
+    font-size: 5em;
+}
