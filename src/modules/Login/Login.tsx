@@ -85,6 +85,23 @@ export const Login = (): JSX.Element => {
         setRevealPassword((oldRevealPassword: boolean) => !oldRevealPassword);
     }, []);
 
+    const onLoginKeyDown = React.useCallback(
+        async (event: React.KeyboardEvent) => {
+            const { ctrlKey, key } = event;
+            if (ctrlKey && key === Key.Enter) {
+                toggleRevealPassword();
+            } else if (
+                key === Key.Enter &&
+                isDirty &&
+                Object.keys(dirtyFields).length === 2 &&
+                Object.keys(errors).length === 0
+            ) {
+                await login();
+            }
+        },
+        [dirtyFields, errors, isDirty, login, toggleRevealPassword],
+    );
+
     return (
         <>
             <Head>
@@ -113,18 +130,7 @@ export const Login = (): JSX.Element => {
             <div
                 className={styles.login_form}
                 id="login_form"
-                onKeyDown={async (
-                    event: React.KeyboardEvent<HTMLDivElement>,
-                ): Promise<void> => {
-                    const { key } = event;
-                    if (
-                        key === Key.Enter &&
-                        isDirty &&
-                        Object.keys(dirtyFields).length === 2
-                    ) {
-                        await login();
-                    }
-                }}
+                onKeyDown={onLoginKeyDown}
                 tabIndex={0}
             >
                 <Form.Group>
