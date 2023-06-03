@@ -2,6 +2,7 @@
 import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 
+import { Analytics } from "@vercel/analytics/react";
 import type { AppProps } from "next/app";
 import React from "react";
 import { ToastContainer } from "react-toastify";
@@ -54,6 +55,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => (
             rtl={false}
             theme="light"
         />
+        <Analytics />
     </>
 );
 
