@@ -43,6 +43,7 @@
     display: flex;
     flex-direction: column;
     gap: 2.5em;
+    max-width: fit-content;
 }
 
 .login_form_control,
@@ -62,4 +63,13 @@
 
 .login_form_floating_control {
     color: rgba(255, 255, 255, 0.25);
+}
+
+.login_form_reveal_password_button {
+    border: 1px solid rgba(173, 216, 230, 0.75);
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.login_form_reveal_password_button > i {
+    width: 1.5em;
 }

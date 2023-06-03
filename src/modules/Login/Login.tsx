@@ -49,6 +49,8 @@ export const Login = (): JSX.Element => {
         reValidateMode: "onChange",
     });
 
+    const [revealPassword, setRevealPassword] = React.useState<boolean>(false);
+
     const { dirtyFields, errors, isDirty, isValidating } = formState;
 
     const login = React.useCallback(async (): Promise<void> => {
@@ -78,6 +80,10 @@ export const Login = (): JSX.Element => {
             }
         }
     }, [dirtyFields, errors, isDirty, getValues, router]);
+
+    const toggleRevealPassword = React.useCallback(() => {
+        setRevealPassword((oldRevealPassword: boolean) => !oldRevealPassword);
+    }, []);
 
     return (
         <>
@@ -164,7 +170,7 @@ export const Login = (): JSX.Element => {
                                 id="login_password_form"
                                 placeholder="Enter your password"
                                 tabIndex={0}
-                                type="password"
+                                type={revealPassword ? "text" : "password"}
                                 {...register("password")}
                             />
                             <label
@@ -174,6 +180,17 @@ export const Login = (): JSX.Element => {
                                 {"Password"}
                             </label>
                         </Form.Floating>
+                        <Button
+                            className={styles.login_form_reveal_password_button}
+                            onClick={toggleRevealPassword}
+                            variant="outline-light"
+                        >
+                            <i
+                                className={`fa-solid ${
+                                    revealPassword ? "fa-eye-slash" : "fa-eye"
+                                }`}
+                            />
+                        </Button>
                         <InputGroup.Text
                             className={styles.login_form_control_icon}
                         >
