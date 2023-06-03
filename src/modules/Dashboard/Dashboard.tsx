@@ -136,6 +136,34 @@ export const Dashboard = ({
         setShowPostsOffCanvas(false);
     }, []);
 
+    const keyboardShortcuts = React.useCallback(
+        async (event: KeyboardEvent) => {
+            const { key, shiftKey } = event;
+            if (shiftKey) {
+                if (key.toLocaleLowerCase() === "p") {
+                    setShowAddPostModal((oldValue: boolean) => !oldValue);
+                } else if (key.toLocaleLowerCase() === "e") {
+                    setShowEditUsernameModal((oldValue: boolean) => !oldValue);
+                } else if (key.toLocaleLowerCase() === "l") {
+                    await logout();
+                } else if (key.toLocaleLowerCase() === "v") {
+                    setShowPostsOffCanvas((oldValue: boolean) => !oldValue);
+                } else if (key.toLocaleLowerCase() === "r") {
+                    await requestAdminAccess();
+                }
+            }
+        },
+        [logout, requestAdminAccess],
+    );
+
+    React.useEffect(() => {
+        document.addEventListener("keydown", keyboardShortcuts);
+
+        return () => {
+            document.removeEventListener("keydown", keyboardShortcuts);
+        };
+    }, [keyboardShortcuts]);
+
     return (
         <>
             <Head>
