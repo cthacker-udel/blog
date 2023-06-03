@@ -9,12 +9,25 @@
     text-align: center;
     justify-content: center !important;
     font-family: "DynaPuff", sans-serif;
+    flex-direction: row;
+    gap: 0.3em;
+}
+
+.posts_offcanvas_body {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
 }
 
 .posts_post_listing {
     display: flex;
     flex-direction: row;
     gap: 1em;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.5em;
+    border: 1px solid rgba(253, 232, 45, 0.5);
+    border-radius: 1em;
 }
 
 .posts_post_title {

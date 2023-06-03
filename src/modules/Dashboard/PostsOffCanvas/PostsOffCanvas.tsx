@@ -50,9 +50,10 @@ export const PostsOffCanvas = ({
         >
             <Offcanvas.Header className={styles.posts_offcanvas_header}>
                 {"Posts"}
+                <i className="fa-solid fa-signs-post fa-md" />
             </Offcanvas.Header>
             <hr />
-            <Offcanvas.Body>
+            <Offcanvas.Body className={styles.posts_offcanvas_body}>
                 {posts.length > 0 ? (
                     posts.map((eachPost: Post) => (
                         <div
