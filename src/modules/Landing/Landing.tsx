@@ -1,6 +1,5 @@
 /* eslint-disable camelcase -- disabled */
-/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
-import { useRouter } from "next/router";
+import Link from "next/link";
 import React from "react";
 import { Button } from "react-bootstrap";
 
@@ -28,7 +27,6 @@ export const Landing = (): JSX.Element => {
         },
         ids: ["landing_button_container"],
     });
-    const router = useRouter();
 
     return (
         <>
@@ -42,22 +40,12 @@ export const Landing = (): JSX.Element => {
                 className={styles.button_container}
                 id="landing_button_container"
             >
-                <Button
-                    onClick={(): void => {
-                        router.push("/login");
-                    }}
-                    variant="outline-primary"
-                >
-                    {"Login"}
-                </Button>
-                <Button
-                    onClick={(): void => {
-                        router.push("/signup");
-                    }}
-                    variant="outline-secondary"
-                >
-                    {"Sign Up"}
-                </Button>
+                <Link href="/login">
+                    <Button variant="outline-primary">{"Login"}</Button>
+                </Link>
+                <Link href="/signup">
+                    <Button variant="outline-secondary">{"Sign Up"}</Button>
+                </Link>
             </div>
         </>
     );

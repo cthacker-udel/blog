@@ -41,3 +41,11 @@
 .button_container > button {
     width: 50%;
 }
+
+.button_container > a {
+    width: 50%;
+}
+
+.button_container > a > button {
+    width: 100%;
+}
