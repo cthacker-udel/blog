@@ -138,8 +138,8 @@ export const Dashboard = ({
 
     const keyboardShortcuts = React.useCallback(
         async (event: KeyboardEvent) => {
-            const { key, shiftKey } = event;
-            if (shiftKey) {
+            const { ctrlKey, key, shiftKey } = event;
+            if (shiftKey && ctrlKey) {
                 if (key.toLocaleLowerCase() === "p") {
                     setShowAddPostModal((oldValue: boolean) => !oldValue);
                 } else if (key.toLocaleLowerCase() === "e") {

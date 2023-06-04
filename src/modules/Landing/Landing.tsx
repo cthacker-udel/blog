@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { Button } from "react-bootstrap";
+import { Key } from "ts-key-enum";
 
 import { SimulateTyping } from "@/common";
 import { useBackground, useCancelAnimations, useLayoutInjector } from "@/hooks";
@@ -33,11 +34,11 @@ export const Landing = (): JSX.Element => {
 
     const keyboardShortcuts = React.useCallback(
         (event: KeyboardEvent) => {
-            const { key, shiftKey } = event;
-            if (shiftKey) {
-                if (key.toLocaleLowerCase() === "l") {
+            const { ctrlKey, key, shiftKey } = event;
+            if (shiftKey && ctrlKey) {
+                if (key === Key.ArrowRight) {
                     router.push("/login");
-                } else if (key.toLocaleLowerCase() === "s") {
+                } else if (key === Key.ArrowLeft) {
                     router.push("/signup");
                 }
             }

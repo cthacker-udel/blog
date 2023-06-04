@@ -104,11 +104,11 @@ export const Login = (): JSX.Element => {
 
     const keyboardShortcuts = React.useCallback(
         (event: KeyboardEvent) => {
-            const { key, shiftKey } = event;
-            if (shiftKey) {
-                if (key.toLocaleLowerCase() === "s") {
+            const { ctrlKey, key, shiftKey } = event;
+            if (shiftKey && ctrlKey) {
+                if (key === Key.ArrowRight) {
                     router.push("/signup");
-                } else if (key.toLocaleLowerCase() === "d") {
+                } else if (key === Key.ArrowLeft) {
                     router.push("/");
                 }
             }
