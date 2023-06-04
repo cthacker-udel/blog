@@ -1,3 +1,4 @@
+/* eslint-disable node/no-unpublished-import -- disabled, is published */
 /* eslint-disable @typescript-eslint/no-explicit-any -- disabled */
 import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
