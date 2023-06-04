@@ -94,6 +94,30 @@ export const SignUp = (): JSX.Element => {
         }
     }, [dirtyFields, errors, isDirty, getValues, isPasswordValid, router]);
 
+    const keyboardShortcuts = React.useCallback(
+        (event: KeyboardEvent) => {
+            const { key, shiftKey } = event;
+            if (shiftKey) {
+                if (key.toLocaleLowerCase() === "d") {
+                    router.push("/");
+                } else if (key.toLocaleLowerCase() === "l") {
+                    router.push("/login");
+                }
+            }
+        },
+        [router],
+    );
+
+    React.useEffect(() => {
+        router.prefetch("/");
+        router.prefetch("/login");
+        document.addEventListener("keydown", keyboardShortcuts);
+
+        return () => {
+            document.removeEventListener("keydown", keyboardShortcuts);
+        };
+    }, [keyboardShortcuts, router]);
+
     return (
         <>
             <Head>

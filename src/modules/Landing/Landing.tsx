@@ -46,12 +46,14 @@ export const Landing = (): JSX.Element => {
     );
 
     React.useEffect(() => {
+        router.prefetch("/login");
+        router.prefetch("/signup");
         document.addEventListener("keydown", keyboardShortcuts);
 
         return () => {
             document.removeEventListener("keydown", keyboardShortcuts);
         };
-    }, [keyboardShortcuts]);
+    }, [keyboardShortcuts, router]);
 
     return (
         <>

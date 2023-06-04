@@ -102,6 +102,30 @@ export const Login = (): JSX.Element => {
         [dirtyFields, errors, isDirty, login, toggleRevealPassword],
     );
 
+    const keyboardShortcuts = React.useCallback(
+        (event: KeyboardEvent) => {
+            const { key, shiftKey } = event;
+            if (shiftKey) {
+                if (key.toLocaleLowerCase() === "s") {
+                    router.push("/signup");
+                } else if (key.toLocaleLowerCase() === "d") {
+                    router.push("/");
+                }
+            }
+        },
+        [router],
+    );
+
+    React.useEffect(() => {
+        router.prefetch("/signup");
+        router.prefetch("/");
+        document.addEventListener("keydown", keyboardShortcuts);
+
+        return () => {
+            document.removeEventListener("keydown", keyboardShortcuts);
+        };
+    }, [keyboardShortcuts, router]);
+
     return (
         <>
             <Head>
