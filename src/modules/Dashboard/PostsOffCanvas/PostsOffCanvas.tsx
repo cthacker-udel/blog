@@ -3,6 +3,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { Offcanvas } from "react-bootstrap";
+import DotLoader from "react-spinners/DotLoader";
 
 import type { Post } from "@/@types";
 import { UserService } from "@/api/service";
@@ -27,10 +28,15 @@ export const PostsOffCanvas = ({
     showPostsOffCanvas,
 }: PostsOffCanvasProperties): JSX.Element => {
     const [posts, setPosts] = React.useState<Post[]>([]);
+    const [isLoadingPosts, setIsLoadingPosts] = React.useState<boolean>(true);
+    const [isPending, startTransition] = React.useTransition();
 
-    const fetchPosts = React.useCallback(async (): Promise<void> => {
-        const { data } = await new UserService().authoredPosts();
-        setPosts(data);
+    const fetchPosts = React.useCallback((): void => {
+        startTransition(async () => {
+            const { data } = await new UserService().authoredPosts();
+            setPosts(data);
+            setIsLoadingPosts(false);
+        });
     }, []);
 
     React.useEffect(() => {
@@ -54,7 +60,14 @@ export const PostsOffCanvas = ({
             </Offcanvas.Header>
             <hr />
             <Offcanvas.Body className={styles.posts_offcanvas_body}>
-                {posts.length > 0 ? (
+                {isLoadingPosts || isPending ? (
+                    <div className={styles.loading_posts_container}>
+                        <div className={styles.loading_posts_title}>
+                            {"Loading"}
+                        </div>
+                        <DotLoader color="yellow" />
+                    </div>
+                ) : posts.length > 0 ? (
                     posts.map((eachPost: Post) => (
                         <div
                             className={styles.posts_post_listing}
