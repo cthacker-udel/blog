@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 /* eslint-disable camelcase -- disabled */
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 import { Button } from "react-bootstrap";
 
@@ -27,6 +29,29 @@ export const Landing = (): JSX.Element => {
         },
         ids: ["landing_button_container"],
     });
+    const router = useRouter();
+
+    const keyboardShortcuts = React.useCallback(
+        (event: KeyboardEvent) => {
+            const { key, shiftKey } = event;
+            if (shiftKey) {
+                if (key.toLocaleLowerCase() === "l") {
+                    router.push("/login");
+                } else if (key.toLocaleLowerCase() === "s") {
+                    router.push("/signup");
+                }
+            }
+        },
+        [router],
+    );
+
+    React.useEffect(() => {
+        document.addEventListener("keydown", keyboardShortcuts);
+
+        return () => {
+            document.removeEventListener("keydown", keyboardShortcuts);
+        };
+    }, [keyboardShortcuts]);
 
     return (
         <>
