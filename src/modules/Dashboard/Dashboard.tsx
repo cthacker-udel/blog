@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { Button, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
+import { GridLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 
@@ -55,11 +56,10 @@ export const Dashboard = ({
     useSession();
     useNotifications();
 
-    const { data: mostRecentPosts } = useSWR<
-        ApiResponse<MostRecentPost[]>,
-        Error,
-        string
-    >(`${Endpoints.POST.BASE}${Endpoints.POST.MOST_RECENT}`);
+    const { data: mostRecentPosts, isLoading: isMostRecentPostsLoading } =
+        useSWR<ApiResponse<MostRecentPost[]>, Error, string>(
+            `${Endpoints.POST.BASE}${Endpoints.POST.MOST_RECENT}`,
+        );
 
     const router = useRouter();
 
@@ -170,8 +170,15 @@ export const Dashboard = ({
                 <title>{"Dashboard"}</title>
             </Head>
             <div className={styles.each_post_container}>
-                {mostRecentPosts?.data.length !== undefined &&
-                mostRecentPosts.data.length > 0 ? (
+                {isMostRecentPostsLoading ? (
+                    <div className={styles.loading_posts_container}>
+                        <div className={styles.loading_posts_title}>
+                            {"Loading Posts"}
+                        </div>
+                        <GridLoader color="blue" size={30} />
+                    </div>
+                ) : mostRecentPosts?.data.length !== undefined &&
+                  mostRecentPosts.data.length > 0 ? (
                     mostRecentPosts?.data.map((eachPost: MostRecentPost) => (
                         <DashboardPost
                             key={eachPost._id?.toString() ?? ""}
