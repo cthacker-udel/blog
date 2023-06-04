@@ -262,6 +262,24 @@ export const Post = ({
         setEditPost((oldValue: boolean) => !oldValue);
     }, []);
 
+    const keyboardShortcuts = React.useCallback(
+        (event: KeyboardEvent) => {
+            const { ctrlKey, key, shiftKey } = event;
+            if (ctrlKey && shiftKey && key === Key.ArrowDown) {
+                router.push("/dashboard");
+            }
+        },
+        [router],
+    );
+
+    React.useEffect(() => {
+        document.addEventListener("keydown", keyboardShortcuts);
+
+        return () => {
+            document.removeEventListener("keydown", keyboardShortcuts);
+        };
+    }, [keyboardShortcuts]);
+
     if (
         postId === undefined ||
         isLoading ||
