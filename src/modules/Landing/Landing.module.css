@@ -49,3 +49,14 @@
 .button_container > a > button {
     width: 100%;
 }
+
+.landing_container_skip_notif {
+    position: absolute;
+    left: 87%;
+    bottom: 90%;
+}
+
+.landing_container_skip_notif_alert {
+    width: fit-content;
+    font-size: 0.85em;
+}

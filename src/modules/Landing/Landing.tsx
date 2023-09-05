@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
-import { Button } from "react-bootstrap";
+import { Alert, Button } from "react-bootstrap";
 import { Key } from "ts-key-enum";
 
 import { SimulateTyping } from "@/common";
@@ -58,6 +58,14 @@ export const Landing = (): JSX.Element => {
 
     return (
         <>
+            <div className={styles.landing_container_skip_notif}>
+                <Alert
+                    className={`opacity-50 ${styles.landing_container_skip_notif_alert}`}
+                    variant="secondary"
+                >
+                    {"Press Enter to skip animation"}
+                </Alert>
+            </div>
             <div className={styles.landing_container}>
                 <SimulateTyping
                     className={styles.landing_title}
