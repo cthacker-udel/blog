@@ -5,15 +5,13 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
-import { Button, OverlayTrigger } from "react-bootstrap";
-import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 import { GridLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 
 import type { ApiResponse, MostRecentPost } from "@/@types";
 import { AdminService, UserService } from "@/api/service";
-import { generateTooltip, UserRoles } from "@/common";
+import { UserRoles } from "@/common";
 import { Endpoints } from "@/constants";
 import {
     useBackground,
@@ -24,6 +22,7 @@ import {
 
 import { AddPostModal } from "./AddPostModal";
 import styles from "./Dashboard.module.css";
+import { DashboardOption } from "./DashboardOption";
 import { DashboardPost } from "./DashboardPost";
 import { EditUsernameModal } from "./EditUsernameModal";
 import { PostsOffCanvas } from "./PostsOffCanvas";
@@ -191,368 +190,82 @@ export const Dashboard = ({
                     </div>
                 )}
             </div>
-            <OverlayTrigger
-                overlay={(properties: OverlayInjectedProps): JSX.Element =>
-                    generateTooltip({ content: "Log Out", props: properties })
-                }
-                placement="left"
-            >
-                <Button
-                    className={styles.logout_button}
-                    onClick={async (): Promise<void> => {
-                        await logout();
-                    }}
-                    onMouseEnter={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (target !== null) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replaceAll(
-                                    "btn-secondary",
-                                    "btn-warning",
-                                );
-                            const icon = document.querySelector("#logout_icon");
-                            if (Boolean(icon) && icon !== null) {
-                                const convertedIcon = icon as HTMLElement;
-                                convertedIcon.className = `${convertedIcon.className} fa-fade`;
-                            }
-                        }
-                    }}
-                    onMouseLeave={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (target !== null) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replaceAll(
-                                    "btn-warning",
-                                    "btn-secondary",
-                                );
-                            const icon = document.querySelector("#logout_icon");
-                            if (Boolean(icon) && icon !== null) {
-                                const convertedIcon = icon as HTMLElement;
-                                convertedIcon.className =
-                                    convertedIcon.className.replaceAll(
-                                        " fa-fade",
-                                        "",
-                                    );
-                            }
-                        }
-                    }}
-                    variant="secondary"
-                >
-                    <i className="fa-solid fa-share" id="logout_icon" />
-                </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-                overlay={(properties: OverlayInjectedProps): JSX.Element =>
-                    generateTooltip({
-                        content: "Edit Username",
-                        props: properties,
-                    })
-                }
-                placement="left"
-            >
-                <Button
-                    className={styles.change_username_button}
-                    onClick={(): void => {
-                        setShowEditUsernameModal(true);
-                    }}
-                    onMouseEnter={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-info",
-                                    "btn-primary",
-                                );
-                            const icon = document.querySelector(
-                                "#edit_username_icon",
-                            );
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = `${icon.className} fa-beat`;
-                            }
-                        }
-                    }}
-                    onMouseLeave={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-primary",
-                                    "btn-info",
-                                );
-                            const icon = document.querySelector(
-                                "#edit_username_icon",
-                            );
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = icon.className.replaceAll(
-                                    " fa-beat",
-                                    "",
-                                );
-                            }
-                        }
-                    }}
-                    variant="danger"
-                >
-                    <i
-                        className="fa-solid fa-user-pen"
-                        id="edit_username_icon"
+            <DashboardOption
+                buttonEndingGradient="btn-warning"
+                buttonFAAnimation="fa-fade"
+                buttonIconClassName="fa-solid fa-share"
+                buttonIconId="logout_icon"
+                buttonStartingGradient="btn-secondary"
+                buttonVariant="secondary"
+                customButtonStyle={styles.logout_button}
+                onClick={async (): Promise<void> => {
+                    await logout();
+                }}
+                overlayTriggerTooltipContent={"Log Out"}
+            />
+            <DashboardOption
+                buttonEndingGradient="btn-primary"
+                buttonFAAnimation="fa-beat"
+                buttonIconClassName="fa-solid fa-user-pen"
+                buttonIconId="edit_username_icon"
+                buttonStartingGradient="btn-info"
+                buttonVariant="danger"
+                customButtonStyle={styles.change_username_button}
+                onClick={setShowEditUsernameModal}
+                overlayTriggerTooltipContent={"Edit Username"}
+            />
+            <DashboardOption
+                buttonEndingGradient="btn-info"
+                buttonFAAnimation="fa-flip"
+                buttonIconClassName="fa-solid fa-unlock"
+                buttonIconId="request_admin_access_icon"
+                buttonStartingGradient="btn-info"
+                buttonVariant="warning"
+                customButtonStyle={styles.request_admin_access_button}
+                onClick={async (): Promise<void> => {
+                    await requestAdminAccess();
+                }}
+                overlayTriggerTooltipContent={"Request Admin Access"}
+            />
+            <DashboardOption
+                buttonEndingGradient="btn-primary"
+                buttonFAAnimation="fa-spin"
+                buttonIconClassName="fa-solid fa-info"
+                buttonIconId="user_info_icon"
+                buttonStartingGradient="btn-info"
+                customButtonStyle={styles.user_info_button}
+                overlayTriggerTooltipContent={
+                    <UserInfo
+                        createdAt={createdAt}
+                        role={role}
+                        username={username}
                     />
-                </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-                overlay={(properties: OverlayInjectedProps): JSX.Element =>
-                    generateTooltip({
-                        content: "Request Admin Access",
-                        props: properties,
-                    })
                 }
-                placement="left"
-            >
-                <Button
-                    className={styles.request_admin_access_button}
-                    onClick={async (): Promise<void> => {
-                        await requestAdminAccess();
-                    }}
-                    onMouseEnter={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-primary",
-                                    "btn-info",
-                                );
-                            const icon = document.querySelector(
-                                "#request_admin_access_icon",
-                            );
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = `${icon.className} fa-flip`;
-                            }
-                        }
-                    }}
-                    onMouseLeave={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-primary",
-                                    "btn-info",
-                                );
-                            const icon = document.querySelector(
-                                "#request_admin_access_icon",
-                            );
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = icon.className.replaceAll(
-                                    " fa-flip",
-                                    "",
-                                );
-                            }
-                        }
-                    }}
-                    variant="warning"
-                >
-                    <i
-                        className="fa-solid fa-unlock"
-                        id="request_admin_access_icon"
-                    />
-                </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-                overlay={(properties: OverlayInjectedProps): JSX.Element =>
-                    generateTooltip({
-                        content: (
-                            <UserInfo
-                                createdAt={createdAt}
-                                role={role}
-                                username={username}
-                            />
-                        ),
-                        props: properties,
-                    })
-                }
-                placement="left"
-            >
-                <div
-                    className={styles.user_info_button}
-                    onMouseEnter={(
-                        event: React.MouseEvent<HTMLDivElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLDivElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-primary",
-                                    "btn-info",
-                                );
-                            const icon =
-                                document.querySelector("#user_info_icon");
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = `${icon.className} fa-spin`;
-                            }
-                        }
-                    }}
-                    onMouseLeave={(
-                        event: React.MouseEvent<HTMLDivElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLDivElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-primary",
-                                    "btn-info",
-                                );
-                            const icon =
-                                document.querySelector("#user_info_icon");
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = icon.className.replaceAll(
-                                    " fa-spin",
-                                    "",
-                                );
-                            }
-                        }
-                    }}
-                >
-                    <i className="fa-solid fa-info" id="user_info_icon" />
-                </div>
-            </OverlayTrigger>
+            />
             {role === UserRoles.ADMIN && (
-                <OverlayTrigger
-                    overlay={(properties: OverlayInjectedProps): JSX.Element =>
-                        generateTooltip({
-                            content: "Add Post",
-                            props: properties,
-                        })
-                    }
-                    placement="left"
-                >
-                    <Button
-                        className={styles.add_post_button}
-                        onClick={(): void => {
-                            setShowAddPostModal(true);
-                        }}
-                        onMouseEnter={(
-                            event: React.MouseEvent<HTMLButtonElement>,
-                        ): void => {
-                            const { target } = event;
-                            if (Boolean(target)) {
-                                const convertedTarget =
-                                    target as HTMLButtonElement;
-                                convertedTarget.className =
-                                    convertedTarget.className.replace(
-                                        "btn-dark",
-                                        "btn-light",
-                                    );
-                                const icon =
-                                    document.querySelector("#add_post_icon");
-                                if (Boolean(icon) && icon !== null) {
-                                    icon.className = `${icon.className} fa-shake`;
-                                }
-                            }
-                        }}
-                        onMouseLeave={(
-                            event: React.MouseEvent<HTMLButtonElement>,
-                        ): void => {
-                            const { target } = event;
-                            if (Boolean(target)) {
-                                const convertedTarget =
-                                    target as HTMLButtonElement;
-                                convertedTarget.className =
-                                    convertedTarget.className.replace(
-                                        "btn-light",
-                                        "btn-dark",
-                                    );
-                                const icon =
-                                    document.querySelector("#add_post_icon");
-                                if (Boolean(icon) && icon !== null) {
-                                    icon.className = icon.className.replaceAll(
-                                        " fa-shake",
-                                        "",
-                                    );
-                                }
-                            }
-                        }}
-                        variant="dark"
-                    >
-                        <i className="fa-solid fa-plus" id="add_post_icon" />
-                    </Button>
-                </OverlayTrigger>
+                <DashboardOption
+                    buttonEndingGradient="btn-light"
+                    buttonFAAnimation="fa-shake"
+                    buttonIconClassName="fa-solid fa-plus"
+                    buttonIconId="add_post_icon"
+                    buttonStartingGradient="btn-dark"
+                    buttonVariant="dark"
+                    customButtonStyle={styles.add_post_button}
+                    onClick={setShowAddPostModal}
+                    overlayTriggerTooltipContent="Add Post"
+                />
             )}
-            <OverlayTrigger
-                overlay={(properties: OverlayInjectedProps): JSX.Element =>
-                    generateTooltip({
-                        content: "View Posts",
-                        props: properties,
-                    })
-                }
-                placement="left"
-            >
-                <Button
-                    className={styles.view_posts_button}
-                    onClick={(): void => {
-                        setShowPostsOffCanvas(true);
-                    }}
-                    onMouseEnter={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-primary",
-                                    "btn-info",
-                                );
-                            const icon =
-                                document.querySelector("#view_posts_icon");
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = `${icon.className} fa-bounce`;
-                            }
-                        }
-                    }}
-                    onMouseLeave={(
-                        event: React.MouseEvent<HTMLButtonElement>,
-                    ): void => {
-                        const { target } = event;
-                        if (Boolean(target)) {
-                            const convertedTarget = target as HTMLButtonElement;
-                            convertedTarget.className =
-                                convertedTarget.className.replace(
-                                    "btn-primary",
-                                    "btn-info",
-                                );
-                            const icon =
-                                document.querySelector("#view_posts_icon");
-                            if (Boolean(icon) && icon !== null) {
-                                icon.className = icon.className.replaceAll(
-                                    " fa-bounce",
-                                    "",
-                                );
-                            }
-                        }
-                    }}
-                    variant="success"
-                >
-                    <i className="fa-solid fa-eye" id="view_posts_icon" />
-                </Button>
-            </OverlayTrigger>
+            <DashboardOption
+                buttonEndingGradient="btn-primary"
+                buttonFAAnimation="fa-bounce"
+                buttonIconClassName="fa-solid fa-eye"
+                buttonIconId="view_posts_icon"
+                buttonStartingGradient="fa-info"
+                buttonVariant="success"
+                customButtonStyle={styles.view_posts_button}
+                onClick={setShowPostsOffCanvas}
+                overlayTriggerTooltipContent="View Posts"
+            />
             <EditUsernameModal
                 onHide={closeEditUsernameModal}
                 showEditUsernameModal={showEditUsernameModal}

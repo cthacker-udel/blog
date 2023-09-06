@@ -60,10 +60,14 @@ export const Landing = (): JSX.Element => {
         <>
             <div className={styles.landing_container_skip_notif}>
                 <Alert
-                    className={`opacity-50 ${styles.landing_container_skip_notif_alert}`}
+                    className={`${styles.landing_container_skip_notif_alert}`}
                     variant="secondary"
                 >
-                    {"Press Enter to skip animation"}
+                    <span>
+                        {"Press "}
+                        <b>{"Enter"}</b>
+                        {" to skip animation"}
+                    </span>
                 </Alert>
             </div>
             <div className={styles.landing_container}>

@@ -59,4 +59,5 @@
 .landing_container_skip_notif_alert {
     width: fit-content;
     font-size: 0.85em;
+    opacity: 35%;
 }

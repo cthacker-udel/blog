@@ -54,6 +54,7 @@
     align-items: center;
     justify-content: center;
     background-color: #0dcaf0;
+    cursor: default !important;
 }
 
 .add_post_button {
