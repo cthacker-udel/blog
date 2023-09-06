@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/indent -- disabled */
-/* eslint-disable sonarjs/no-duplicate-string -- disabled */
-/* eslint-disable no-extra-boolean-cast -- disabled */
-/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import React from "react";

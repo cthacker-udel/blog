@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 /* eslint-disable camelcase -- disabled */
 import Link from "next/link";
 import { useRouter } from "next/navigation";
