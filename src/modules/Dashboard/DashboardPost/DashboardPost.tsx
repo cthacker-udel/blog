@@ -104,7 +104,7 @@ export const DashboardPost = ({
                     <Button
                         className={styles.each_post_view}
                         onClick={viewPost}
-                        variant="secondary"
+                        variant="outline-dark"
                     >
                         <i className="fa-solid fa-eye" />
                     </Button>

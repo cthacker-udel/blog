@@ -16,7 +16,7 @@ import css from "highlight.js/lib/languages/css";
 import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
 import html from "highlight.js/lib/languages/xml";
-import { lowlight } from "lowlight";
+import { createLowlight } from "lowlight";
 import React from "react";
 import { Button, Form, Modal, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
@@ -38,10 +38,7 @@ type EditPostModalProperties = {
     updateTitle: (_updatedTitle: string) => void;
 };
 
-lowlight.registerLanguage("html", html);
-lowlight.registerLanguage("css", css);
-lowlight.registerLanguage("js", js);
-lowlight.registerLanguage("ts", ts);
+const lowlight = createLowlight({ css, html, js, ts });
 
 const editorToggleOffVariant = "outline-dark";
 const editorToggleOnVariant = "dark";
