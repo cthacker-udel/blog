@@ -3,7 +3,7 @@
 /* eslint-disable no-extra-boolean-cast -- disabled */
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 import Head from "next/head";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { GridLoader } from "react-spinners";
 import { toast } from "react-toastify";

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises -- disabled */
 /* eslint-disable camelcase -- disabled */
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { Alert, Button } from "react-bootstrap";
 import { Key } from "ts-key-enum";
