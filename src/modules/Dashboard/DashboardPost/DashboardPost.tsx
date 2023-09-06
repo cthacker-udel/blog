@@ -5,7 +5,7 @@ import { Button, OverlayTrigger } from "react-bootstrap";
 import type { OverlayInjectedProps } from "react-bootstrap/esm/Overlay";
 
 import type { MostRecentPost } from "@/@types";
-import { generateTooltip } from "@/common";
+import { generateTooltip, triggerLoading } from "@/common";
 import { truncate } from "@/common/helpers/truncate";
 
 import styles from "./DashboardPost.module.css";
@@ -30,6 +30,7 @@ export const DashboardPost = ({
     const router = useRouter();
 
     const viewPost = React.useCallback(() => {
+        triggerLoading();
         router.push(`/post/${_id?.toString()}`);
     }, [_id, router]);
 

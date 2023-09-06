@@ -5,3 +5,4 @@ export * from "./generatePopover";
 export * from "./generateRequestAdminAccessLink";
 export * from "./generateTooltip";
 export * from "./parseCookie";
+export * from "./triggerLoading";

@@ -10,7 +10,16 @@ import { ToastContainer } from "react-toastify";
 import { SWRConfig } from "swr/_internal";
 
 import type { ApiResponse } from "@/@types";
-import { Layout } from "@/common";
+import { Layout, LoadingIndicator, triggerLoading } from "@/common";
+
+if (typeof window !== "undefined") {
+    document.addEventListener("readystatechange", (ev: Event) => {
+        triggerLoading(true);
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        triggerLoading();
+    });
+}
 
 /**
  * Used to initialize pages, control the page initialization and persist layouts between page
@@ -44,6 +53,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => (
                 <Component {...pageProps} />
             </Layout>
         </SWRConfig>
+        <LoadingIndicator />
         <ToastContainer
             autoClose={5000}
             closeOnClick
@@ -56,7 +66,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => (
             rtl={false}
             theme="light"
         />
-        <Analytics />
     </>
 );
 
